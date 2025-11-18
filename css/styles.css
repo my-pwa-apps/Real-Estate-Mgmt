@@ -1,9 +1,4 @@
 /* ========================================
-   FONTS
-   ======================================== */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600;700&display=swap');
-
-/* ========================================
    GENERAL STYLES & RESET
    ======================================== */
 * {
@@ -41,26 +36,13 @@
     
     --sidebar-width: 260px;
     --header-height: 70px;
-    
-    /* Typography */
-    --font-heading: 'Playfair Display', Georgia, serif;
-    --font-body: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 body {
-    font-family: var(--font-body);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: var(--bg-secondary);
     color: var(--text-primary);
-    line-height: 1.7;
-    font-weight: 400;
-    letter-spacing: 0.01em;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--primary-color);
+    line-height: 1.6;
 }
 
 /* ========================================
@@ -122,6 +104,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 20px;
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
     transition: transform 0.3s ease;
+    display: block;
 }
 
 .logo-section .logo:hover {
@@ -132,12 +115,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 28px;
     color: var(--primary-color);
     margin-bottom: 8px;
-    font-family: var(--font-heading);
     font-weight: 700;
-}
-
-.logo-fallback {
-    display: none;
 }
 
 .subtitle {
@@ -380,7 +358,6 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 22px;
     color: var(--primary-color);
     font-weight: 700;
-    font-family: var(--font-heading);
 }
 
 .sidebar-header .sidebar-logo {
@@ -487,8 +464,6 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 32px;
     font-weight: 700;
     color: var(--primary-color);
-    font-family: var(--font-heading);
-    letter-spacing: -0.5px;
 }
 
 .user-info {
@@ -573,8 +548,6 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 4px;
-    font-family: var(--font-heading);
-    letter-spacing: -0.5px;
 }
 
 .stat-content p {
@@ -612,7 +585,6 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     color: var(--primary-color);
     margin-bottom: 24px;
-    font-family: var(--font-heading);
 }
 
 .card-header {
@@ -785,7 +757,6 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    font-family: var(--font-body);
 }
 
 .data-table td {
@@ -1056,8 +1027,6 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 14px;
     font-weight: 600;
     color: var(--primary-color);
-    font-family: var(--font-body);
-    letter-spacing: 0.3px;
 }
 
 .form-group input,
@@ -1068,7 +1037,7 @@ h1, h2, h3, h4, h5, h6 {
     border: 2px solid var(--border-color);
     border-radius: 10px;
     font-size: 14px;
-    font-family: var(--font-body);
+    font-family: inherit;
     background: var(--bg-primary);
     transition: all 0.3s ease;
 }
