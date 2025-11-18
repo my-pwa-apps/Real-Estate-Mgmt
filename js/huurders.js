@@ -12,14 +12,27 @@ const huurderForm = document.getElementById('huurderForm');
 // Load all huurders
 async function loadHuurders() {
     try {
+        if (typeof showLoading === 'function') {
+            showLoading('Huurders laden...');
+        }
         huurders = await dbGetAll('huurders');
         // Sort by last name
         huurders.sort((a, b) => (a.achternaam || '').localeCompare(b.achternaam || ''));
         filteredHuurders = [...huurders];
         renderHuurders();
+        if (typeof hideLoading === 'function') {
+            hideLoading();
+        }
     } catch (error) {
         console.error('Error loading huurders:', error);
-        alert('Fout bij het laden van huurders');
+        if (typeof hideLoading === 'function') {
+            hideLoading();
+        }
+        if (typeof showToast === 'function') {
+            showToast('Fout bij het laden van huurders', 'error');
+        } else {
+            alert('Fout bij het laden van huurders');
+        }
     }
 }
 
@@ -89,17 +102,22 @@ huurderForm.addEventListener('submit', async (e) => {
     const huurderId = document.getElementById('huurderId').value;
 
     try {
+        showLoading(huurderId ? 'Huurder bijwerken...' : 'Huurder opslaan...');
+        
         if (huurderId) {
             await dbUpdate('huurders', huurderId, huurderData);
+            showToast('Huurder succesvol bijgewerkt', 'success');
         } else {
             await dbAdd('huurders', huurderData);
+            showToast('Huurder succesvol toegevoegd', 'success');
         }
 
         closeModalWindow();
         await loadHuurders();
     } catch (error) {
         console.error('Error saving huurder:', error);
-        alert('Fout bij het opslaan van de huurder');
+        hideLoading();
+        showToast('Fout bij het opslaan van de huurder', 'error');
     }
 });
 

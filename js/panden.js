@@ -13,14 +13,27 @@ const pandForm = document.getElementById('pandForm');
 // Load all panden
 async function loadPanden() {
     try {
+        if (typeof showLoading === 'function') {
+            showLoading('Panden laden...');
+        }
         panden = await dbGetAll('panden');
         // Sort by address
         panden.sort((a, b) => (a.adres || '').localeCompare(b.adres || ''));
         filteredPanden = [...panden];
         renderPanden();
+        if (typeof hideLoading === 'function') {
+            hideLoading();
+        }
     } catch (error) {
         console.error('Error loading panden:', error);
-        alert('Fout bij het laden van panden');
+        if (typeof hideLoading === 'function') {
+            hideLoading();
+        }
+        if (typeof showToast === 'function') {
+            showToast('Fout bij het laden van panden', 'error');
+        } else {
+            alert('Fout bij het laden van panden');
+        }
     }
 }
 
@@ -91,19 +104,24 @@ pandForm.addEventListener('submit', async (e) => {
     const pandId = document.getElementById('pandId').value;
 
     try {
+        showLoading(pandId ? 'Pand bijwerken...' : 'Pand opslaan...');
+        
         if (pandId) {
             // Update existing pand
             await dbUpdate('panden', pandId, pandData);
+            showToast('Pand succesvol bijgewerkt', 'success');
         } else {
             // Create new pand
             await dbAdd('panden', pandData);
+            showToast('Pand succesvol toegevoegd', 'success');
         }
 
         closeModalWindow();
         await loadPanden();
     } catch (error) {
         console.error('Error saving pand:', error);
-        alert('Fout bij het opslaan van het pand');
+        hideLoading();
+        showToast('Fout bij het opslaan van het pand', 'error');
     }
 });
 
@@ -129,14 +147,18 @@ async function editPand(id) {
 
 // Delete pand
 async function deletePand(id) {
-    if (!confirm('Weet u zeker dat u dit pand wilt verwijderen?')) return;
+    const confirmed = await showConfirm('Weet u zeker dat u dit pand wilt verwijderen?', 'Pand verwijderen');
+    if (!confirmed) return;
 
     try {
+        showLoading('Pand verwijderen...');
         await dbDelete('panden', id);
+        showToast('Pand succesvol verwijderd', 'success');
         await loadPanden();
     } catch (error) {
         console.error('Error deleting pand:', error);
-        alert('Fout bij het verwijderen van het pand');
+        hideLoading();
+        showToast('Fout bij het verwijderen van het pand', 'error');
     }
 }
 

@@ -8,6 +8,10 @@ let meldingen = [];
 // Load dashboard data
 async function loadDashboardData() {
     try {
+        if (typeof showLoading === 'function') {
+            showLoading('Dashboard laden...');
+        }
+        
         // Load all data from Realtime Database
         const [pandenData, huurdersData, contractenData, meldingenData] = await Promise.all([
             dbGetAll('panden'),
@@ -24,8 +28,18 @@ async function loadDashboardData() {
         updateStatistics();
         loadRecentMeldingen();
         loadVerlopendeContracten();
+        
+        if (typeof hideLoading === 'function') {
+            hideLoading();
+        }
     } catch (error) {
         console.error('Error loading dashboard data:', error);
+        if (typeof hideLoading === 'function') {
+            hideLoading();
+        }
+        if (typeof showToast === 'function') {
+            showToast('Fout bij laden dashboard gegevens', 'error');
+        }
     }
 }
 
