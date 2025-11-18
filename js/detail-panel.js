@@ -362,6 +362,15 @@ function generateOnderhoudDetail(onderhoud) {
             ` : ''}
         </div>
         <div class="detail-actions">
+            ${!onderhoud.werkbonId ? `
+            <button class="btn-primary" onclick="createWerkbon('${onderhoud.id}'); closeDetailPanel();" style="background: var(--success-color);">
+                📄 Werkbon Aanmaken
+            </button>
+            ` : `
+            <button class="btn-secondary" onclick="showToast('Werkbon ${onderhoud.werkbonNummer || 'reeds aangemaakt'}', 'info')">
+                ✅ Werkbon Gemaakt
+            </button>
+            `}
             <button class="btn-primary" onclick="editOnderhoud('${onderhoud.id}'); closeDetailPanel();">
                 ✏️ Bewerken
             </button>

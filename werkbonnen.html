@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Werkbonnen - Stadsgezicht Ontwikkelingen</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/enhancements.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/stadsgezicht-logo.jpg" alt="Stadsgezicht" class="sidebar-logo">
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="panden.html" class="nav-item">
+                    <span class="icon">🏢</span>
+                    Panden
+                </a>
+                <a href="huurders.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    Huurders
+                </a>
+                <a href="contracten.html" class="nav-item">
+                    <span class="icon">📄</span>
+                    Contracten
+                </a>
+                <a href="onderhoud.html" class="nav-item">
+                    <span class="icon">🔧</span>
+                    Onderhoud
+                </a>
+                <a href="werkbonnen.html" class="nav-item active">
+                    <span class="icon">📋</span>
+                    Werkbonnen
+                </a>
+                <a href="financieel.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    Financieel
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-secondary">
+                    <span class="icon">🚪</span>
+                    Uitloggen
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Werkbonnen Overzicht</h1>
+            </header>
+
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="statusFilter">Status:</label>
+                    <select id="statusFilter">
+                        <option value="">Alle</option>
+                        <option value="aangemaakt">Aangemaakt</option>
+                        <option value="verstuurd">Verstuurd</option>
+                        <option value="gepland">Gepland</option>
+                        <option value="in-uitvoering">In uitvoering</option>
+                        <option value="afgerond">Afgerond</option>
+                        <option value="goedgekeurd">Goedgekeurd</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="jaarFilter">Jaar:</label>
+                    <select id="jaarFilter">
+                        <option value="">Alle jaren</option>
+                    </select>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Zoek op werkbonnummer of adres...">
+                </div>
+            </div>
+
+            <div id="werkbonnenList" class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Werkbonnummer</th>
+                            <th>Adres</th>
+                            <th>Titel</th>
+                            <th>Prioriteit</th>
+                            <th>Status</th>
+                            <th>Aangemaakt</th>
+                            <th>Kosten</th>
+                            <th>Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody id="werkbonnenTableBody">
+                        <tr>
+                            <td colspan="8" class="empty-state">Geen werkbonnen gevonden.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- MSAL.js for Microsoft 365 -->
+    <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/ui-utilities.js"></script>
+    <script src="js/demo-data.js"></script>
+    <script src="js/entra-auth.js"></script>
+    <script src="js/db-helpers.js"></script>
+    <script src="js/app-init.js"></script>
+    <script src="js/detail-panel.js"></script>
+    <script src="js/microsoft-auth.js"></script>
+    <script src="js/sharepoint-helpers.js"></script>
+    <script src="js/email-helpers.js"></script>
+    <script src="js/werkbon-helpers.js"></script>
+    <script src="js/werkbonnen.js"></script>
+</body>
+</html>

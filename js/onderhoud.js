@@ -59,6 +59,7 @@ function renderMeldingen() {
                 <div class="item-card-header">
                     <h3>${melding.titel}</h3>
                     <div class="item-card-actions" onclick="event.stopPropagation();">
+                        ${!melding.werkbonId ? `<span class="action-icon" onclick="createWerkbon('${melding.id}')" title="Werkbon Aanmaken">📄</span>` : `<span class="action-icon" style="opacity: 0.5;" title="Werkbon aangemaakt">✅</span>`}
                         <span class="action-icon" onclick="editMelding('${melding.id}')" title="Bewerken">✏️</span>
                         <span class="action-icon" onclick="deleteMelding('${melding.id}')" title="Verwijderen">🗑️</span>
                     </div>
@@ -286,7 +287,169 @@ function viewOnderhoudDetail(meldingId) {
     }
 }
 
+// Create and send werkbon
+async function createWerkbon(meldingId) {
+    if (!confirm('Weet u zeker dat u een werkbon wilt aanmaken voor deze melding?')) {
+        return;
+    }
+
+    try {
+        showLoading('Werkbon aanmaken...');
+
+        // Generate werkbon
+        const werkbon = await generateWerkbon(meldingId);
+        
+        hideLoading();
+
+        // Show send options modal
+        showWerkbonSendModal(werkbon);
+
+    } catch (error) {
+        hideLoading();
+        console.error('Error creating werkbon:', error);
+        showToast('Fout bij aanmaken werkbon: ' + error.message, 'error');
+    }
+}
+
+// Show werkbon send options modal
+function showWerkbonSendModal(werkbon) {
+    const modalHTML = `
+        <div id="werkbonSendModal" class="modal show" style="display: flex;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📄 Werkbon ${werkbon.werkbonNummer}</h2>
+                    <button class="close-btn" onclick="closeWerkbonSendModal()">&times;</button>
+                </div>
+                
+                <div style="padding: 24px;">
+                    <p style="margin-bottom: 20px;">Werkbon succesvol aangemaakt. Selecteer de ontvangers:</p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="sendToHuurder" ${werkbon.huurderEmail ? 'checked' : 'disabled'}>
+                            <span>Verstuur naar huurder ${werkbon.huurderEmail ? '(' + werkbon.huurderEmail + ')' : '(geen email)'}</span>
+                        </label>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="sendToOnderhoudsBedrijf">
+                            <span>Verstuur naar onderhoudsbedrijf</span>
+                        </label>
+                        <div id="onderhoudsBedrijfFields" style="margin-top: 10px; padding-left: 30px; display: none;">
+                            <div class="form-group">
+                                <label>Bedrijfsnaam *</label>
+                                <input type="text" id="onderhoudsBedrijf" placeholder="Naam onderhoudsbedrijf">
+                            </div>
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" id="onderhoudsBedrijfEmail" placeholder="email@onderhoudsbedrijf.nl">
+                            </div>
+                            <div class="form-group">
+                                <label>Contactpersoon</label>
+                                <input type="text" id="contactPersoon" placeholder="Naam contactpersoon">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefoon</label>
+                                <input type="tel" id="contactTelefoon" placeholder="06-12345678">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="downloadWerkbon('${werkbon.id}')">
+                        💾 Download
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="printWerkbon('${werkbon.id}')">
+                        🖨️ Print
+                    </button>
+                    <button type="button" class="btn-primary" onclick="sendWerkbonFromModal('${werkbon.id}')">
+                        📧 Verstuur
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add modal to page
+    const existingModal = document.getElementById('werkbonSendModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Toggle onderhoudsbedrijf fields
+    document.getElementById('sendToOnderhoudsBedrijf').addEventListener('change', (e) => {
+        document.getElementById('onderhoudsBedrijfFields').style.display = e.target.checked ? 'block' : 'none';
+    });
+}
+
+// Close werkbon send modal
+function closeWerkbonSendModal() {
+    const modal = document.getElementById('werkbonSendModal');
+    if (modal) {
+        modal.remove();
+    }
+    // Reload data to show updated status
+    loadAllData();
+}
+
+// Send werkbon from modal
+async function sendWerkbonFromModal(werkbonId) {
+    try {
+        const sendToHuurder = document.getElementById('sendToHuurder').checked;
+        const sendToOnderhoudsBedrijf = document.getElementById('sendToOnderhoudsBedrijf').checked;
+
+        if (!sendToHuurder && !sendToOnderhoudsBedrijf) {
+            showToast('Selecteer minimaal één ontvanger', 'error');
+            return;
+        }
+
+        const options = {
+            sendToHuurder,
+            sendToOnderhoudsBedrijf,
+            saveToSharePoint: true
+        };
+
+        if (sendToOnderhoudsBedrijf) {
+            const bedrijfNaam = document.getElementById('onderhoudsBedrijf').value.trim();
+            const bedrijfEmail = document.getElementById('onderhoudsBedrijfEmail').value.trim();
+            
+            if (!bedrijfNaam || !bedrijfEmail) {
+                showToast('Vul bedrijfsnaam en email in', 'error');
+                return;
+            }
+
+            options.onderhoudsBedrijfEmail = bedrijfEmail;
+
+            // Update werkbon with company info
+            await dbUpdate('werkbonnen', werkbonId, {
+                onderhoudsBedrijf: bedrijfNaam,
+                contactPersoon: document.getElementById('contactPersoon').value.trim() || null,
+                contactTelefoon: document.getElementById('contactTelefoon').value.trim() || null
+            });
+        }
+
+        showLoading('Werkbon versturen...');
+        
+        await sendWerkbon(werkbonId, options);
+        
+        hideLoading();
+        closeWerkbonSendModal();
+
+    } catch (error) {
+        hideLoading();
+        console.error('Error sending werkbon:', error);
+        showToast('Fout bij versturen werkbon: ' + error.message, 'error');
+    }
+}
+
 window.editMelding = editMelding;
 window.deleteMelding = deleteMelding;
 window.sendConfirmationEmail = sendConfirmationEmail;
 window.viewOnderhoudDetail = viewOnderhoudDetail;
+window.createWerkbon = createWerkbon;
+window.closeWerkbonSendModal = closeWerkbonSendModal;
+window.sendWerkbonFromModal = sendWerkbonFromModal;
