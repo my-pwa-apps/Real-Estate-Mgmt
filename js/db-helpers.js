@@ -29,6 +29,12 @@ async function dbGetAll(path) {
 
 // Get single item by id
 async function dbGet(path, id) {
+    // Use demo database if in demo mode
+    if (typeof isDemoMode === 'function' && isDemoMode()) {
+        const demoHelpers = getDemoDbHelpers();
+        return demoHelpers.dbGet(path, id);
+    }
+    
     try {
         const snapshot = await database.ref(`${path}/${id}`).once('value');
         const data = snapshot.val();

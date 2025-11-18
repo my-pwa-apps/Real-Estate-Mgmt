@@ -387,6 +387,7 @@ function getDemoDbHelpers() {
     
     return {
         dbGetAll: (collection) => db.getAll(collection),
+        dbGet: (collection, id) => db.getById(collection, id),
         dbGetById: (collection, id) => db.getById(collection, id),
         dbAdd: (collection, data) => db.add(collection, data),
         dbUpdate: (collection, id, data) => db.update(collection, id, data),
