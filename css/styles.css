@@ -351,7 +351,7 @@ body {
 .sidebar-header {
     padding: 28px 20px;
     border-bottom: 1px solid var(--border-color);
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
 }
 
 .sidebar-header h2 {
@@ -363,12 +363,14 @@ body {
 .sidebar-header .sidebar-logo {
     max-width: 190px;
     height: auto;
-    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.08));
+    display: block;
+    filter: brightness(1.1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
     transition: transform 0.3s ease;
 }
 
 .sidebar-header .sidebar-logo:hover {
-    transform: scale(1.02);
+    transform: scale(1.03);
+    filter: brightness(1.2) drop-shadow(0 3px 8px rgba(0, 0, 0, 0.4));
 }
 
 .sidebar-nav {
