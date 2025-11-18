@@ -53,7 +53,7 @@ function renderContracten() {
     const tbody = document.getElementById('contractenTableBody');
     
     if (filteredContracten.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Geen contracten gevonden</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Geen contracten gevonden</td></tr>';
         return;
     }
 
@@ -70,7 +70,13 @@ function renderContracten() {
                 <td>${new Date(contract.einddatum).toLocaleDateString('nl-NL')}</td>
                 <td>€${parseFloat(contract.huurprijs).toLocaleString('nl-NL')}</td>
                 <td><span class="status-badge ${status}">${capitalizeFirst(status)}</span></td>
+                <td>
+                    ${contract.documentUrl ? 
+                        `<a href="${contract.documentUrl}" target="_blank" title="Document openen">📄</a>` : 
+                        '<span style="color: #999;" title="Geen document">-</span>'}
+                </td>
                 <td class="actions">
+                    <span class="action-icon" onclick="emailContract('${contract.id}')" title="Email versturen">📧</span>
                     <span class="action-icon" onclick="editContract('${contract.id}')" title="Bewerken">✏️</span>
                     <span class="action-icon" onclick="deleteContract('${contract.id}')" title="Verwijderen">🗑️</span>
                 </td>
@@ -236,5 +242,63 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// Email contract to huurder
+async function emailContract(contractId) {
+    try {
+        // Check if Microsoft signed in
+        if (!isMicrosoftSignedIn()) {
+            const signIn = confirm('U moet eerst inloggen met Microsoft 365 om emails te versturen. Nu inloggen?');
+            if (signIn) {
+                await signInToMicrosoft();
+            }
+            return;
+        }
+
+        const contract = contracten.find(c => c.id === contractId);
+        if (!contract) return;
+
+        const huurder = huurders.find(h => h.id === contract.huurderId);
+        const pand = panden.find(p => p.id === contract.pandId);
+
+        if (!huurder || !pand) {
+            alert('Huurder of pand gegevens ontbreken');
+            return;
+        }
+
+        // Fill template with data
+        const emailData = fillEmailTemplate('huurcontract', {
+            huurder: huurder,
+            pand: pand,
+            contract: contract
+        });
+
+        emailData.to = [huurder.email];
+        emailData.saveToSharePoint = true;
+
+        // Send email with attachment if document exists
+        if (contract.documentUrl) {
+            const fileId = contract.sharepointFileId;
+            if (fileId) {
+                await sendEmailWithSharePointAttachment(emailData, fileId);
+            } else {
+                await sendEmail(emailData);
+            }
+        } else {
+            await sendEmail(emailData);
+        }
+
+        alert('Email succesvol verstuurd naar ' + huurder.email);
+        
+        // Save email to SharePoint Correspondentie folder
+        const folderPath = `Huurders/${huurder.achternaam}_${huurder.voornaam}/Correspondentie`;
+        await saveEmailToSharePoint(emailData, folderPath);
+
+    } catch (error) {
+        console.error('Error sending email:', error);
+        alert('Fout bij versturen email: ' + error.message);
+    }
+}
+
 window.editContract = editContract;
 window.deleteContract = deleteContract;
+window.emailContract = emailContract;

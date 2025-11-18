@@ -1,8 +1,15 @@
 // Database Helper Functions for Firebase Realtime Database
 // Helper functions to work with Firebase Realtime Database
+// Automatically uses demo data when in demo mode
 
 // Get all items from a path
 async function dbGetAll(path) {
+    // Use demo database if in demo mode
+    if (typeof isDemoMode === 'function' && isDemoMode()) {
+        const demoHelpers = getDemoDbHelpers();
+        return demoHelpers.dbGetAll(path);
+    }
+    
     try {
         const snapshot = await database.ref(path).once('value');
         const data = snapshot.val();
@@ -37,6 +44,12 @@ async function dbGet(path, id) {
 
 // Add new item
 async function dbAdd(path, data) {
+    // Use demo database if in demo mode
+    if (typeof isDemoMode === 'function' && isDemoMode()) {
+        const demoHelpers = getDemoDbHelpers();
+        return demoHelpers.dbAdd(path, data);
+    }
+    
     try {
         const timestamp = Date.now();
         const itemData = {
@@ -55,6 +68,12 @@ async function dbAdd(path, data) {
 
 // Update existing item
 async function dbUpdate(path, id, data) {
+    // Use demo database if in demo mode
+    if (typeof isDemoMode === 'function' && isDemoMode()) {
+        const demoHelpers = getDemoDbHelpers();
+        return demoHelpers.dbUpdate(path, id, data);
+    }
+    
     try {
         const updateData = {
             ...data,
@@ -71,6 +90,12 @@ async function dbUpdate(path, id, data) {
 
 // Delete item
 async function dbDelete(path, id) {
+    // Use demo database if in demo mode
+    if (typeof isDemoMode === 'function' && isDemoMode()) {
+        const demoHelpers = getDemoDbHelpers();
+        return demoHelpers.dbDelete(path, id);
+    }
+    
     try {
         await database.ref(`${path}/${id}`).remove();
         return true;
@@ -82,6 +107,12 @@ async function dbDelete(path, id) {
 
 // Query items with filter
 async function dbQuery(path, orderByChild, equalTo) {
+    // Use demo database if in demo mode
+    if (typeof isDemoMode === 'function' && isDemoMode()) {
+        const demoHelpers = getDemoDbHelpers();
+        return demoHelpers.dbQuery(path, { orderBy: orderByChild, where: equalTo ? [orderByChild, '==', equalTo] : null });
+    }
+    
     try {
         let query = database.ref(path);
         

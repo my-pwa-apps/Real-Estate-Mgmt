@@ -205,5 +205,69 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// Send confirmation email to huurder
+async function sendConfirmationEmail(meldingId) {
+    try {
+        // Check if Microsoft signed in
+        if (!isMicrosoftSignedIn()) {
+            const signIn = confirm('U moet eerst inloggen met Microsoft 365 om emails te versturen. Nu inloggen?');
+            if (signIn) {
+                await signInToMicrosoft();
+            }
+            return;
+        }
+
+        const melding = meldingen.find(m => m.id === meldingId);
+        if (!melding) return;
+
+        const pand = panden.find(p => p.id === melding.pandId);
+        if (!pand) return;
+
+        // Get huurder from active contract
+        const contracten = await dbGetAll('contracten');
+        const contract = contracten.find(c => c.pandId === pand.id);
+        
+        if (!contract) {
+            alert('Geen actief contract gevonden voor dit pand');
+            return;
+        }
+
+        const huurders = await dbGetAll('huurders');
+        const huurder = huurders.find(h => h.id === contract.huurderId);
+        
+        if (!huurder) {
+            alert('Huurder gegevens niet gevonden');
+            return;
+        }
+
+        // Fill template with data
+        const emailData = fillEmailTemplate('onderhoud_bevestiging', {
+            huurder: huurder,
+            pand: pand,
+            melding: melding
+        });
+
+        emailData.to = [huurder.email];
+        emailData.saveToSharePoint = true;
+
+        await sendEmail(emailData);
+
+        alert('Bevestiging verstuurd naar ' + huurder.email);
+        
+        // Save email to SharePoint
+        const folderPath = `Onderhoud/${new Date().getFullYear()}/${pand.adres.replace(/[^a-z0-9]/gi, '_')}`;
+        await saveEmailToSharePoint(emailData, folderPath);
+
+        // Update melding status
+        await dbUpdate('onderhoud', meldingId, { status: 'in_behandeling' });
+        await loadAllData();
+
+    } catch (error) {
+        console.error('Error sending email:', error);
+        alert('Fout bij versturen email: ' + error.message);
+    }
+}
+
 window.editMelding = editMelding;
 window.deleteMelding = deleteMelding;
+window.sendConfirmationEmail = sendConfirmationEmail;

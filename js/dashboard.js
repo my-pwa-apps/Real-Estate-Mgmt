@@ -147,13 +147,64 @@ function loadVerlopendeContracten() {
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await checkAuth();
+        // Check Entra ID authentication (or demo mode)
+        const user = await checkEntraAuth();
+        
+        if (!user && !isDemoMode()) {
+            window.location.href = 'index.html';
+            return;
+        }
+        
         await loadDashboardData();
         
         // Set user name if available
-        const user = auth.currentUser;
         if (user) {
-            document.getElementById('userName').textContent = user.email.split('@')[0];
+            document.getElementById('userName').textContent = user.name || user.email.split('@')[0];
+        } else if (isDemoMode()) {
+            document.getElementById('userName').textContent = 'Demo Gebruiker';
+        }
+
+        // Setup Microsoft 365 sign-in button
+        const microsoftBtn = document.getElementById('microsoftSignInBtn');
+        if (microsoftBtn) {
+            // Don't show M365 button in demo mode
+            if (isDemoMode()) {
+                microsoftBtn.style.display = 'none';
+            } else if (typeof initializeMSAL !== 'undefined') {
+                initializeMSAL();
+                
+                // Show button if not signed in
+                if (!isMicrosoftSignedIn()) {
+                    microsoftBtn.style.display = 'block';
+                    microsoftBtn.textContent = '🔐 Microsoft 365 Inloggen';
+                } else {
+                    microsoftBtn.style.display = 'block';
+                    microsoftBtn.textContent = '✅ Microsoft 365';
+                    microsoftBtn.disabled = true;
+                }
+
+                microsoftBtn.addEventListener('click', async () => {
+                    try {
+                        await signInToMicrosoft();
+                        microsoftBtn.textContent = '✅ Microsoft 365';
+                        microsoftBtn.disabled = true;
+                        alert('Succesvol ingelogd bij Microsoft 365! U kunt nu emails versturen en documenten opslaan.');
+                    } catch (error) {
+                        console.error('Microsoft sign-in error:', error);
+                        alert('Fout bij inloggen: ' + error.message);
+                    }
+                });
+            }
+        }
+        
+        // Show demo mode indicator
+        if (isDemoMode()) {
+            const sidebar = document.querySelector('.sidebar-footer');
+            const demoIndicator = document.createElement('div');
+            demoIndicator.className = 'demo-indicator';
+            demoIndicator.innerHTML = '🎭 DEMO MODUS';
+            demoIndicator.style.cssText = 'background: #ffc107; color: #000; padding: 8px; border-radius: 4px; margin-bottom: 10px; text-align: center; font-size: 12px; font-weight: bold;';
+            sidebar.insertBefore(demoIndicator, sidebar.firstChild);
         }
     } catch (error) {
         console.error('Dashboard initialization error:', error);

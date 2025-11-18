@@ -15,25 +15,29 @@
                 <p class="subtitle">Vastgoedbeheer Systeem</p>
             </div>
             
-            <form id="loginForm" class="login-form">
-                <div class="form-group">
-                    <label for="email">E-mailadres</label>
-                    <input type="email" id="email" name="email" required placeholder="uw@email.nl">
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Wachtwoord</label>
-                    <input type="password" id="password" name="password" required placeholder="••••••••">
-                </div>
-                
-                <div id="errorMessage" class="error-message"></div>
-                
-                <button type="submit" class="btn-primary" id="loginBtn">
-                    Inloggen
+            <div class="login-options">
+                <!-- Entra ID SSO Login -->
+                <button type="button" class="btn-primary btn-sso" id="entraLoginBtn">
+                    <span class="icon">🔐</span>
+                    Inloggen met Microsoft 365
                 </button>
                 
-                <a href="#" class="forgot-password">Wachtwoord vergeten?</a>
-            </form>
+                <div class="divider">
+                    <span>of</span>
+                </div>
+                
+                <!-- Demo Mode -->
+                <button type="button" class="btn-secondary btn-demo" id="demoModeBtn">
+                    <span class="icon">👁️</span>
+                    Demo Modus (Geen inlog vereist)
+                </button>
+                
+                <p class="info-text">
+                    <small><strong>Demo Modus:</strong> Verken de applicatie met voorbeeld data zonder configuratie.</small>
+                </p>
+            </div>
+            
+            <div id="errorMessage" class="error-message"></div>
         </div>
     </div>
 
@@ -42,8 +46,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
+    <!-- MSAL.js for Entra ID -->
+    <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js"></script>
+    
     <!-- App Scripts -->
     <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="js/demo-data.js"></script>
+    <script src="js/entra-auth.js"></script>
+    <script src="js/login.js"></script>
 </body>
 </html>

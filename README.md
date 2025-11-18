@@ -2,6 +2,26 @@
 
 Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, onderhoud en financiën.
 
+## 🚀 Nieuwe Features
+
+### 🔐 Microsoft Entra ID Single Sign-On
+- **Enterprise SSO**: Eén login voor webapp én Microsoft 365
+- **Edge for Business**: Optimale integratie met Edge for Business browser
+- **Rol-gebaseerd**: Automatische rol toewijzing via Azure AD groups (Admin/Manager/Viewer)
+- **Veilig**: MFA en Conditional Access ondersteuning
+
+### 🎭 Demo Modus
+- **Geen configuratie**: Verken de app zonder Azure AD of Firebase setup
+- **Realistische data**: Volledige dummy dataset voor demonstraties
+- **Volledig functioneel**: Alle features beschikbaar voor testen
+- **Perfect voor**: Training, presentaties en quick previews
+
+### ⚙️ Administrator Module
+- **Gebruikersbeheer**: Overzicht van ingelogde gebruikers en rollen
+- **Instellingen**: Bedrijfsgegevens, email templates, notificaties
+- **Azure configuratie**: Client ID, Tenant ID en SharePoint instellingen
+- **Demo data beheer**: Reset, export en import van demo data
+
 ## 🏢 Functionaliteiten
 
 ### 📊 Dashboard
@@ -36,6 +56,8 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 - Betalingsdatum per maand
 - Status: actief, verloopt binnenkort, verlopen
 - Voorwaarden en bijzonderheden
+- **📧 Email contract naar huurder** (M365 integratie)
+- **📄 Contract documenten** opslaan in SharePoint
 
 ### 🔧 Onderhoud & Reparaties
 - Onderhoudsmeldingen registreren
@@ -45,6 +67,8 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 - Kostenschatting
 - Koppeling aan specifiek pand
 - Filteren op status en prioriteit
+- **📧 Bevestiging email** naar huurder bij nieuwe melding
+- **📁 Documentatie opslaan** in SharePoint per pand
 
 ### 💰 Financieel Overzicht
 - Totaaloverzicht inkomsten en uitgaven per jaar
@@ -58,72 +82,68 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 
 ## 🚀 Installatie & Setup
 
-### 1. Firebase Project Aanmaken
+### ✅ Firebase Configuratie (Al Ingesteld!)
 
-1. Ga naar [Firebase Console](https://console.firebase.google.com/)
-2. Klik op "Add project" of "Project toevoegen"
-3. Geef je project een naam (bijv. "Stadsgezicht Vastgoed")
-4. Volg de stappen om het project aan te maken
+De applicatie is al geconfigureerd met de Stadsgezicht Firebase Realtime Database.
 
-### 2. Firebase Authentication Inschakelen
+**Belangrijke stappen die u nog moet doen:**
 
-1. In je Firebase project, ga naar **Authentication**
-2. Klik op "Get started"
-3. Kies **Email/Password** als sign-in method
-4. Schakel deze in
-5. Voeg een gebruiker toe:
-   - Klik op "Users" tab
-   - Klik op "Add user"
-   - Voer email en wachtwoord in
-   - Dit wordt je beheerder account
+### 1. Firebase Realtime Database Rules Instellen
 
-### 3. Firestore Database Aanmaken
+⚠️ **BELANGRIJK**: Kopieer de security rules naar Firebase Console
 
-1. In je Firebase project, ga naar **Firestore Database**
-2. Klik op "Create database"
-3. Kies **Start in production mode** (we stellen regels in bij stap 4)
-4. Selecteer een locatie (bijv. europe-west)
+1. Open [Firebase Console](https://console.firebase.google.com/)
+2. Selecteer project: **stadsgezicht-8af8b**
+3. Ga naar **Realtime Database** in het linker menu
+4. Als de database nog niet bestaat:
+   - Klik op **Create Database**
+   - Kies locatie: **europe-west1**
+   - Start in **locked mode**
+5. Klik op het tabblad **Rules**
+6. Kopieer de volgende rules:
 
-### 4. Security Rules Instellen
-
-In Firestore Database → Rules, vervang de inhoud met:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Alleen geauthenticeerde gebruikers
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+```json
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    
+    "panden": {
+      ".indexOn": ["adres", "type", "status"]
+    },
+    "huurders": {
+      ".indexOn": ["achternaam", "email"]
+    },
+    "contracten": {
+      ".indexOn": ["startdatum", "einddatum", "huurderId", "pandId"]
+    },
+    "onderhoud": {
+      ".indexOn": ["status", "prioriteit", "pandId", "createdAt"]
+    },
+    "transacties": {
+      ".indexOn": ["datum", "type", "categorie"]
     }
   }
 }
 ```
 
-Klik op "Publish"
+7. Klik op **Publish**
 
-### 5. Firebase Configuratie Toevoegen
+📄 Zie ook: `FIREBASE-SETUP.md` voor gedetailleerde instructies en `firebase-database-rules.json` voor de rules
 
-1. In Firebase Console, ga naar **Project Settings** (tandwiel icoon)
-2. Scroll naar beneden naar "Your apps"
-3. Klik op het **Web icon** (</>)
-4. Registreer je app (geef een naam)
-5. Kopieer de Firebase configuration code
+### 2. Firebase Authentication - Gebruiker Aanmaken
 
-### 6. Configuratie in de Applicatie
+1. In Firebase Console, ga naar **Authentication**
+2. Klik op "Get started" (als nog niet gedaan)
+3. Schakel **Email/Password** in als sign-in method
+4. Voeg een beheerder toe:
+   - Ga naar het **Users** tabblad
+   - Klik op **Add user**
+   - Email: **admin@stadsgezicht.nl** (of uw gewenste email)
+   - Kies een sterk wachtwoord
+   - Klik op **Add user**
 
-Open het bestand `js/config.js` en vervang de waarden:
-
-```javascript
-const firebaseConfig = {
-    apiKey: "jouw-api-key",
-    authDomain: "jouw-project.firebaseapp.com",
-    projectId: "jouw-project-id",
-    storageBucket: "jouw-project.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "jouw-app-id"
-};
-```
+Dit wordt uw login voor het systeem!
 
 ## 📂 Project Structuur
 
@@ -189,31 +209,81 @@ firebase deploy
 2. Gebruik het email en wachtwoord dat je in Firebase Authentication hebt aangemaakt
 3. Na succesvol inloggen wordt je doorgestuurd naar het dashboard
 
-## 📊 Firestore Database Collecties
+## 📊 Firebase Realtime Database Structuur
 
-De applicatie maakt automatisch de volgende collecties aan:
+De applicatie gebruikt de volgende database paths:
 
-- **panden** - Alle vastgoed objecten
-- **huurders** - Huurder informatie
-- **contracten** - Huurcontracten
-- **onderhoud** - Onderhoudsmeldingen
-- **transacties** - Financiële transacties
+- **panden/** - Alle vastgoed objecten (bedrijfspanden en woningen)
+- **huurders/** - Huurder informatie en contactgegevens
+- **contracten/** - Huurcontracten met koppelingen
+- **onderhoud/** - Onderhoudsmeldingen en reparaties
+- **transacties/** - Financiële inkomsten en uitgaven
+
+Data wordt automatisch aangemaakt wanneer u items toevoegt via de applicatie.
 
 ## 🎨 Design Kenmerken
 
+- **Stadsgezicht Branding** - Logo en huisstijl kleuren geïntegreerd
+- **Professionele uitstraling** - Zakelijke kleuren (donkerblauw, goud accent)
 - Modern en schoon interface
 - Responsive design (werkt op desktop, tablet en mobiel)
-- Intuïtieve navigatie
+- Intuïtieve navigatie met iconen
 - Kleurcodering voor statussen en prioriteiten
 - Smooth animaties en transitions
 - Eenvoudige filters en zoekfuncties
+
+## 🔗 Microsoft 365 Integratie
+
+### 📧 Email Functionaliteit
+- **Email versturen** via Exchange Online
+- **Email templates** voor veelvoorkomende scenario's:
+  - Huurcontract verzenden
+  - Huurverhoging notificatie
+  - Onderhoud bevestigingen
+  - Huur herinneringen
+  - Welkomstmail nieuwe huurders
+- **Automatisch archiveren** van emails naar SharePoint
+
+### 📁 Document Management (SharePoint/OneDrive)
+- **Automatische folder structuur**:
+  - `Panden/[Adres-Postcode]/` (Foto's, Documenten, Technisch, Verbouwing)
+  - `Huurders/[Naam]/` (Contracten, Correspondentie, Documenten)
+  - `Contracten/[Jaar]/`
+  - `Onderhoud/[Jaar]/[Adres]/`
+  - `Financieel/[Jaar]/`
+- **Document upload/download** vanuit de applicatie
+- **Metadata tagging** voor Copilot indexering
+- **Zoeken** in SharePoint documenten
+
+### 🤖 Microsoft Copilot Ready
+- Alle documenten en emails worden geïndexeerd door Copilot
+- Vind informatie met natural language queries
+- Automatische insights in documenten en correspondentie
+- Context-aware suggesties
+
+### ⚙️ Setup Microsoft 365 Integratie
+
+**Zie:** `AZURE-AD-SETUP.md` voor complete setup instructies
+
+**Stappen:**
+1. Azure AD app registreren
+2. API permissions instellen (Files, Sites, Mail)
+3. Admin consent geven
+4. SharePoint site configureren
+5. Configuratie updaten in `js/microsoft-auth.js`
 
 ## 🛠️ Technologieën
 
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
 - **Backend**: Firebase
   - Authentication (Email/Password)
-  - Firestore Database (NoSQL)
+  - **Realtime Database** (Real-time synchronisatie)
+- **Microsoft 365 Integratie**:
+  - MSAL.js (Microsoft Authentication Library)
+  - Microsoft Graph API
+  - SharePoint/OneDrive voor document storage
+  - Exchange Online voor email
+- **Branding**: Stadsgezicht logo en huisstijl
 - **Hosting**: Firebase Hosting (optioneel)
 
 ## 📱 Responsive Design

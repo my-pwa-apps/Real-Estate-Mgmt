@@ -1,0 +1,51 @@
+{
+  "rules": {
+    ".read": "auth != null || root.child('publicAccess').val() === true",
+    ".write": "auth != null",
+    
+    "panden": {
+      ".indexOn": ["adres", "type", "status"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "huurders": {
+      ".indexOn": ["achternaam", "email"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "contracten": {
+      ".indexOn": ["startdatum", "einddatum", "huurderId", "pandId"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "onderhoud": {
+      ".indexOn": ["status", "prioriteit", "pandId", "createdAt"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "transacties": {
+      ".indexOn": ["datum", "type", "categorie"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "settings": {
+      ".read": "auth != null",
+      ".write": "root.child('admins').child(auth.uid).exists() || root.child('adminEmails').child(auth.token.email).exists()"
+    },
+    
+    "admins": {
+      ".read": "auth != null",
+      ".write": "root.child('admins').child(auth.uid).exists()"
+    },
+    
+    "adminEmails": {
+      ".read": "auth != null",
+      ".write": "root.child('admins').child(auth.uid).exists()"
+    }
+  }
+}
