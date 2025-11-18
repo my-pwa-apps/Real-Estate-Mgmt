@@ -245,7 +245,7 @@ jaarFilter.addEventListener('change', async (e) => {
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await checkAuth();
+        await ensureAuthenticated();
         jaarFilter.value = currentYear;
         await loadAllData();
     } catch (error) {

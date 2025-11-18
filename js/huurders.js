@@ -150,8 +150,8 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await checkAuth();
-        await loadHuurders();
+        await ensureAuthenticated();
+        await loadAllHuurders();
     } catch (error) {
         console.error('Initialization error:', error);
     }

@@ -198,7 +198,7 @@ function capitalizeFirst(str) {
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await checkAuth();
+        await ensureAuthenticated();
         await loadAllData();
     } catch (error) {
         console.error('Initialization error:', error);
