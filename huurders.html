@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huurders - Stadsgezicht Ontwikkelingen</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/stadsgezicht-logo.svg" alt="Stadsgezicht" class="sidebar-logo">
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="panden.html" class="nav-item">
+                    <span class="icon">🏢</span>
+                    Panden
+                </a>
+                <a href="huurders.html" class="nav-item active">
+                    <span class="icon">👥</span>
+                    Huurders
+                </a>
+                <a href="contracten.html" class="nav-item">
+                    <span class="icon">📄</span>
+                    Contracten
+                </a>
+                <a href="onderhoud.html" class="nav-item">
+                    <span class="icon">🔧</span>
+                    Onderhoud
+                </a>
+                <a href="financieel.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    Financieel
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-secondary">
+                    <span class="icon">🚪</span>
+                    Uitloggen
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Huurders Beheer</h1>
+                <button id="addHuurderBtn" class="btn-primary">
+                    ➕ Nieuwe Huurder
+                </button>
+            </header>
+
+            <div class="filters-bar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Zoek op naam, email of telefoon...">
+                </div>
+            </div>
+
+            <div id="huurdersGrid" class="cards-grid">
+                <p class="empty-state">Geen huurders gevonden. Klik op "Nieuwe Huurder" om te beginnen.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Huurder -->
+    <div id="huurderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nieuwe Huurder</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <form id="huurderForm">
+                <input type="hidden" id="huurderId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="voornaam">Voornaam *</label>
+                        <input type="text" id="voornaam" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="achternaam">Achternaam *</label>
+                        <input type="text" id="achternaam" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mailadres *</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="telefoon">Telefoonnummer *</label>
+                        <input type="tel" id="telefoon" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="geboortedatum">Geboortedatum</label>
+                        <input type="date" id="geboortedatum">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notities">Notities</label>
+                    <textarea id="notities" rows="3" placeholder="Aanvullende informatie..."></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Annuleren</button>
+                    <button type="submit" class="btn-primary">Opslaan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/db-helpers.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/huurders.js"></script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panden - Stadsgezicht Ontwikkelingen</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/stadsgezicht-logo.svg" alt="Stadsgezicht" class="sidebar-logo">
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="panden.html" class="nav-item active">
+                    <span class="icon">🏢</span>
+                    Panden
+                </a>
+                <a href="huurders.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    Huurders
+                </a>
+                <a href="contracten.html" class="nav-item">
+                    <span class="icon">📄</span>
+                    Contracten
+                </a>
+                <a href="onderhoud.html" class="nav-item">
+                    <span class="icon">🔧</span>
+                    Onderhoud
+                </a>
+                <a href="financieel.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    Financieel
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-secondary">
+                    <span class="icon">🚪</span>
+                    Uitloggen
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Panden Beheer</h1>
+                <button id="addPandBtn" class="btn-primary">
+                    ➕ Nieuw Pand
+                </button>
+            </header>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="typeFilter">Type:</label>
+                    <select id="typeFilter">
+                        <option value="">Alle</option>
+                        <option value="bedrijfspand">Bedrijfspand</option>
+                        <option value="woning">Woning</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="statusFilter">Status:</label>
+                    <select id="statusFilter">
+                        <option value="">Alle</option>
+                        <option value="verhuurd">Verhuurd</option>
+                        <option value="beschikbaar">Beschikbaar</option>
+                        <option value="onderhoud">Onderhoud</option>
+                    </select>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Zoek op adres of naam...">
+                </div>
+            </div>
+
+            <!-- Panden List -->
+            <div id="pandenList" class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Adres</th>
+                            <th>Postcode</th>
+                            <th>Plaats</th>
+                            <th>Status</th>
+                            <th>Huurprijs</th>
+                            <th>Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pandenTableBody">
+                        <tr>
+                            <td colspan="7" class="empty-state">Geen panden gevonden. Klik op "Nieuw Pand" om te beginnen.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Pand -->
+    <div id="pandModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nieuw Pand</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <form id="pandForm">
+                <input type="hidden" id="pandId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="type">Type *</label>
+                        <select id="type" required>
+                            <option value="">Selecteer type</option>
+                            <option value="bedrijfspand">Bedrijfspand</option>
+                            <option value="woning">Woning</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" required>
+                            <option value="beschikbaar">Beschikbaar</option>
+                            <option value="verhuurd">Verhuurd</option>
+                            <option value="onderhoud">Onderhoud</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="adres">Adres *</label>
+                    <input type="text" id="adres" required placeholder="Straatnaam 123">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="postcode">Postcode *</label>
+                        <input type="text" id="postcode" required placeholder="1234 AB">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="plaats">Plaats *</label>
+                        <input type="text" id="plaats" required placeholder="Amsterdam">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="oppervlakte">Oppervlakte (m²)</label>
+                        <input type="number" id="oppervlakte" placeholder="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="kamers">Aantal kamers</label>
+                        <input type="number" id="kamers" placeholder="3">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="huurprijs">Huurprijs per maand (€) *</label>
+                    <input type="number" id="huurprijs" required placeholder="1500">
+                </div>
+
+                <div class="form-group">
+                    <label for="beschrijving">Beschrijving</label>
+                    <textarea id="beschrijving" rows="4" placeholder="Aanvullende informatie over het pand..."></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Annuleren</button>
+                    <button type="submit" class="btn-primary">Opslaan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/db-helpers.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/panden.js"></script>
+</body>
+</html>

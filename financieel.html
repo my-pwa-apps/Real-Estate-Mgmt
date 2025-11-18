@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financieel - Stadsgezicht Ontwikkelingen</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/stadsgezicht-logo.svg" alt="Stadsgezicht" class="sidebar-logo">
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="panden.html" class="nav-item">
+                    <span class="icon">🏢</span>
+                    Panden
+                </a>
+                <a href="huurders.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    Huurders
+                </a>
+                <a href="contracten.html" class="nav-item">
+                    <span class="icon">📄</span>
+                    Contracten
+                </a>
+                <a href="onderhoud.html" class="nav-item">
+                    <span class="icon">🔧</span>
+                    Onderhoud
+                </a>
+                <a href="financieel.html" class="nav-item active">
+                    <span class="icon">💰</span>
+                    Financieel
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-secondary">
+                    <span class="icon">🚪</span>
+                    Uitloggen
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Financieel Overzicht</h1>
+                <div class="filter-group">
+                    <label for="jaarFilter">Jaar:</label>
+                    <select id="jaarFilter">
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+            </header>
+
+            <!-- Financial Summary -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon green">📈</div>
+                    <div class="stat-content">
+                        <h3 id="totaalInkomsten">€0</h3>
+                        <p>Totale Inkomsten</p>
+                        <small id="inkomstenDetail">Dit jaar</small>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon red">📉</div>
+                    <div class="stat-content">
+                        <h3 id="totaalUitgaven">€0</h3>
+                        <p>Totale Uitgaven</p>
+                        <small id="uitgavenDetail">Onderhoud & kosten</small>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon blue">💵</div>
+                    <div class="stat-content">
+                        <h3 id="nettoResultaat">€0</h3>
+                        <p>Netto Resultaat</p>
+                        <small id="resultaatDetail">Inkomsten - Uitgaven</small>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">📅</div>
+                    <div class="stat-content">
+                        <h3 id="maandelijks">€0</h3>
+                        <p>Deze Maand</p>
+                        <small id="maandDetail">Verwachte huurinkomsten</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Overview -->
+            <section class="card">
+                <h2>Maandoverzicht <span id="currentYear">2025</span></h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Maand</th>
+                                <th>Huurinkomsten</th>
+                                <th>Onderhoudskosten</th>
+                                <th>Overige kosten</th>
+                                <th>Netto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maandelijksTableBody">
+                            <tr>
+                                <td colspan="5" class="empty-state">Geen financiële gegevens beschikbaar</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Recente Transacties -->
+            <div class="content-grid">
+                <section class="card">
+                    <div class="card-header">
+                        <h2>Recente Inkomsten</h2>
+                        <button id="addInkomstBtn" class="btn-small">➕ Toevoegen</button>
+                    </div>
+                    <div id="recenteInkomsten" class="list-container">
+                        <p class="empty-state">Geen recente inkomsten</p>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h2>Recente Uitgaven</h2>
+                        <button id="addUitgaveBtn" class="btn-small">➕ Toevoegen</button>
+                    </div>
+                    <div id="recenteUitgaven" class="list-container">
+                        <p class="empty-state">Geen recente uitgaven</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Add Transaction -->
+    <div id="transactieModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nieuwe Transactie</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <form id="transactieForm">
+                <input type="hidden" id="transactieId">
+                <input type="hidden" id="transactieType">
+                
+                <div class="form-group">
+                    <label for="beschrijving">Beschrijving *</label>
+                    <input type="text" id="beschrijving" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bedrag">Bedrag (€) *</label>
+                        <input type="number" id="bedrag" required step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="datum">Datum *</label>
+                        <input type="date" id="datum" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="categorie">Categorie</label>
+                    <select id="categorie">
+                        <option value="huur">Huur</option>
+                        <option value="onderhoud">Onderhoud</option>
+                        <option value="verzekering">Verzekering</option>
+                        <option value="belasting">Belasting</option>
+                        <option value="overig">Overig</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="notities">Notities</label>
+                    <textarea id="notities" rows="3"></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Annuleren</button>
+                    <button type="submit" class="btn-primary">Opslaan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/db-helpers.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/financieel.js"></script>
+</body>
+</html>

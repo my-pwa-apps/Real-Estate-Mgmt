@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contracten - Stadsgezicht Ontwikkelingen</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/stadsgezicht-logo.svg" alt="Stadsgezicht" class="sidebar-logo">
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="panden.html" class="nav-item">
+                    <span class="icon">🏢</span>
+                    Panden
+                </a>
+                <a href="huurders.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    Huurders
+                </a>
+                <a href="contracten.html" class="nav-item active">
+                    <span class="icon">📄</span>
+                    Contracten
+                </a>
+                <a href="onderhoud.html" class="nav-item">
+                    <span class="icon">🔧</span>
+                    Onderhoud
+                </a>
+                <a href="financieel.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    Financieel
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-secondary">
+                    <span class="icon">🚪</span>
+                    Uitloggen
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Huurcontracten</h1>
+                <button id="addContractBtn" class="btn-primary">
+                    ➕ Nieuw Contract
+                </button>
+            </header>
+
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="statusFilter">Status:</label>
+                    <select id="statusFilter">
+                        <option value="">Alle</option>
+                        <option value="actief">Actief</option>
+                        <option value="verloopt">Verloopt binnenkort</option>
+                        <option value="verlopen">Verlopen</option>
+                    </select>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Zoek op huurder of adres...">
+                </div>
+            </div>
+
+            <div id="contractenList" class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Huurder</th>
+                            <th>Pand</th>
+                            <th>Startdatum</th>
+                            <th>Einddatum</th>
+                            <th>Huurprijs</th>
+                            <th>Status</th>
+                            <th>Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractenTableBody">
+                        <tr>
+                            <td colspan="7" class="empty-state">Geen contracten gevonden.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Contract -->
+    <div id="contractModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nieuw Contract</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <form id="contractForm">
+                <input type="hidden" id="contractId">
+                
+                <div class="form-group">
+                    <label for="huurderId">Huurder *</label>
+                    <select id="huurderId" required>
+                        <option value="">Selecteer huurder</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="pandId">Pand *</label>
+                    <select id="pandId" required>
+                        <option value="">Selecteer pand</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startdatum">Startdatum *</label>
+                        <input type="date" id="startdatum" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="einddatum">Einddatum *</label>
+                        <input type="date" id="einddatum" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="huurprijs">Huurprijs per maand (€) *</label>
+                        <input type="number" id="huurprijs" required step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="borg">Borg (€)</label>
+                        <input type="number" id="borg" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="betalingsdatum">Betalingsdatum (dag van de maand)</label>
+                    <input type="number" id="betalingsdatum" min="1" max="31" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="voorwaarden">Voorwaarden</label>
+                    <textarea id="voorwaarden" rows="4" placeholder="Bijzondere voorwaarden van het contract..."></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Annuleren</button>
+                    <button type="submit" class="btn-primary">Opslaan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/db-helpers.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/contracten.js"></script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onderhoud - Stadsgezicht Ontwikkelingen</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/stadsgezicht-logo.svg" alt="Stadsgezicht" class="sidebar-logo">
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="panden.html" class="nav-item">
+                    <span class="icon">🏢</span>
+                    Panden
+                </a>
+                <a href="huurders.html" class="nav-item">
+                    <span class="icon">👥</span>
+                    Huurders
+                </a>
+                <a href="contracten.html" class="nav-item">
+                    <span class="icon">📄</span>
+                    Contracten
+                </a>
+                <a href="onderhoud.html" class="nav-item active">
+                    <span class="icon">🔧</span>
+                    Onderhoud
+                </a>
+                <a href="financieel.html" class="nav-item">
+                    <span class="icon">💰</span>
+                    Financieel
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-secondary">
+                    <span class="icon">🚪</span>
+                    Uitloggen
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Onderhoud & Reparaties</h1>
+                <button id="addMeldingBtn" class="btn-primary">
+                    ➕ Nieuwe Melding
+                </button>
+            </header>
+
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="statusFilter">Status:</label>
+                    <select id="statusFilter">
+                        <option value="">Alle</option>
+                        <option value="nieuw">Nieuw</option>
+                        <option value="in-behandeling">In behandeling</option>
+                        <option value="gepland">Gepland</option>
+                        <option value="afgerond">Afgerond</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="prioriteitFilter">Prioriteit:</label>
+                    <select id="prioriteitFilter">
+                        <option value="">Alle</option>
+                        <option value="laag">Laag</option>
+                        <option value="normaal">Normaal</option>
+                        <option value="hoog">Hoog</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Zoek op adres of beschrijving...">
+                </div>
+            </div>
+
+            <div id="meldingenGrid" class="cards-grid">
+                <p class="empty-state">Geen onderhoudsmeldingen gevonden.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Melding -->
+    <div id="meldingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nieuwe Melding</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <form id="meldingForm">
+                <input type="hidden" id="meldingId">
+                
+                <div class="form-group">
+                    <label for="pandId">Pand *</label>
+                    <select id="pandId" required>
+                        <option value="">Selecteer pand</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="titel">Titel *</label>
+                    <input type="text" id="titel" required placeholder="Korte beschrijving van het probleem">
+                </div>
+
+                <div class="form-group">
+                    <label for="beschrijving">Beschrijving *</label>
+                    <textarea id="beschrijving" rows="4" required placeholder="Uitgebreide beschrijving van het onderhoudsprobleem..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="prioriteit">Prioriteit *</label>
+                        <select id="prioriteit" required>
+                            <option value="laag">Laag</option>
+                            <option value="normaal" selected>Normaal</option>
+                            <option value="hoog">Hoog</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" required>
+                            <option value="nieuw" selected>Nieuw</option>
+                            <option value="in-behandeling">In behandeling</option>
+                            <option value="gepland">Gepland</option>
+                            <option value="afgerond">Afgerond</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="geplanddatum">Geplande datum</label>
+                        <input type="date" id="geplanddatum">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="kosten">Geschatte kosten (€)</label>
+                        <input type="number" id="kosten" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notities">Notities</label>
+                    <textarea id="notities" rows="3" placeholder="Aanvullende notities..."></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Annuleren</button>
+                    <button type="submit" class="btn-primary">Opslaan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/db-helpers.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/onderhoud.js"></script>
+</body>
+</html>

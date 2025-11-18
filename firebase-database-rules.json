@@ -1,0 +1,26 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    
+    "panden": {
+      ".indexOn": ["adres", "type", "status"]
+    },
+    
+    "huurders": {
+      ".indexOn": ["achternaam", "email"]
+    },
+    
+    "contracten": {
+      ".indexOn": ["startdatum", "einddatum", "huurderId", "pandId"]
+    },
+    
+    "onderhoud": {
+      ".indexOn": ["status", "prioriteit", "pandId", "createdAt"]
+    },
+    
+    "transacties": {
+      ".indexOn": ["datum", "type", "categorie"]
+    }
+  }
+}
