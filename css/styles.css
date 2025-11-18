@@ -338,8 +338,8 @@ body {
 /* Sidebar */
 .sidebar {
     width: var(--sidebar-width);
-    background: var(--bg-primary);
-    border-right: 1px solid var(--border-color);
+    background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    border-right: 1px solid var(--primary-dark);
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -350,8 +350,8 @@ body {
 
 .sidebar-header {
     padding: 28px 20px;
-    border-bottom: 1px solid var(--border-color);
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
 }
 
 .sidebar-header h2 {
@@ -385,7 +385,7 @@ body {
     gap: 12px;
     padding: 14px 20px;
     margin: 2px 12px;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 500;
@@ -399,8 +399,8 @@ body {
 }
 
 .nav-item:hover {
-    background: linear-gradient(135deg, var(--bg-tertiary) 0%, rgba(198, 156, 109, 0.08) 100%);
-    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
     transform: translateX(4px);
 }
 
@@ -409,10 +409,10 @@ body {
 }
 
 .nav-item.active {
-    background: linear-gradient(135deg, rgba(30, 58, 95, 0.08) 0%, rgba(198, 156, 109, 0.12) 100%);
-    color: var(--primary-color);
+    background: rgba(198, 156, 109, 0.2);
+    color: white;
     border-right: none;
-    box-shadow: inset 3px 0 0 var(--accent-color);
+    box-shadow: inset 4px 0 0 var(--accent-color);
     font-weight: 600;
 }
 
@@ -423,15 +423,26 @@ body {
     top: 50%;
     transform: translateY(-50%);
     width: 4px;
-    height: 24px;
+    height: 100%;
     background: var(--accent-color);
     border-radius: 0 4px 4px 0;
 }
 
 .sidebar-footer {
     padding: 20px;
-    border-top: 1px solid var(--border-color);
-    background: var(--bg-secondary);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+}
+
+.sidebar-footer .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-footer .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--accent-color);
 }
 
 /* Main Content */
