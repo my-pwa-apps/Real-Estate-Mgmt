@@ -169,7 +169,7 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         await ensureAuthenticated();
-        await loadAllHuurders();
+        await loadHuurders();
     } catch (error) {
         console.error('Initialization error:', error);
     }
