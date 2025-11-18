@@ -33,10 +33,10 @@ function renderHuurders() {
     }
 
     container.innerHTML = filteredHuurders.map(huurder => `
-        <div class="item-card">
+        <div class="item-card" onclick="viewHuurderDetail('${huurder.id}')">
             <div class="item-card-header">
                 <h3>${huurder.voornaam} ${huurder.achternaam}</h3>
-                <div class="item-card-actions">
+                <div class="item-card-actions" onclick="event.stopPropagation();">
                     <span class="action-icon" onclick="editHuurder('${huurder.id}')" title="Bewerken">✏️</span>
                     <span class="action-icon" onclick="deleteHuurder('${huurder.id}')" title="Verwijderen">🗑️</span>
                 </div>
@@ -157,5 +157,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// View huurder detail
+function viewHuurderDetail(huurderId) {
+    const huurder = huurders.find(h => h.id === huurderId);
+    if (huurder) {
+        showDetailPanel('huurder', huurder);
+    }
+}
+
 window.editHuurder = editHuurder;
 window.deleteHuurder = deleteHuurder;
+window.viewHuurderDetail = viewHuurderDetail;

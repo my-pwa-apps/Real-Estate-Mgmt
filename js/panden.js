@@ -34,14 +34,14 @@ function renderPanden() {
     }
 
     tbody.innerHTML = filteredPanden.map(pand => `
-        <tr>
+        <tr onclick="viewPandDetail('${pand.id}')" style="cursor: pointer;">
             <td><span class="status-badge ${pand.type}">${pand.type === 'bedrijfspand' ? 'Bedrijfspand' : 'Woning'}</span></td>
             <td>${pand.adres}</td>
             <td>${pand.postcode}</td>
             <td>${pand.plaats}</td>
             <td><span class="status-badge ${pand.status}">${capitalizeFirst(pand.status)}</span></td>
             <td>€${parseFloat(pand.huurprijs).toLocaleString('nl-NL')}</td>
-            <td class="actions">
+            <td class="actions" onclick="event.stopPropagation();">
                 <span class="action-icon" onclick="editPand('${pand.id}')" title="Bewerken">✏️</span>
                 <span class="action-icon" onclick="deletePand('${pand.id}')" title="Verwijderen">🗑️</span>
             </td>
@@ -179,6 +179,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// View pand detail
+function viewPandDetail(pandId) {
+    const pand = panden.find(p => p.id === pandId);
+    if (pand) {
+        showDetailPanel('pand', pand);
+    }
+}
+
 // Make functions global for onclick handlers
 window.editPand = editPand;
 window.deletePand = deletePand;
+window.viewPandDetail = viewPandDetail;
