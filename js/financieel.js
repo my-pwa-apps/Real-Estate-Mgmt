@@ -139,10 +139,10 @@ function renderRecenteTransacties() {
         inkomstenContainer.innerHTML = '<p class="empty-state">Geen recente inkomsten</p>';
     } else {
         inkomstenContainer.innerHTML = recenteInkomsten.map(t => `
-            <div class="list-item" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+            <div class="list-item" onclick="viewTransactieDetail('${t.id}')" style="padding: 12px 0; border-bottom: 1px solid var(--border-color); cursor: pointer;">
                 <div style="display: flex; justify-content: space-between;">
                     <div>
-                        <strong>${t.beschrijving}</strong>
+                        <strong>${t.omschrijving || t.beschrijving}</strong>
                         <p style="font-size: 12px; color: var(--text-muted);">
                             ${new Date(t.datum).toLocaleDateString('nl-NL')}
                         </p>
@@ -159,10 +159,10 @@ function renderRecenteTransacties() {
         uitgavenContainer.innerHTML = '<p class="empty-state">Geen recente uitgaven</p>';
     } else {
         uitgavenContainer.innerHTML = recenteUitgaven.map(t => `
-            <div class="list-item" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+            <div class="list-item" onclick="viewTransactieDetail('${t.id}')" style="padding: 12px 0; border-bottom: 1px solid var(--border-color); cursor: pointer;">
                 <div style="display: flex; justify-content: space-between;">
                     <div>
-                        <strong>${t.beschrijving}</strong>
+                        <strong>${t.omschrijving || t.beschrijving}</strong>
                         <p style="font-size: 12px; color: var(--text-muted);">
                             ${new Date(t.datum).toLocaleDateString('nl-NL')}
                         </p>
@@ -241,6 +241,18 @@ jaarFilter.addEventListener('change', async (e) => {
     currentYear = parseInt(e.target.value);
     await loadAllData();
 });
+
+// View transactie detail in side panel
+function viewTransactieDetail(transactieId) {
+    const transactie = transacties.find(t => t.id === transactieId);
+    if (!transactie) return;
+    
+    if (typeof showDetailPanel === 'function') {
+        showDetailPanel('transactie', transactie);
+    }
+}
+
+window.viewTransactieDetail = viewTransactieDetail;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {

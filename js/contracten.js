@@ -63,7 +63,7 @@ function renderContracten() {
         const status = getContractStatus(contract);
         
         return `
-            <tr>
+            <tr onclick="viewContractDetail('${contract.id}')" style="cursor: pointer;">
                 <td>${huurder ? `${huurder.voornaam} ${huurder.achternaam}` : 'Onbekend'}</td>
                 <td>${pand ? pand.adres : 'Onbekend'}</td>
                 <td>${new Date(contract.startdatum).toLocaleDateString('nl-NL')}</td>
@@ -75,7 +75,7 @@ function renderContracten() {
                         `<a href="${contract.documentUrl}" target="_blank" title="Document openen">📄</a>` : 
                         '<span style="color: #999;" title="Geen document">-</span>'}
                 </td>
-                <td class="actions">
+                <td class="actions" onclick="event.stopPropagation();">
                     <span class="action-icon" onclick="emailContract('${contract.id}')" title="Email versturen">📧</span>
                     <span class="action-icon" onclick="editContract('${contract.id}')" title="Bewerken">✏️</span>
                     <span class="action-icon" onclick="deleteContract('${contract.id}')" title="Verwijderen">🗑️</span>
@@ -299,6 +299,30 @@ async function emailContract(contractId) {
     }
 }
 
+// View contract detail in side panel
+function viewContractDetail(contractId) {
+    const contract = contracten.find(c => c.id === contractId);
+    if (!contract) return;
+    
+    const huurder = huurders.find(h => h.id === contract.huurderId);
+    const pand = panden.find(p => p.id === contract.pandId);
+    
+    const enrichedContract = {
+        ...contract,
+        huurderNaam: huurder ? `${huurder.voornaam} ${huurder.achternaam}` : 'Onbekend',
+        huurderEmail: huurder?.email || '',
+        huurderTelefoon: huurder?.telefoon || '',
+        pandAdres: pand ? `${pand.adres}, ${pand.plaats}` : 'Onbekend',
+        pandType: pand?.type || '',
+        status: getContractStatus(contract)
+    };
+    
+    if (typeof showDetailPanel === 'function') {
+        showDetailPanel('contract', enrichedContract);
+    }
+}
+
 window.editContract = editContract;
 window.deleteContract = deleteContract;
 window.emailContract = emailContract;
+window.viewContractDetail = viewContractDetail;

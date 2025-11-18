@@ -55,10 +55,10 @@ function renderMeldingen() {
         const statusClass = melding.status || 'nieuw';
         
         return `
-            <div class="item-card">
+            <div class="item-card" onclick="viewOnderhoudDetail('${melding.id}')">
                 <div class="item-card-header">
                     <h3>${melding.titel}</h3>
-                    <div class="item-card-actions">
+                    <div class="item-card-actions" onclick="event.stopPropagation();">
                         <span class="action-icon" onclick="editMelding('${melding.id}')" title="Bewerken">✏️</span>
                         <span class="action-icon" onclick="deleteMelding('${melding.id}')" title="Verwijderen">🗑️</span>
                     </div>
@@ -66,7 +66,7 @@ function renderMeldingen() {
                 <div class="item-card-body">
                     <p>🏢 ${pand ? pand.adres : 'Onbekend pand'}</p>
                     <p style="margin-top: 8px;">${melding.beschrijving}</p>
-                    ${melding.geplanddatum ? `<p>📅 Gepland: ${new Date(melding.geplanddatum).toLocaleDateString('nl-NL')}</p>` : ''}
+                    ${melding.geplande_datum ? `<p>📅 Gepland: ${new Date(melding.geplande_datum).toLocaleDateString('nl-NL')}</p>` : ''}
                     ${melding.kosten ? `<p>💰 Kosten: €${parseFloat(melding.kosten).toLocaleString('nl-NL')}</p>` : ''}
                 </div>
                 <div class="item-card-footer">
@@ -268,6 +268,25 @@ async function sendConfirmationEmail(meldingId) {
     }
 }
 
+// View onderhoud detail in side panel
+function viewOnderhoudDetail(meldingId) {
+    const melding = meldingen.find(m => m.id === meldingId);
+    if (!melding) return;
+    
+    const pand = panden.find(p => p.id === melding.pandId);
+    
+    const enrichedMelding = {
+        ...melding,
+        pandAdres: pand ? `${pand.adres}, ${pand.plaats}` : 'Onbekend',
+        pandType: pand?.type || ''
+    };
+    
+    if (typeof showDetailPanel === 'function') {
+        showDetailPanel('onderhoud', enrichedMelding);
+    }
+}
+
 window.editMelding = editMelding;
 window.deleteMelding = deleteMelding;
 window.sendConfirmationEmail = sendConfirmationEmail;
+window.viewOnderhoudDetail = viewOnderhoudDetail;
