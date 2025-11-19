@@ -399,6 +399,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await ensureAuthenticated();
         await loadWerkbonnen();
+        
+        // Check if there's a werkbon ID in the hash
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            // Give it a moment for data to load
+            setTimeout(() => {
+                viewWerkbonDetail(hash);
+                // Clear hash
+                history.replaceState(null, null, ' ');
+            }, 500);
+        }
     } catch (error) {
         console.error('Initialization error:', error);
     }

@@ -289,14 +289,76 @@ function viewOnderhoudDetail(meldingId) {
 
 // Create and send werkbon
 async function createWerkbon(meldingId) {
-    if (!confirm('Weet u zeker dat u een werkbon wilt aanmaken voor deze melding?')) {
-        return;
-    }
+    try {
+        // Get melding details for preview
+        const melding = meldingen.find(m => m.id === meldingId);
+        if (!melding) return;
 
+        const pand = panden.find(p => p.id === melding.pandId);
+        
+        // Show preview/confirm modal FIRST
+        showWerkbonPreviewModal(meldingId, melding, pand);
+
+    } catch (error) {
+        console.error('Error showing werkbon preview:', error);
+        showToast('Fout bij voorbereiden werkbon: ' + error.message, 'error');
+    }
+}
+
+// Show werkbon preview modal before creating
+function showWerkbonPreviewModal(meldingId, melding, pand) {
+    const modalHTML = `
+        <div id="werkbonPreviewModal" class="modal show" style="display: flex;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📄 Werkbon Aanmaken</h2>
+                    <button class="close-btn" onclick="closeWerkbonPreviewModal()">&times;</button>
+                </div>
+                
+                <div style="padding: 24px;">
+                    <p style="margin-bottom: 20px;">U staat op het punt een werkbon aan te maken voor:</p>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <strong>🏢 Pand:</strong> ${pand ? pand.adres : 'Onbekend'}<br>
+                        <strong>🔧 Werkzaamheden:</strong> ${melding.titel}<br>
+                        <strong>⚠️ Prioriteit:</strong> ${melding.prioriteit}<br>
+                        ${melding.kosten ? `<strong>💰 Geschatte kosten:</strong> €${parseFloat(melding.kosten).toLocaleString('nl-NL')}<br>` : ''}
+                    </div>
+                    
+                    <p style="color: #666; font-size: 14px;">
+                        Na het aanmaken kunt u de werkbon versturen, downloaden of printen.
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeWerkbonPreviewModal()">
+                        Annuleren
+                    </button>
+                    <button type="button" class="btn-primary" onclick="confirmCreateWerkbon('${meldingId}')">
+                        ✓ Werkbon Aanmaken
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Close preview modal
+function closeWerkbonPreviewModal() {
+    const modal = document.getElementById('werkbonPreviewModal');
+    if (modal) modal.remove();
+}
+
+// Confirm and actually create werkbon
+async function confirmCreateWerkbon(meldingId) {
+    closeWerkbonPreviewModal();
+    
     try {
         showLoading('Werkbon aanmaken...');
 
-        // Generate werkbon
+        // NOW generate werkbon
         const werkbon = await generateWerkbon(meldingId);
         
         hideLoading();
@@ -308,6 +370,17 @@ async function createWerkbon(meldingId) {
         hideLoading();
         console.error('Error creating werkbon:', error);
         showToast('Fout bij aanmaken werkbon: ' + error.message, 'error');
+    }
+}
+
+// View existing werkbon
+async function viewExistingWerkbon(werkbonId) {
+    try {
+        // Redirect to werkbonnen page with hash to open detail
+        window.location.href = `werkbonnen.html#${werkbonId}`;
+    } catch (error) {
+        console.error('Error viewing werkbon:', error);
+        showToast('Fout bij openen werkbon', 'error');
     }
 }
 
@@ -394,6 +467,7 @@ function closeWerkbonSendModal() {
     }
     // Reload data to show updated status
     loadAllData();
+    showToast('Werkbon succesvol aangemaakt', 'success');
 }
 
 // Send werkbon from modal
@@ -451,5 +525,8 @@ window.deleteMelding = deleteMelding;
 window.sendConfirmationEmail = sendConfirmationEmail;
 window.viewOnderhoudDetail = viewOnderhoudDetail;
 window.createWerkbon = createWerkbon;
+window.closeWerkbonPreviewModal = closeWerkbonPreviewModal;
+window.confirmCreateWerkbon = confirmCreateWerkbon;
+window.viewExistingWerkbon = viewExistingWerkbon;
 window.closeWerkbonSendModal = closeWerkbonSendModal;
 window.sendWerkbonFromModal = sendWerkbonFromModal;
