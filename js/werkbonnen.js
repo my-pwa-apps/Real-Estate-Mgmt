@@ -405,9 +405,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (hash) {
             // Give it a moment for data to load
             setTimeout(() => {
-                viewWerkbonDetail(hash);
+                const werkbon = werkbonnen.find(w => w.id === hash);
+                if (werkbon) {
+                    viewWerkbonDetail(hash);
+                } else {
+                    showToast('Werkbon niet gevonden', 'error');
+                }
                 // Clear hash
-                history.replaceState(null, null, ' ');
+                history.replaceState(null, null, 'werkbonnen.html');
             }, 500);
         }
     } catch (error) {

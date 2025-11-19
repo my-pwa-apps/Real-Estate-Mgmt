@@ -123,6 +123,7 @@ const DEMO_DATA = {
             huurprijs: 3500,
             borg: 7000,
             betalingsdatum: 1,
+            status: 'actief',
             voorwaarden: '5-jarig contract met bedrijf. Jaarlijkse indexatie conform CBS.',
             createdAt: new Date('2024-01-15').toISOString()
         },
@@ -135,6 +136,7 @@ const DEMO_DATA = {
             huurprijs: 2100,
             borg: 4200,
             betalingsdatum: 1,
+            status: 'actief',
             voorwaarden: '2-jarig contract met optie tot verlenging. Servicekosten €75 per maand.',
             createdAt: new Date('2024-02-10').toISOString()
         },
@@ -147,6 +149,7 @@ const DEMO_DATA = {
             huurprijs: 2800,
             borg: 5600,
             betalingsdatum: 5,
+            status: 'actief',
             voorwaarden: '1-jarig contract. Huismeester regeling met reductie van €200 per maand.',
             createdAt: new Date('2024-03-05').toISOString()
         }

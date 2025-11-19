@@ -402,6 +402,21 @@ function showWerkbonSendModal(werkbon) {
                             <input type="checkbox" id="sendToHuurder" ${werkbon.huurderEmail ? 'checked' : 'disabled'}>
                             <span>Verstuur naar huurder ${werkbon.huurderEmail ? '(' + werkbon.huurderEmail + ')' : '(geen email)'}</span>
                         </label>
+                        ${werkbon.huurderId ? `
+                        <div style="margin-left: 30px; margin-top: 8px;">
+                            <a href="huurders.html#${werkbon.huurderId}" target="_blank" style="color: var(--primary-color); font-size: 13px; text-decoration: none;">
+                                👤 Bekijk huurder informatie →
+                            </a>
+                        </div>
+                        ` : werkbon.huurderNaam ? `
+                        <div style="margin-left: 30px; margin-top: 8px; color: #999; font-size: 13px;">
+                            Huurder: ${werkbon.huurderNaam} (geen email beschikbaar)
+                        </div>
+                        ` : `
+                        <div style="margin-left: 30px; margin-top: 8px; color: #999; font-size: 13px;">
+                            ⚠️ Geen huurder gekoppeld aan dit pand
+                        </div>
+                        `}
                     </div>
                     
                     <div style="margin-bottom: 20px;">

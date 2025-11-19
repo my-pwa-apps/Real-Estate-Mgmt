@@ -170,6 +170,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await ensureAuthenticated();
         await loadHuurders();
+        
+        // Check if there's a huurder ID in the hash
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            // Give it a moment for data to load
+            setTimeout(() => {
+                const huurder = huurders.find(h => h.id === hash);
+                if (huurder) {
+                    viewHuurderDetail(hash);
+                } else {
+                    showToast('Huurder niet gevonden', 'error');
+                }
+                // Clear hash
+                history.replaceState(null, null, 'huurders.html');
+            }, 500);
+        }
     } catch (error) {
         console.error('Initialization error:', error);
     }

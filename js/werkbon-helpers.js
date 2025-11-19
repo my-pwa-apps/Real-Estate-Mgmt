@@ -22,10 +22,10 @@ async function generateWerkbon(meldingId) {
 
         // Get active contract and huurder
         const contracten = await dbGetAll('contracten');
-        const contract = contracten.find(c => 
-            c.pandId === melding.pandId && 
-            c.status === 'actief'
-        );
+        // Find most recent contract for this pand (check status if present, otherwise accept any)
+        const contract = contracten
+            .filter(c => c.pandId === melding.pandId)
+            .sort((a, b) => new Date(b.startdatum) - new Date(a.startdatum))[0];
 
         let huurder = null;
         if (contract) {
