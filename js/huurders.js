@@ -12,27 +12,17 @@ const huurderForm = document.getElementById('huurderForm');
 // Load all huurders
 async function loadHuurders() {
     try {
-        if (typeof showLoading === 'function') {
-            showLoading('Huurders laden...');
-        }
+        showLoading('Huurders laden...');
         huurders = await dbGetAll('huurders');
         // Sort by last name
         huurders.sort((a, b) => (a.achternaam || '').localeCompare(b.achternaam || ''));
         filteredHuurders = [...huurders];
         renderHuurders();
-        if (typeof hideLoading === 'function') {
-            hideLoading();
-        }
+        hideLoading();
     } catch (error) {
         console.error('Error loading huurders:', error);
-        if (typeof hideLoading === 'function') {
-            hideLoading();
-        }
-        if (typeof showToast === 'function') {
-            showToast('Fout bij het laden van huurders', 'error');
-        } else {
-            alert('Fout bij het laden van huurders');
-        }
+        hideLoading();
+        showToast('Fout bij het laden van huurders', 'error');
     }
 }
 
@@ -140,14 +130,18 @@ async function editHuurder(id) {
 
 // Delete huurder
 async function deleteHuurder(id) {
-    if (!confirm('Weet u zeker dat u deze huurder wilt verwijderen?')) return;
+    const confirmed = await showConfirm('Weet u zeker dat u deze huurder wilt verwijderen?', 'Huurder verwijderen');
+    if (!confirmed) return;
 
     try {
+        showLoading('Huurder verwijderen...');
         await dbDelete('huurders', id);
+        showToast('Huurder succesvol verwijderd', 'success');
         await loadHuurders();
     } catch (error) {
         console.error('Error deleting huurder:', error);
-        alert('Fout bij het verwijderen van de huurder');
+        hideLoading();
+        showToast('Fout bij het verwijderen van de huurder', 'error');
     }
 }
 

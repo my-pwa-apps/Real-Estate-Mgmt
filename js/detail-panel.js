@@ -466,12 +466,6 @@ function generateGenericDetail(data) {
     `;
 }
 
-// Helper function to capitalize first letter
-function capitalizeFirst(str) {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 // Close panel on ESC key
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && currentDetailPanel) {

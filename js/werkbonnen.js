@@ -6,6 +6,7 @@ let filteredWerkbonnen = [];
 // Load all werkbonnen
 async function loadWerkbonnen() {
     try {
+        showLoading('Werkbonnen laden...');
         const data = await dbGetAll('werkbonnen');
         werkbonnen = data;
         
@@ -15,8 +16,10 @@ async function loadWerkbonnen() {
         filteredWerkbonnen = [...werkbonnen];
         populateYearFilter();
         renderWerkbonnen();
+        hideLoading();
     } catch (error) {
         console.error('Error loading werkbonnen:', error);
+        hideLoading();
         showToast('Fout bij het laden van werkbonnen', 'error');
     }
 }
@@ -386,12 +389,6 @@ function applyFilters() {
     });
 
     renderWerkbonnen();
-}
-
-// Helper function
-function capitalizeFirst(str) {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // Initialize

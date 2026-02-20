@@ -13,6 +13,7 @@ const meldingForm = document.getElementById('meldingForm');
 // Load all data
 async function loadAllData() {
     try {
+        showLoading('Gegevens laden...');
         const [meldingenData, pandenData] = await Promise.all([
             dbGetAll('onderhoud'),
             dbGetAll('panden')
@@ -27,9 +28,11 @@ async function loadAllData() {
         filteredMeldingen = [...meldingen];
         populateDropdowns();
         renderMeldingen();
+        hideLoading();
     } catch (error) {
         console.error('Error loading data:', error);
-        alert('Fout bij het laden van gegevens');
+        hideLoading();
+        showToast('Fout bij het laden van gegevens', 'error');
     }
 }
 
@@ -111,7 +114,7 @@ meldingForm.addEventListener('submit', async (e) => {
         beschrijving: document.getElementById('beschrijving').value,
         prioriteit: document.getElementById('prioriteit').value,
         status: document.getElementById('status').value,
-        geplanddatum: document.getElementById('geplanddatum').value || null,
+        geplande_datum: document.getElementById('geplanddatum').value || null,
         kosten: parseFloat(document.getElementById('kosten').value) || null,
         notities: document.getElementById('notities').value
     };
@@ -119,17 +122,21 @@ meldingForm.addEventListener('submit', async (e) => {
     const meldingId = document.getElementById('meldingId').value;
 
     try {
+        showLoading(meldingId ? 'Melding bijwerken...' : 'Melding opslaan...');
         if (meldingId) {
             await dbUpdate('onderhoud', meldingId, meldingData);
+            showToast('Melding succesvol bijgewerkt', 'success');
         } else {
             await dbAdd('onderhoud', meldingData);
+            showToast('Melding succesvol toegevoegd', 'success');
         }
 
         closeModalWindow();
         await loadAllData();
     } catch (error) {
         console.error('Error saving melding:', error);
-        alert('Fout bij het opslaan van de melding');
+        hideLoading();
+        showToast('Fout bij het opslaan van de melding', 'error');
     }
 });
 
@@ -145,7 +152,7 @@ async function editMelding(id) {
     document.getElementById('beschrijving').value = melding.beschrijving;
     document.getElementById('prioriteit').value = melding.prioriteit || 'normaal';
     document.getElementById('status').value = melding.status || 'nieuw';
-    document.getElementById('geplanddatum').value = melding.geplanddatum || '';
+    document.getElementById('geplanddatum').value = melding.geplande_datum || '';
     document.getElementById('kosten').value = melding.kosten || '';
     document.getElementById('notities').value = melding.notities || '';
 
@@ -154,14 +161,18 @@ async function editMelding(id) {
 
 // Delete melding
 async function deleteMelding(id) {
-    if (!confirm('Weet u zeker dat u deze melding wilt verwijderen?')) return;
+    const confirmed = await showConfirm('Weet u zeker dat u deze melding wilt verwijderen?', 'Melding verwijderen');
+    if (!confirmed) return;
 
     try {
+        showLoading('Melding verwijderen...');
         await dbDelete('onderhoud', id);
+        showToast('Melding succesvol verwijderd', 'success');
         await loadAllData();
     } catch (error) {
         console.error('Error deleting melding:', error);
-        alert('Fout bij het verwijderen van de melding');
+        hideLoading();
+        showToast('Fout bij het verwijderen van de melding', 'error');
     }
 }
 
@@ -191,11 +202,6 @@ function applyFilters() {
     renderMeldingen();
 }
 
-// Helper function
-function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -211,7 +217,7 @@ async function sendConfirmationEmail(meldingId) {
     try {
         // Check if Microsoft signed in
         if (!isMicrosoftSignedIn()) {
-            const signIn = confirm('U moet eerst inloggen met Microsoft 365 om emails te versturen. Nu inloggen?');
+            const signIn = await showConfirm('U moet eerst inloggen met Microsoft 365 om emails te versturen. Nu inloggen?', 'Microsoft 365 vereist');
             if (signIn) {
                 await signInToMicrosoft();
             }
@@ -229,7 +235,7 @@ async function sendConfirmationEmail(meldingId) {
         const contract = contracten.find(c => c.pandId === pand.id);
         
         if (!contract) {
-            alert('Geen actief contract gevonden voor dit pand');
+            showToast('Geen actief contract gevonden voor dit pand', 'warning');
             return;
         }
 
@@ -237,7 +243,7 @@ async function sendConfirmationEmail(meldingId) {
         const huurder = huurders.find(h => h.id === contract.huurderId);
         
         if (!huurder) {
-            alert('Huurder gegevens niet gevonden');
+            showToast('Huurder gegevens niet gevonden', 'error');
             return;
         }
 
@@ -253,19 +259,19 @@ async function sendConfirmationEmail(meldingId) {
 
         await sendEmail(emailData);
 
-        alert('Bevestiging verstuurd naar ' + huurder.email);
+        showToast('Bevestiging verstuurd naar ' + huurder.email, 'success');
         
         // Save email to SharePoint
         const folderPath = `Onderhoud/${new Date().getFullYear()}/${pand.adres.replace(/[^a-z0-9]/gi, '_')}`;
         await saveEmailToSharePoint(emailData, folderPath);
 
         // Update melding status
-        await dbUpdate('onderhoud', meldingId, { status: 'in_behandeling' });
+        await dbUpdate('onderhoud', meldingId, { status: 'in-behandeling' });
         await loadAllData();
 
     } catch (error) {
         console.error('Error sending email:', error);
-        alert('Fout bij versturen email: ' + error.message);
+        showToast('Fout bij versturen email: ' + error.message, 'error');
     }
 }
 

@@ -16,6 +16,7 @@ const jaarFilter = document.getElementById('jaarFilter');
 // Load all data
 async function loadAllData() {
     try {
+        showLoading('Financiële gegevens laden...');
         const [transactiesData, contractenData, onderhoudData] = await Promise.all([
             dbGetAll('transacties'),
             dbGetAll('contracten'),
@@ -32,9 +33,11 @@ async function loadAllData() {
         calculateStatistics();
         renderMaandelijksOverzicht();
         renderRecenteTransacties();
+        hideLoading();
     } catch (error) {
         console.error('Error loading data:', error);
-        alert('Fout bij het laden van financiële gegevens');
+        hideLoading();
+        showToast('Fout bij het laden van financiële gegevens', 'error');
     }
 }
 
@@ -224,15 +227,18 @@ transactieForm.addEventListener('submit', async (e) => {
     try {
         if (transactieId) {
             await dbUpdate('transacties', transactieId, transactieData);
+            showToast('Transactie succesvol bijgewerkt', 'success');
         } else {
             await dbAdd('transacties', transactieData);
+            showToast('Transactie succesvol toegevoegd', 'success');
         }
 
         closeModalWindow();
         await loadAllData();
     } catch (error) {
         console.error('Error saving transaction:', error);
-        alert('Fout bij het opslaan van de transactie');
+        hideLoading();
+        showToast('Fout bij het opslaan van de transactie', 'error');
     }
 });
 

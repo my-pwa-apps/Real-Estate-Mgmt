@@ -13,27 +13,17 @@ const pandForm = document.getElementById('pandForm');
 // Load all panden
 async function loadPanden() {
     try {
-        if (typeof showLoading === 'function') {
-            showLoading('Panden laden...');
-        }
+        showLoading('Panden laden...');
         panden = await dbGetAll('panden');
         // Sort by address
         panden.sort((a, b) => (a.adres || '').localeCompare(b.adres || ''));
         filteredPanden = [...panden];
         renderPanden();
-        if (typeof hideLoading === 'function') {
-            hideLoading();
-        }
+        hideLoading();
     } catch (error) {
         console.error('Error loading panden:', error);
-        if (typeof hideLoading === 'function') {
-            hideLoading();
-        }
-        if (typeof showToast === 'function') {
-            showToast('Fout bij het laden van panden', 'error');
-        } else {
-            alert('Fout bij het laden van panden');
-        }
+        hideLoading();
+        showToast('Fout bij het laden van panden', 'error');
     }
 }
 
@@ -184,11 +174,6 @@ function applyFilters() {
     });
 
     renderPanden();
-}
-
-// Helper function
-function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // Initialize

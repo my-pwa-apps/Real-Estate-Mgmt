@@ -14,6 +14,7 @@ const contractForm = document.getElementById('contractForm');
 // Load all data
 async function loadAllData() {
     try {
+        showLoading('Gegevens laden...');
         const [contractenData, huurdersData, pandenData] = await Promise.all([
             dbGetAll('contracten'),
             dbGetAll('huurders'),
@@ -30,9 +31,11 @@ async function loadAllData() {
         filteredContracten = [...contracten];
         populateDropdowns();
         renderContracten();
+        hideLoading();
     } catch (error) {
         console.error('Error loading data:', error);
-        alert('Fout bij het laden van gegevens');
+        hideLoading();
+        showToast('Fout bij het laden van gegevens', 'error');
     }
 }
 
@@ -146,20 +149,23 @@ contractForm.addEventListener('submit', async (e) => {
     const contractId = document.getElementById('contractId').value;
 
     try {
+        showLoading(contractId ? 'Contract bijwerken...' : 'Contract opslaan...');
         if (contractId) {
             await dbUpdate('contracten', contractId, contractData);
+            showToast('Contract succesvol bijgewerkt', 'success');
         } else {
             await dbAdd('contracten', contractData);
-            
             // Update pand status to 'verhuurd'
             await dbUpdate('panden', contractData.pandId, { status: 'verhuurd' });
+            showToast('Contract succesvol toegevoegd', 'success');
         }
 
         closeModalWindow();
         await loadAllData();
     } catch (error) {
         console.error('Error saving contract:', error);
-        alert('Fout bij het opslaan van het contract');
+        hideLoading();
+        showToast('Fout bij het opslaan van het contract', 'error');
     }
 });
 
@@ -184,9 +190,11 @@ async function editContract(id) {
 
 // Delete contract
 async function deleteContract(id) {
-    if (!confirm('Weet u zeker dat u dit contract wilt verwijderen?')) return;
+    const confirmed = await showConfirm('Weet u zeker dat u dit contract wilt verwijderen?', 'Contract verwijderen');
+    if (!confirmed) return;
 
     try {
+        showLoading('Contract verwijderen...');
         const contract = contracten.find(c => c.id === id);
         await dbDelete('contracten', id);
         
@@ -195,10 +203,12 @@ async function deleteContract(id) {
             await dbUpdate('panden', contract.pandId, { status: 'beschikbaar' });
         }
         
+        showToast('Contract succesvol verwijderd', 'success');
         await loadAllData();
     } catch (error) {
         console.error('Error deleting contract:', error);
-        alert('Fout bij het verwijderen van het contract');
+        hideLoading();
+        showToast('Fout bij het verwijderen van het contract', 'error');
     }
 }
 
@@ -227,11 +237,6 @@ function applyFilters() {
     renderContracten();
 }
 
-// Helper function
-function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -247,7 +252,7 @@ async function emailContract(contractId) {
     try {
         // Check if Microsoft signed in
         if (!isMicrosoftSignedIn()) {
-            const signIn = confirm('U moet eerst inloggen met Microsoft 365 om emails te versturen. Nu inloggen?');
+            const signIn = await showConfirm('U moet eerst inloggen met Microsoft 365 om emails te versturen. Nu inloggen?', 'Microsoft 365 vereist');
             if (signIn) {
                 await signInToMicrosoft();
             }
@@ -261,7 +266,7 @@ async function emailContract(contractId) {
         const pand = panden.find(p => p.id === contract.pandId);
 
         if (!huurder || !pand) {
-            alert('Huurder of pand gegevens ontbreken');
+            showToast('Huurder of pand gegevens ontbreken', 'error');
             return;
         }
 
@@ -287,15 +292,14 @@ async function emailContract(contractId) {
             await sendEmail(emailData);
         }
 
-        alert('Email succesvol verstuurd naar ' + huurder.email);
+        showToast('Email succesvol verstuurd naar ' + huurder.email, 'success');
         
-        // Save email to SharePoint Correspondentie folder
-        const folderPath = `Huurders/${huurder.achternaam}_${huurder.voornaam}/Correspondentie`;
+        // Save email to SharePoint Correspondentie folderconst folderPath = `Huurders/${huurder.achternaam}_${huurder.voornaam}/Correspondentie`;
         await saveEmailToSharePoint(emailData, folderPath);
 
     } catch (error) {
         console.error('Error sending email:', error);
-        alert('Fout bij versturen email: ' + error.message);
+        showToast('Fout bij versturen email: ' + error.message, 'error');
     }
 }
 

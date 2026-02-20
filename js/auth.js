@@ -35,7 +35,7 @@ async function logout() {
         window.location.href = 'index.html';
     } catch (error) {
         console.error('Logout error:', error);
-        alert('Er is een fout opgetreden bij het uitloggen');
+        showToast('Er is een fout opgetreden bij het uitloggen', 'error');
     }
 }
 

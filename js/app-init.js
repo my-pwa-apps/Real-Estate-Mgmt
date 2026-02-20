@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', async () => {
             if (isDemoMode()) {
                 // Exit demo mode
-                if (confirm('Demo modus verlaten? U keert terug naar het login scherm.')) {
+                const confirmed = await showConfirm('Demo modus verlaten? U keert terug naar het login scherm.', 'Demo modus verlaten');
+                if (confirmed) {
                     disableDemoMode();
                     window.location.href = 'index.html';
                 }
@@ -30,8 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
             demoIndicator.style.cssText = 'background: #ffc107; color: #000; padding: 8px; border-radius: 4px; margin-bottom: 10px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer;';
             demoIndicator.title = 'Klik om demo modus te verlaten';
             
-            demoIndicator.addEventListener('click', () => {
-                if (confirm('Demo modus verlaten?')) {
+            demoIndicator.addEventListener('click', async () => {
+                const confirmed = await showConfirm('Demo modus verlaten?', 'Demo modus verlaten');
+                if (confirmed) {
                     disableDemoMode();
                     window.location.href = 'index.html';
                 }

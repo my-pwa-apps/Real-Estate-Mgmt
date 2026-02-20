@@ -354,7 +354,7 @@ async function sendWerkbon(werkbonId, options = {}) {
     try {
         // Check if Microsoft signed in
         if (!isMicrosoftSignedIn()) {
-            const signIn = confirm('U moet eerst inloggen met Microsoft 365 om werkbonnen te versturen. Nu inloggen?');
+            const signIn = await showConfirm('U moet eerst inloggen met Microsoft 365 om werkbonnen te versturen. Nu inloggen?', 'Microsoft 365 vereist');
             if (signIn) {
                 await signInToMicrosoft();
             }

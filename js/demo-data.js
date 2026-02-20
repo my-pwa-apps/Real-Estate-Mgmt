@@ -39,7 +39,7 @@ const DEMO_DATA = {
             postcode: '1017 BX',
             plaats: 'Amsterdam',
             type: 'bedrijfspand',
-            status: 'verhuurd',
+            status: 'beschikbaar',
             oppervlakte: 180,
             kamers: 6,
             bouwjaar: 1880,
@@ -132,7 +132,7 @@ const DEMO_DATA = {
             huurderId: 'demo-huurder-2',
             pandId: 'demo-pand-2',
             startdatum: '2024-03-01',
-            einddatum: '2026-02-28',
+            einddatum: '2027-02-28',
             huurprijs: 2100,
             borg: 4200,
             betalingsdatum: 1,
@@ -172,7 +172,7 @@ const DEMO_DATA = {
             pandId: 'demo-pand-2',
             titel: 'Lekkage badkamer',
             beschrijving: 'Huurder meldt lekkage bij douche. Loodgieter ingepland voor spoedklus.',
-            status: 'in_behandeling',
+            status: 'in-behandeling',
             prioriteit: 'hoog',
             geplande_datum: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Over 2 dagen
             kosten: 450,
@@ -183,7 +183,7 @@ const DEMO_DATA = {
             pandId: 'demo-pand-5',
             titel: 'Renovatie elektrische bedrading',
             beschrijving: 'Complete vervanging elektrische installatie in kader van renovatie.',
-            status: 'in_behandeling',
+            status: 'in-behandeling',
             prioriteit: 'hoog',
             geplande_datum: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             kosten: 12500,
@@ -215,31 +215,67 @@ const DEMO_DATA = {
     
     transacties: [
         // Huurinkomsten 2024
-        { id: 'demo-trans-1', datum: '2024-01-01', type: 'inkomst', categorie: 'huur', bedrag: 3500, omschrijving: 'Huur januari - Keizersgracht 123', createdAt: '2024-01-01' },
-        { id: 'demo-trans-2', datum: '2024-02-01', type: 'inkomst', categorie: 'huur', bedrag: 3500, omschrijving: 'Huur februari - Keizersgracht 123', createdAt: '2024-02-01' },
-        { id: 'demo-trans-3', datum: '2024-03-01', type: 'inkomst', categorie: 'huur', bedrag: 6400, omschrijving: 'Huur maart - Keizersgracht 123 + Prinsengracht 456', createdAt: '2024-03-01' },
-        { id: 'demo-trans-4', datum: '2024-04-01', type: 'inkomst', categorie: 'huur', bedrag: 9200, omschrijving: 'Huur april - Alle panden', createdAt: '2024-04-01' },
-        { id: 'demo-trans-5', datum: '2024-05-01', type: 'inkomst', categorie: 'huur', bedrag: 9200, omschrijving: 'Huur mei - Alle panden', createdAt: '2024-05-01' },
-        { id: 'demo-trans-6', datum: '2024-06-01', type: 'inkomst', categorie: 'huur', bedrag: 9200, omschrijving: 'Huur juni - Alle panden', createdAt: '2024-06-01' },
-        { id: 'demo-trans-7', datum: '2024-07-01', type: 'inkomst', categorie: 'huur', bedrag: 9200, omschrijving: 'Huur juli - Alle panden', createdAt: '2024-07-01' },
-        { id: 'demo-trans-8', datum: '2024-08-01', type: 'inkomst', categorie: 'huur', bedrag: 9200, omschrijving: 'Huur augustus - Alle panden', createdAt: '2024-08-01' },
-        { id: 'demo-trans-9', datum: '2024-09-01', type: 'inkomst', categorie: 'huur', bedrag: 9200, omschrijving: 'Huur september - Alle panden', createdAt: '2024-09-01' },
-        { id: 'demo-trans-10', datum: '2024-10-01', type: 'inkomst', categorie: 'huur', bedrag: 9200, omschrijving: 'Huur oktober - Alle panden', createdAt: '2024-10-01' },
-        { id: 'demo-trans-11', datum: '2024-11-01', type: 'inkomst', categorie: 'huur', bedrag: 9200, omschrijving: 'Huur november - Alle panden', createdAt: '2024-11-01' },
+        { id: 'demo-trans-1',  datum: '2024-01-01', type: 'inkomst', categorie: 'huur', bedrag: 3500,  omschrijving: 'Huur januari - Keizersgracht 123',                    createdAt: new Date('2024-01-01').toISOString() },
+        { id: 'demo-trans-2',  datum: '2024-02-01', type: 'inkomst', categorie: 'huur', bedrag: 3500,  omschrijving: 'Huur februari - Keizersgracht 123',                   createdAt: new Date('2024-02-01').toISOString() },
+        { id: 'demo-trans-3',  datum: '2024-03-01', type: 'inkomst', categorie: 'huur', bedrag: 6400,  omschrijving: 'Huur maart - Keizersgracht 123 + Prinsengracht 456',   createdAt: new Date('2024-03-01').toISOString() },
+        { id: 'demo-trans-4',  datum: '2024-04-01', type: 'inkomst', categorie: 'huur', bedrag: 9200,  omschrijving: 'Huur april - Alle panden',                            createdAt: new Date('2024-04-01').toISOString() },
+        { id: 'demo-trans-5',  datum: '2024-05-01', type: 'inkomst', categorie: 'huur', bedrag: 9200,  omschrijving: 'Huur mei - Alle panden',                              createdAt: new Date('2024-05-01').toISOString() },
+        { id: 'demo-trans-6',  datum: '2024-06-01', type: 'inkomst', categorie: 'huur', bedrag: 9200,  omschrijving: 'Huur juni - Alle panden',                             createdAt: new Date('2024-06-01').toISOString() },
+        { id: 'demo-trans-7',  datum: '2024-07-01', type: 'inkomst', categorie: 'huur', bedrag: 9200,  omschrijving: 'Huur juli - Alle panden',                             createdAt: new Date('2024-07-01').toISOString() },
+        { id: 'demo-trans-8',  datum: '2024-08-01', type: 'inkomst', categorie: 'huur', bedrag: 9200,  omschrijving: 'Huur augustus - Alle panden',                         createdAt: new Date('2024-08-01').toISOString() },
+        { id: 'demo-trans-9',  datum: '2024-09-01', type: 'inkomst', categorie: 'huur', bedrag: 9200,  omschrijving: 'Huur september - Alle panden',                        createdAt: new Date('2024-09-01').toISOString() },
+        { id: 'demo-trans-10', datum: '2024-10-01', type: 'inkomst', categorie: 'huur', bedrag: 9200,  omschrijving: 'Huur oktober - Alle panden',                          createdAt: new Date('2024-10-01').toISOString() },
+        { id: 'demo-trans-11', datum: '2024-11-01', type: 'inkomst', categorie: 'huur', bedrag: 9200,  omschrijving: 'Huur november - Alle panden',                         createdAt: new Date('2024-11-01').toISOString() },
+        { id: 'demo-trans-12', datum: '2024-12-01', type: 'inkomst', categorie: 'huur', bedrag: 9200,  omschrijving: 'Huur december - Alle panden',                         createdAt: new Date('2024-12-01').toISOString() },
         
-        // Onderhoudskosten
-        { id: 'demo-trans-20', datum: '2024-03-15', type: 'uitgave', categorie: 'onderhoud', bedrag: 850, omschrijving: 'CV onderhoud Keizersgracht 123', createdAt: '2024-03-15' },
-        { id: 'demo-trans-21', datum: '2024-05-20', type: 'uitgave', categorie: 'onderhoud', bedrag: 1240, omschrijving: 'Loodgieter werkzaamheden Prinsengracht 456', createdAt: '2024-05-20' },
-        { id: 'demo-trans-22', datum: '2024-09-15', type: 'uitgave', categorie: 'onderhoud', bedrag: 3200, omschrijving: 'Schilderwerk gevel Herengracht 789', createdAt: '2024-09-15' },
-        { id: 'demo-trans-23', datum: '2024-09-10', type: 'uitgave', categorie: 'onderhoud', bedrag: 4500, omschrijving: 'Renovatie elektrische bedrading (deel 1)', createdAt: '2024-09-10' },
-        { id: 'demo-trans-24', datum: '2024-10-15', type: 'uitgave', categorie: 'onderhoud', bedrag: 8000, omschrijving: 'Renovatie elektrische bedrading (deel 2)', createdAt: '2024-10-15' },
+        // Huurinkomsten 2025
+        { id: 'demo-trans-40', datum: '2025-01-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur januari 2025 - Alle panden',                     createdAt: new Date('2025-01-01').toISOString() },
+        { id: 'demo-trans-41', datum: '2025-02-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur februari 2025 - Alle panden',                    createdAt: new Date('2025-02-01').toISOString() },
+        { id: 'demo-trans-42', datum: '2025-03-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur maart 2025 - Alle panden',                       createdAt: new Date('2025-03-01').toISOString() },
+        { id: 'demo-trans-43', datum: '2025-04-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur april 2025 - Alle panden',                       createdAt: new Date('2025-04-01').toISOString() },
+        { id: 'demo-trans-44', datum: '2025-05-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur mei 2025 - Alle panden',                         createdAt: new Date('2025-05-01').toISOString() },
+        { id: 'demo-trans-45', datum: '2025-06-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur juni 2025 - Alle panden',                        createdAt: new Date('2025-06-01').toISOString() },
+        { id: 'demo-trans-46', datum: '2025-07-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur juli 2025 - Alle panden',                        createdAt: new Date('2025-07-01').toISOString() },
+        { id: 'demo-trans-47', datum: '2025-08-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur augustus 2025 - Alle panden',                    createdAt: new Date('2025-08-01').toISOString() },
+        { id: 'demo-trans-48', datum: '2025-09-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur september 2025 - Alle panden',                   createdAt: new Date('2025-09-01').toISOString() },
+        { id: 'demo-trans-49', datum: '2025-10-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur oktober 2025 - Alle panden',                     createdAt: new Date('2025-10-01').toISOString() },
+        { id: 'demo-trans-50', datum: '2025-11-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur november 2025 - Alle panden',                    createdAt: new Date('2025-11-01').toISOString() },
+        { id: 'demo-trans-51', datum: '2025-12-01', type: 'inkomst', categorie: 'huur', bedrag: 9400,  omschrijving: 'Huur december 2025 - Alle panden',                    createdAt: new Date('2025-12-01').toISOString() },
         
-        // Overige kosten
-        { id: 'demo-trans-30', datum: '2024-01-10', type: 'uitgave', categorie: 'verzekering', bedrag: 2400, omschrijving: 'WA verzekering alle panden (jaar)', createdAt: '2024-01-10' },
-        { id: 'demo-trans-31', datum: '2024-02-01', type: 'uitgave', categorie: 'administratie', bedrag: 125, omschrijving: 'Accountant - maandelijkse administratie', createdAt: '2024-02-01' },
-        { id: 'demo-trans-32', datum: '2024-03-01', type: 'uitgave', categorie: 'administratie', bedrag: 125, omschrijving: 'Accountant - maandelijkse administratie', createdAt: '2024-03-01' },
-        { id: 'demo-trans-33', datum: '2024-04-01', type: 'uitgave', categorie: 'administratie', bedrag: 125, omschrijving: 'Accountant - maandelijkse administratie', createdAt: '2024-04-01' },
-        { id: 'demo-trans-34', datum: '2024-06-15', type: 'uitgave', categorie: 'belasting', bedrag: 3800, omschrijving: 'OZB alle panden', createdAt: '2024-06-15' }
+        // Huurinkomsten 2026
+        { id: 'demo-trans-60', datum: '2026-01-01', type: 'inkomst', categorie: 'huur', bedrag: 9600,  omschrijving: 'Huur januari 2026 - Alle panden',                     createdAt: new Date('2026-01-01').toISOString() },
+        { id: 'demo-trans-61', datum: '2026-02-01', type: 'inkomst', categorie: 'huur', bedrag: 9600,  omschrijving: 'Huur februari 2026 - Alle panden',                    createdAt: new Date('2026-02-01').toISOString() },
+        
+        // Onderhoudskosten 2024
+        { id: 'demo-trans-20', datum: '2024-03-15', type: 'uitgave', categorie: 'onderhoud',      bedrag: 850,   omschrijving: 'CV onderhoud Keizersgracht 123',                        createdAt: new Date('2024-03-15').toISOString() },
+        { id: 'demo-trans-21', datum: '2024-05-20', type: 'uitgave', categorie: 'onderhoud',      bedrag: 1240,  omschrijving: 'Loodgieter werkzaamheden Prinsengracht 456',              createdAt: new Date('2024-05-20').toISOString() },
+        { id: 'demo-trans-22', datum: '2024-09-15', type: 'uitgave', categorie: 'onderhoud',      bedrag: 3200,  omschrijving: 'Schilderwerk gevel Herengracht 789',                      createdAt: new Date('2024-09-15').toISOString() },
+        { id: 'demo-trans-23', datum: '2024-09-10', type: 'uitgave', categorie: 'onderhoud',      bedrag: 4500,  omschrijving: 'Renovatie elektrische bedrading (deel 1)',                createdAt: new Date('2024-09-10').toISOString() },
+        { id: 'demo-trans-24', datum: '2024-10-15', type: 'uitgave', categorie: 'onderhoud',      bedrag: 8000,  omschrijving: 'Renovatie elektrische bedrading (deel 2)',                createdAt: new Date('2024-10-15').toISOString() },
+        
+        // Onderhoudskosten 2025
+        { id: 'demo-trans-70', datum: '2025-02-10', type: 'uitgave', categorie: 'onderhoud',      bedrag: 195,   omschrijving: 'CV ketel jaarlijks onderhoud Keizersgracht 123',          createdAt: new Date('2025-02-10').toISOString() },
+        { id: 'demo-trans-71', datum: '2025-04-22', type: 'uitgave', categorie: 'onderhoud',      bedrag: 680,   omschrijving: 'Dakgoot reparatie Prinsengracht 456',                     createdAt: new Date('2025-04-22').toISOString() },
+        { id: 'demo-trans-72', datum: '2025-08-05', type: 'uitgave', categorie: 'onderhoud',      bedrag: 2800,  omschrijving: 'Schilderwerk binnenzijde Herengracht 789',                createdAt: new Date('2025-08-05').toISOString() },
+        
+        // Overige kosten 2024
+        { id: 'demo-trans-30', datum: '2024-01-10', type: 'uitgave', categorie: 'verzekering',    bedrag: 2400,  omschrijving: 'WA verzekering alle panden (jaar)',                       createdAt: new Date('2024-01-10').toISOString() },
+        { id: 'demo-trans-31', datum: '2024-02-01', type: 'uitgave', categorie: 'administratie',  bedrag: 125,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2024-02-01').toISOString() },
+        { id: 'demo-trans-32', datum: '2024-03-01', type: 'uitgave', categorie: 'administratie',  bedrag: 125,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2024-03-01').toISOString() },
+        { id: 'demo-trans-33', datum: '2024-04-01', type: 'uitgave', categorie: 'administratie',  bedrag: 125,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2024-04-01').toISOString() },
+        { id: 'demo-trans-34', datum: '2024-06-15', type: 'uitgave', categorie: 'belasting',      bedrag: 3800,  omschrijving: 'OZB alle panden',                                         createdAt: new Date('2024-06-15').toISOString() },
+        
+        // Overige kosten 2025
+        { id: 'demo-trans-80', datum: '2025-01-10', type: 'uitgave', categorie: 'verzekering',    bedrag: 2520,  omschrijving: 'WA verzekering alle panden (jaar 2025)',                  createdAt: new Date('2025-01-10').toISOString() },
+        { id: 'demo-trans-81', datum: '2025-01-01', type: 'uitgave', categorie: 'administratie',  bedrag: 135,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2025-01-01').toISOString() },
+        { id: 'demo-trans-82', datum: '2025-02-01', type: 'uitgave', categorie: 'administratie',  bedrag: 135,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2025-02-01').toISOString() },
+        { id: 'demo-trans-83', datum: '2025-03-01', type: 'uitgave', categorie: 'administratie',  bedrag: 135,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2025-03-01').toISOString() },
+        { id: 'demo-trans-84', datum: '2025-06-15', type: 'uitgave', categorie: 'belasting',      bedrag: 3950,  omschrijving: 'OZB alle panden 2025',                                    createdAt: new Date('2025-06-15').toISOString() },
+        
+        // Overige kosten 2026
+        { id: 'demo-trans-90', datum: '2026-01-10', type: 'uitgave', categorie: 'verzekering',    bedrag: 2645,  omschrijving: 'WA verzekering alle panden (jaar 2026)',                  createdAt: new Date('2026-01-10').toISOString() },
+        { id: 'demo-trans-91', datum: '2026-01-01', type: 'uitgave', categorie: 'administratie',  bedrag: 145,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2026-01-01').toISOString() },
+        { id: 'demo-trans-92', datum: '2026-02-01', type: 'uitgave', categorie: 'administratie',  bedrag: 145,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2026-02-01').toISOString() }
     ]
 };
 

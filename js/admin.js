@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
     } catch (error) {
         console.error('Error initializing admin page:', error);
-        alert('Fout bij laden van admin pagina');
+        showToast('Fout bij laden van admin pagina', 'error');
     }
 });
 
@@ -153,8 +153,9 @@ function updateDemoStatus() {
             <p><small>Let op: Bij verlaten moet u opnieuw inloggen met Microsoft 365</small></p>
         `;
         
-        document.getElementById('exitDemoMode').addEventListener('click', () => {
-            if (confirm('Weet u zeker dat u demo modus wilt verlaten? U moet daarna opnieuw inloggen.')) {
+        document.getElementById('exitDemoMode').addEventListener('click', async () => {
+            const confirmed = await showConfirm('Weet u zeker dat u demo modus wilt verlaten? U moet daarna opnieuw inloggen.', 'Demo modus verlaten');
+            if (confirmed) {
                 disableDemoMode();
                 window.location.href = 'index.html';
             }
@@ -242,7 +243,7 @@ function saveSettings() {
     };
     
     localStorage.setItem('appSettings', JSON.stringify(currentSettings));
-    alert('✅ Instellingen opgeslagen!');
+    showToast('Instellingen opgeslagen', 'success');
 }
 
 // Save admin emails
@@ -251,7 +252,7 @@ function saveAdminEmails() {
     const emails = emailsText.split('\n').map(e => e.trim()).filter(e => e.length > 0);
     
     localStorage.setItem('adminEmails', JSON.stringify(emails));
-    alert('✅ Administrator emails opgeslagen!');
+    showToast('Administrator emails opgeslagen', 'success');
 }
 
 // Save Azure config
@@ -265,7 +266,7 @@ function saveAzureConfig() {
     localStorage.setItem('azureConfig', JSON.stringify(config));
     
     // Update config in entra-auth.js (requires page reload)
-    alert('✅ Azure configuratie opgeslagen!\n\nHerlaad de pagina om de nieuwe configuratie te gebruiken.');
+    showToast('Azure configuratie opgeslagen! Herlaad de pagina om de nieuwe configuratie te gebruiken.', 'success', 6000);
 }
 
 // Test Azure config
@@ -298,16 +299,17 @@ async function testAzureConfig() {
 }
 
 // Reset demo data
-function resetDemoData() {
+async function resetDemoData() {
     if (!isDemoMode()) {
-        alert('Demo modus is niet actief');
+        showToast('Demo modus is niet actief', 'warning');
         return;
     }
     
-    if (confirm('Weet u zeker dat u alle demo data wilt resetten naar de standaard waarden?')) {
+    const confirmed = await showConfirm('Weet u zeker dat u alle demo data wilt resetten naar de standaard waarden?', 'Demo data resetten');
+    if (confirmed) {
         const db = getDemoDatabase();
         db.reset();
-        alert('✅ Demo data is gereset!');
+        showToast('Demo data is gereset', 'success');
         window.location.reload();
     }
 }
@@ -315,7 +317,7 @@ function resetDemoData() {
 // Export demo data
 function exportDemoData() {
     if (!isDemoMode()) {
-        alert('Demo modus is niet actief');
+        showToast('Demo modus is niet actief', 'warning');
         return;
     }
     
@@ -336,7 +338,7 @@ function exportDemoData() {
 // Import demo data
 function importDemoData() {
     if (!isDemoMode()) {
-        alert('Demo modus is niet actief');
+        showToast('Demo modus is niet actief', 'warning');
         return;
     }
     
@@ -354,10 +356,10 @@ function importDemoData() {
                 const db = getDemoDatabase();
                 db.data = data;
                 
-                alert('✅ Demo data geïmporteerd!');
+                showToast('Demo data geïmporteerd', 'success');
                 window.location.reload();
             } catch (error) {
-                alert('❌ Fout bij importeren: ' + error.message);
+                showToast('Fout bij importeren: ' + error.message, 'error');
             }
         };
         

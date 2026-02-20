@@ -223,7 +223,17 @@ function sanitizeHTML(html) {
  * @returns {string} - Unique ID
  */
 function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+/**
+ * Capitalize the first letter of a string
+ * @param {string} str - String to capitalize
+ * @returns {string} - String with first letter capitalized
+ */
+function capitalizeFirst(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /**
@@ -391,6 +401,7 @@ if (typeof module !== 'undefined' && module.exports) {
         isValidPhone,
         sanitizeHTML,
         generateId,
+        capitalizeFirst,
         scrollToElement,
         isInViewport,
         trapFocus,

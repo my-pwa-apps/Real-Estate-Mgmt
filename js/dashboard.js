@@ -8,9 +8,7 @@ let meldingen = [];
 // Load dashboard data
 async function loadDashboardData() {
     try {
-        if (typeof showLoading === 'function') {
-            showLoading('Dashboard laden...');
-        }
+        showLoading('Dashboard laden...');
         
         // Load all data from Realtime Database
         const [pandenData, huurdersData, contractenData, meldingenData] = await Promise.all([
@@ -29,17 +27,11 @@ async function loadDashboardData() {
         loadRecentMeldingen();
         loadVerlopendeContracten();
         
-        if (typeof hideLoading === 'function') {
-            hideLoading();
-        }
+        hideLoading();
     } catch (error) {
         console.error('Error loading dashboard data:', error);
-        if (typeof hideLoading === 'function') {
-            hideLoading();
-        }
-        if (typeof showToast === 'function') {
-            showToast('Fout bij laden dashboard gegevens', 'error');
-        }
+        hideLoading();
+        showToast('Fout bij laden dashboard gegevens', 'error');
     }
 }
 
@@ -202,24 +194,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await signInToMicrosoft();
                         microsoftBtn.textContent = '✅ Microsoft 365';
                         microsoftBtn.disabled = true;
-                        alert('Succesvol ingelogd bij Microsoft 365! U kunt nu emails versturen en documenten opslaan.');
+                        showToast('Succesvol ingelogd bij Microsoft 365! U kunt nu emails versturen en documenten opslaan.', 'success', 5000);
                     } catch (error) {
                         console.error('Microsoft sign-in error:', error);
-                        alert('Fout bij inloggen: ' + error.message);
+                        showToast('Fout bij inloggen: ' + error.message, 'error');
                     }
                 });
             }
         }
-        
-        // Show demo mode indicator
-        if (isDemoMode()) {
-            const sidebar = document.querySelector('.sidebar-footer');
-            const demoIndicator = document.createElement('div');
-            demoIndicator.className = 'demo-indicator';
-            demoIndicator.innerHTML = '🎭 DEMO MODUS';
-            demoIndicator.style.cssText = 'background: #ffc107; color: #000; padding: 8px; border-radius: 4px; margin-bottom: 10px; text-align: center; font-size: 12px; font-weight: bold;';
-            sidebar.insertBefore(demoIndicator, sidebar.firstChild);
-        }
+        // Demo indicator is handled globally by app-init.js
     } catch (error) {
         console.error('Dashboard initialization error:', error);
     }
