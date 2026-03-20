@@ -5,6 +5,8 @@ const DEMO_DATA = {
     panden: [
         {
             id: 'demo-pand-1',
+            objectSoort: 'gebouw',
+            objectNummer: 'OBJ-001',
             adres: 'Keizersgracht 123',
             postcode: '1015 CJ',
             plaats: 'Amsterdam',
@@ -14,12 +16,19 @@ const DEMO_DATA = {
             kamers: 8,
             bouwjaar: 1890,
             huurprijs: 3500,
+            streefhuur: 3650,
             energielabel: 'B',
+            bagId: '0363100012345678',
+            ownerNaam: 'Stadsgezicht Vastgoed B.V.',
+            beheerderNaam: 'Bloxs-pariteit beheerteam',
             beschrijving: 'Prachtig kantoorpand aan de Keizersgracht met authentieke details',
             createdAt: new Date('2024-01-15').toISOString()
         },
         {
             id: 'demo-pand-2',
+            objectSoort: 'unit',
+            objectNummer: 'UNIT-201',
+            parentObjectId: 'demo-pand-6',
             adres: 'Prinsengracht 456',
             postcode: '1016 HK',
             plaats: 'Amsterdam',
@@ -29,12 +38,17 @@ const DEMO_DATA = {
             kamers: 4,
             bouwjaar: 1910,
             huurprijs: 2100,
+            streefhuur: 2200,
             energielabel: 'C',
+            bagId: '0363100099991001',
+            ownerNaam: 'Stadsgezicht Wonen C.V.',
             beschrijving: 'Sfeervolle bovenwoning met balkon en vrij uitzicht',
             createdAt: new Date('2024-02-10').toISOString()
         },
         {
             id: 'demo-pand-3',
+            objectSoort: 'gebouw',
+            objectNummer: 'OBJ-003',
             adres: 'Herengracht 789',
             postcode: '1017 BX',
             plaats: 'Amsterdam',
@@ -50,6 +64,9 @@ const DEMO_DATA = {
         },
         {
             id: 'demo-pand-4',
+            objectSoort: 'unit',
+            objectNummer: 'UNIT-102',
+            parentObjectId: 'demo-pand-6',
             adres: 'Jordaanstraat 12',
             postcode: '1015 GH',
             plaats: 'Amsterdam',
@@ -65,6 +82,8 @@ const DEMO_DATA = {
         },
         {
             id: 'demo-pand-5',
+            objectSoort: 'gebouw',
+            objectNummer: 'OBJ-005',
             adres: 'Nieuwezijds Voorburgwal 234',
             postcode: '1012 RV',
             plaats: 'Amsterdam',
@@ -77,6 +96,25 @@ const DEMO_DATA = {
             energielabel: 'C',
             beschrijving: 'Groot kantoorpand, momenteel in renovatie',
             createdAt: new Date('2023-11-20').toISOString()
+        },
+        {
+            id: 'demo-pand-6',
+            objectSoort: 'complex',
+            objectNummer: 'CMP-010',
+            adres: 'Prinsengracht 450-460',
+            postcode: '1016 HK',
+            plaats: 'Amsterdam',
+            type: 'woning',
+            status: 'verhuurd',
+            oppervlakte: 540,
+            kamers: 18,
+            bouwjaar: 1908,
+            huurprijs: 0,
+            streefhuur: 0,
+            energielabel: 'B',
+            ownerNaam: 'Stadsgezicht Wonen C.V.',
+            beschrijving: 'Complex met meerdere verhuurbare units aan de Prinsengracht',
+            createdAt: new Date('2023-10-05').toISOString()
         }
     ],
     
@@ -116,6 +154,8 @@ const DEMO_DATA = {
     contracten: [
         {
             id: 'demo-contract-1',
+            contractType: 'commercieel',
+            contractFase: 'actief',
             huurderId: 'demo-huurder-3',
             pandId: 'demo-pand-1',
             startdatum: '2024-02-01',
@@ -123,12 +163,17 @@ const DEMO_DATA = {
             huurprijs: 3500,
             borg: 7000,
             betalingsdatum: 1,
+            indexatieMethode: 'cbs',
+            waarborgType: 'borg',
+            contractReferentie: 'COM-2024-001',
             status: 'actief',
             voorwaarden: '5-jarig contract met bedrijf. Jaarlijkse indexatie conform CBS.',
             createdAt: new Date('2024-01-15').toISOString()
         },
         {
             id: 'demo-contract-2',
+            contractType: 'residentieel',
+            contractFase: 'actief',
             huurderId: 'demo-huurder-2',
             pandId: 'demo-pand-2',
             startdatum: '2024-03-01',
@@ -136,12 +181,17 @@ const DEMO_DATA = {
             huurprijs: 2100,
             borg: 4200,
             betalingsdatum: 1,
+            indexatieMethode: 'cpi',
+            waarborgType: 'borg',
+            contractReferentie: 'RES-2024-014',
             status: 'actief',
             voorwaarden: '2-jarig contract met optie tot verlenging. Servicekosten €75 per maand.',
             createdAt: new Date('2024-02-10').toISOString()
         },
         {
             id: 'demo-contract-3',
+            contractType: 'residentieel',
+            contractFase: 'concept',
             huurderId: 'demo-huurder-1',
             pandId: 'demo-pand-3',
             startdatum: '2024-04-01',
@@ -149,6 +199,9 @@ const DEMO_DATA = {
             huurprijs: 2800,
             borg: 5600,
             betalingsdatum: 5,
+            indexatieMethode: 'vast-percentage',
+            waarborgType: 'bankgarantie',
+            contractReferentie: 'RES-2024-027',
             status: 'actief',
             voorwaarden: '1-jarig contract. Huismeester regeling met reductie van €200 per maand.',
             createdAt: new Date('2024-03-05').toISOString()
@@ -161,10 +214,15 @@ const DEMO_DATA = {
             pandId: 'demo-pand-1',
             titel: 'CV ketel onderhoudsbeurt',
             beschrijving: 'Jaarlijkse onderhoudsbeurt CV ketel. Afspraak gemaakt met installateur.',
+            probleemCategorie: 'installatie',
             status: 'gepland',
             prioriteit: 'normaal',
+            kostenCategorie: 'preventief',
+            uitvoerderNaam: 'Warmtebeheer Amsterdam',
             geplande_datum: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Over 1 week
             kosten: 185,
+            melderNaam: 'Technisch beheer',
+            externeReferentie: 'SVT-1001',
             createdAt: new Date('2024-10-15').toISOString()
         },
         {
@@ -172,10 +230,16 @@ const DEMO_DATA = {
             pandId: 'demo-pand-2',
             titel: 'Lekkage badkamer',
             beschrijving: 'Huurder meldt lekkage bij douche. Loodgieter ingepland voor spoedklus.',
+            probleemCategorie: 'sanitair',
             status: 'in-behandeling',
             prioriteit: 'hoog',
+            kostenCategorie: 'reparatie',
+            uitvoerderNaam: 'Loodgietersbedrijf De Pijp',
             geplande_datum: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Over 2 dagen
             kosten: 450,
+            melderNaam: 'Maria Jansen',
+            melderContact: 'maria.jansen@example.com',
+            externeReferentie: 'SVT-1002',
             createdAt: new Date('2024-11-10').toISOString()
         },
         {
@@ -183,10 +247,14 @@ const DEMO_DATA = {
             pandId: 'demo-pand-5',
             titel: 'Renovatie elektrische bedrading',
             beschrijving: 'Complete vervanging elektrische installatie in kader van renovatie.',
+            probleemCategorie: 'elektra',
             status: 'in-behandeling',
             prioriteit: 'hoog',
+            kostenCategorie: 'vervanging',
+            uitvoerderNaam: 'Elektro Noord-Holland',
             geplande_datum: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             kosten: 12500,
+            externeReferentie: 'SVT-1003',
             createdAt: new Date('2024-09-01').toISOString()
         },
         {
@@ -194,10 +262,14 @@ const DEMO_DATA = {
             pandId: 'demo-pand-3',
             titel: 'Schilderwerk gevel',
             beschrijving: 'Onderhoud buitenschilderwerk voorgevel en kozijnen.',
+            probleemCategorie: 'bouwkundig',
             status: 'afgerond',
             prioriteit: 'laag',
+            kostenCategorie: 'preventief',
+            uitvoerderNaam: 'Schilders Collectief Amsterdam',
             geplande_datum: '2024-09-15',
             kosten: 3200,
+            externeReferentie: 'SVT-1004',
             createdAt: new Date('2024-08-01').toISOString()
         },
         {
@@ -205,10 +277,15 @@ const DEMO_DATA = {
             pandId: 'demo-pand-1',
             titel: 'Kapotte ruit verdieping 2',
             beschrijving: 'Ruit vervangen na stormschade. Glazenier heeft ruit besteld.',
+            probleemCategorie: 'veiligheid',
             status: 'nieuw',
             prioriteit: 'urgent',
+            kostenCategorie: 'schade',
+            uitvoerderNaam: 'Glas Express',
             geplande_datum: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             kosten: 320,
+            melderNaam: 'Facilitair meldpunt',
+            externeReferentie: 'SVT-1005',
             createdAt: new Date('2024-11-16').toISOString()
         }
     ],

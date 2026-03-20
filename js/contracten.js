@@ -5,6 +5,25 @@ let huurders = [];
 let panden = [];
 let filteredContracten = [];
 
+function getContractTypeLabel(contractType) {
+    const labels = {
+        residentieel: 'Residentieel',
+        commercieel: 'Commercieel',
+        algemeen: 'Algemeen'
+    };
+    return labels[contractType] || capitalizeFirst(contractType || 'onbekend');
+}
+
+function getContractFaseLabel(contractFase) {
+    const labels = {
+        concept: 'Concept',
+        actief: 'Actief',
+        opgezegd: 'Opgezegd',
+        beeindigd: 'Beeindigd'
+    };
+    return labels[contractFase] || capitalizeFirst(contractFase || 'onbekend');
+}
+
 const modal = document.getElementById('contractModal');
 const addContractBtn = document.getElementById('addContractBtn');
 const closeModal = document.getElementById('closeModal');
@@ -68,6 +87,10 @@ function renderContracten() {
         
         return `
             <tr onclick="viewContractDetail('${contract.id}')" style="cursor: pointer;">
+                <td>
+                    <div><strong>${s(getContractTypeLabel(contract.contractType || 'residentieel'))}</strong></div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">${s(getContractFaseLabel(contract.contractFase || 'concept'))}</div>
+                </td>
                 <td>${huurder ? `${s(huurder.voornaam)} ${s(huurder.achternaam)}` : 'Onbekend'}</td>
                 <td>${pand ? s(pand.adres) : 'Onbekend'}</td>
                 <td>${new Date(contract.startdatum).toLocaleDateString('nl-NL')}</td>
@@ -137,6 +160,8 @@ contractForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const contractData = {
+        contractType: document.getElementById('contractType').value,
+        contractFase: document.getElementById('contractFase').value,
         huurderId: document.getElementById('huurderId').value,
         pandId: document.getElementById('pandId').value,
         startdatum: document.getElementById('startdatum').value,
@@ -144,8 +169,22 @@ contractForm.addEventListener('submit', async (e) => {
         huurprijs: parseFloat(document.getElementById('huurprijs').value),
         borg: parseFloat(document.getElementById('borg').value) || 0,
         betalingsdatum: parseInt(document.getElementById('betalingsdatum').value) || 1,
+        indexatieMethode: document.getElementById('indexatieMethode').value || null,
+        waarborgType: document.getElementById('waarborgType').value || null,
+        contractReferentie: document.getElementById('contractReferentie').value.trim() || null,
         voorwaarden: document.getElementById('voorwaarden').value.trim()
     };
+
+    const validContractTypes = ['residentieel', 'commercieel', 'algemeen'];
+    const validContractFasen = ['concept', 'actief', 'opgezegd', 'beeindigd'];
+    if (!validContractTypes.includes(contractData.contractType)) {
+        showToast('Kies een geldig contracttype', 'error');
+        return;
+    }
+    if (!validContractFasen.includes(contractData.contractFase)) {
+        showToast('Kies een geldige contractfase', 'error');
+        return;
+    }
 
     // Validate einddatum is after startdatum
     if (new Date(contractData.einddatum) <= new Date(contractData.startdatum)) {
@@ -201,6 +240,8 @@ async function editContract(id) {
 
     document.getElementById('modalTitle').textContent = 'Contract Bewerken';
     document.getElementById('contractId').value = contract.id;
+    document.getElementById('contractType').value = contract.contractType || 'residentieel';
+    document.getElementById('contractFase').value = contract.contractFase || 'concept';
     document.getElementById('huurderId').value = contract.huurderId;
     document.getElementById('pandId').value = contract.pandId;
     document.getElementById('startdatum').value = contract.startdatum;
@@ -208,6 +249,9 @@ async function editContract(id) {
     document.getElementById('huurprijs').value = contract.huurprijs;
     document.getElementById('borg').value = contract.borg || '';
     document.getElementById('betalingsdatum').value = contract.betalingsdatum || 1;
+    document.getElementById('indexatieMethode').value = contract.indexatieMethode || '';
+    document.getElementById('waarborgType').value = contract.waarborgType || '';
+    document.getElementById('contractReferentie').value = contract.contractReferentie || '';
     document.getElementById('voorwaarden').value = contract.voorwaarden || '';
 
     modal.classList.add('show');
@@ -238,15 +282,18 @@ async function deleteContract(id) {
 }
 
 // Filters
+document.getElementById('contractFaseFilter').addEventListener('change', applyFilters);
 document.getElementById('statusFilter').addEventListener('change', applyFilters);
 document.getElementById('searchInput').addEventListener('input', applyFilters);
 
 function applyFilters() {
+    const contractFaseFilter = document.getElementById('contractFaseFilter').value;
     const statusFilter = document.getElementById('statusFilter').value;
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
     filteredContracten = contracten.filter(contract => {
         const status = getContractStatus(contract);
+        const matchesFase = !contractFaseFilter || (contract.contractFase || 'concept') === contractFaseFilter;
         const matchesStatus = !statusFilter || status === statusFilter;
         
         const huurder = huurders.find(h => h.id === contract.huurderId);
@@ -254,9 +301,11 @@ function applyFilters() {
         
         const matchesSearch = !searchTerm || 
             (huurder && `${huurder.voornaam} ${huurder.achternaam}`.toLowerCase().includes(searchTerm)) ||
-            (pand && pand.adres.toLowerCase().includes(searchTerm));
+            (pand && pand.adres.toLowerCase().includes(searchTerm)) ||
+            (contract.contractReferentie || '').toLowerCase().includes(searchTerm) ||
+            getContractTypeLabel(contract.contractType || '').toLowerCase().includes(searchTerm);
 
-        return matchesStatus && matchesSearch;
+        return matchesFase && matchesStatus && matchesSearch;
     });
 
     renderContracten();
@@ -344,7 +393,9 @@ function viewContractDetail(contractId) {
         huurderTelefoon: huurder?.telefoon || '',
         pandAdres: pand ? `${pand.adres}, ${pand.plaats}` : 'Onbekend',
         pandType: pand?.type || '',
-        status: getContractStatus(contract)
+        status: getContractStatus(contract),
+        contractTypeLabel: getContractTypeLabel(contract.contractType || 'residentieel'),
+        contractFaseLabel: getContractFaseLabel(contract.contractFase || 'concept')
     };
     
     if (typeof showDetailPanel === 'function') {

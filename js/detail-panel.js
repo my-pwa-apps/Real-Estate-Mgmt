@@ -89,6 +89,7 @@ function closeDetailPanel() {
  */
 function generatePandDetail(pand) {
     const s = sanitizeHTML;
+    const objectSoortLabel = pand.objectSoort ? capitalizeFirst(s(pand.objectSoort)) : 'Gebouw';
     return `
         <div class="detail-panel-header">
             <h2>🏢 Pand Details</h2>
@@ -113,6 +114,22 @@ function generatePandDetail(pand) {
 
             <div class="detail-section">
                 <div class="detail-section-title">🏗️ Eigenschappen</div>
+                <div class="detail-row">
+                    <div class="detail-label">Objectsoort</div>
+                    <div class="detail-value"><strong>${objectSoortLabel}</strong></div>
+                </div>
+                ${pand.objectNummer ? `
+                <div class="detail-row">
+                    <div class="detail-label">Objectnummer</div>
+                    <div class="detail-value">${s(pand.objectNummer)}</div>
+                </div>
+                ` : ''}
+                ${pand.parentObjectAdres ? `
+                <div class="detail-row">
+                    <div class="detail-label">Bovenliggend object</div>
+                    <div class="detail-value">${s(pand.parentObjectAdres)}</div>
+                </div>
+                ` : ''}
                 <div class="detail-row">
                     <div class="detail-label">Type</div>
                     <div class="detail-value"><span class="status-badge ${s(pand.type)}">${pand.type === 'bedrijfspand' ? 'Bedrijfspand' : 'Woning'}</span></div>
@@ -145,6 +162,12 @@ function generatePandDetail(pand) {
                     <div class="detail-value"><strong>${s(pand.energielabel)}</strong></div>
                 </div>
                 ` : ''}
+                ${pand.bagId ? `
+                <div class="detail-row">
+                    <div class="detail-label">BAG ID</div>
+                    <div class="detail-value">${s(pand.bagId)}</div>
+                </div>
+                ` : ''}
             </div>
 
             <div class="detail-section">
@@ -153,7 +176,31 @@ function generatePandDetail(pand) {
                     <div class="detail-label">Huurprijs</div>
                     <div class="detail-value"><strong style="font-size: 18px; color: var(--primary-color);">€${parseFloat(pand.huurprijs).toLocaleString('nl-NL')}</strong> / maand</div>
                 </div>
+                ${pand.streefhuur ? `
+                <div class="detail-row">
+                    <div class="detail-label">Streefhuur</div>
+                    <div class="detail-value">€${parseFloat(pand.streefhuur).toLocaleString('nl-NL')} / maand</div>
+                </div>
+                ` : ''}
             </div>
+
+            ${(pand.ownerNaam || pand.beheerderNaam) ? `
+            <div class="detail-section">
+                <div class="detail-section-title">🤝 Relaties</div>
+                ${pand.ownerNaam ? `
+                <div class="detail-row">
+                    <div class="detail-label">Eigenaar</div>
+                    <div class="detail-value">${s(pand.ownerNaam)}</div>
+                </div>
+                ` : ''}
+                ${pand.beheerderNaam ? `
+                <div class="detail-row">
+                    <div class="detail-label">Beheerder</div>
+                    <div class="detail-value">${s(pand.beheerderNaam)}</div>
+                </div>
+                ` : ''}
+            </div>
+            ` : ''}
 
             ${pand.beschrijving ? `
             <div class="detail-section">
@@ -273,6 +320,18 @@ function generateContractDetail(contract) {
         <div class="detail-panel-body">
             <div class="detail-section">
                 <div class="detail-section-title">📋 Contract Informatie</div>
+                ${contract.contractTypeLabel ? `
+                <div class="detail-row">
+                    <div class="detail-label">Contracttype</div>
+                    <div class="detail-value">${s(contract.contractTypeLabel)}</div>
+                </div>
+                ` : ''}
+                ${contract.contractFaseLabel ? `
+                <div class="detail-row">
+                    <div class="detail-label">Fase</div>
+                    <div class="detail-value">${s(contract.contractFaseLabel)}</div>
+                </div>
+                ` : ''}
                 <div class="detail-row">
                     <div class="detail-label">Status</div>
                     <div class="detail-value"><span class="status-badge ${s(contract.status)}">${capitalizeFirst(s(contract.status))}</span></div>
@@ -289,18 +348,36 @@ function generateContractDetail(contract) {
                     <div class="detail-label">Huurprijs</div>
                     <div class="detail-value"><strong style="font-size: 18px; color: var(--primary-color);">€${parseFloat(contract.huurprijs).toLocaleString('nl-NL')}</strong> / maand</div>
                 </div>
-                ${contract.borgsom ? `
+                ${(contract.borg || contract.borgsom) ? `
                 <div class="detail-row">
                     <div class="detail-label">Borgsom</div>
-                    <div class="detail-value">€${parseFloat(contract.borgsom).toLocaleString('nl-NL')}</div>
+                    <div class="detail-value">€${parseFloat(contract.borg || contract.borgsom).toLocaleString('nl-NL')}</div>
+                </div>
+                ` : ''}
+                ${contract.indexatieMethode ? `
+                <div class="detail-row">
+                    <div class="detail-label">Indexatiemethode</div>
+                    <div class="detail-value">${s(contract.indexatieMethode)}</div>
+                </div>
+                ` : ''}
+                ${contract.waarborgType ? `
+                <div class="detail-row">
+                    <div class="detail-label">Waarborgtype</div>
+                    <div class="detail-value">${s(contract.waarborgType)}</div>
+                </div>
+                ` : ''}
+                ${contract.contractReferentie ? `
+                <div class="detail-row">
+                    <div class="detail-label">Externe referentie</div>
+                    <div class="detail-value">${s(contract.contractReferentie)}</div>
                 </div>
                 ` : ''}
             </div>
 
-            ${contract.opmerkingen ? `
+            ${(contract.voorwaarden || contract.opmerkingen) ? `
             <div class="detail-section">
-                <div class="detail-section-title">📝 Opmerkingen</div>
-                <p style="color: var(--text-secondary); line-height: 1.6;">${s(contract.opmerkingen)}</p>
+                <div class="detail-section-title">📝 Voorwaarden</div>
+                <p style="color: var(--text-secondary); line-height: 1.6;">${s(contract.voorwaarden || contract.opmerkingen)}</p>
             </div>
             ` : ''}
         </div>
@@ -342,6 +419,18 @@ function generateOnderhoudDetail(onderhoud) {
                     <div class="detail-value">${s(onderhoud.categorie)}</div>
                 </div>
                 ` : ''}
+                ${onderhoud.probleemCategorie ? `
+                <div class="detail-row">
+                    <div class="detail-label">Probleemcategorie</div>
+                    <div class="detail-value">${s(onderhoud.probleemCategorie)}</div>
+                </div>
+                ` : ''}
+                ${onderhoud.kostenCategorie ? `
+                <div class="detail-row">
+                    <div class="detail-label">Kosten categorie</div>
+                    <div class="detail-value">${s(onderhoud.kostenCategorie)}</div>
+                </div>
+                ` : ''}
                 ${onderhoud.datum ? `
                 <div class="detail-row">
                     <div class="detail-label">Datum</div>
@@ -362,6 +451,30 @@ function generateOnderhoudDetail(onderhoud) {
                     <div class="detail-label">Bedrag</div>
                     <div class="detail-value"><strong style="font-size: 18px; color: var(--primary-color);">€${parseFloat(onderhoud.kosten).toLocaleString('nl-NL')}</strong></div>
                 </div>
+            </div>
+            ` : ''}
+
+            ${(onderhoud.uitvoerderNaam || onderhoud.melderNaam || onderhoud.externeReferentie) ? `
+            <div class="detail-section">
+                <div class="detail-section-title">🧾 Verwerking</div>
+                ${onderhoud.uitvoerderNaam ? `
+                <div class="detail-row">
+                    <div class="detail-label">Uitvoerder</div>
+                    <div class="detail-value">${s(onderhoud.uitvoerderNaam)}</div>
+                </div>
+                ` : ''}
+                ${onderhoud.melderNaam ? `
+                <div class="detail-row">
+                    <div class="detail-label">Melder</div>
+                    <div class="detail-value">${s(onderhoud.melderNaam)}${onderhoud.melderContact ? ` (${s(onderhoud.melderContact)})` : ''}</div>
+                </div>
+                ` : ''}
+                ${onderhoud.externeReferentie ? `
+                <div class="detail-row">
+                    <div class="detail-label">Externe referentie</div>
+                    <div class="detail-value">${s(onderhoud.externeReferentie)}</div>
+                </div>
+                ` : ''}
             </div>
             ` : ''}
         </div>

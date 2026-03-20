@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/enhancements.css">
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/stadsgezicht-logo.jpg">
     <meta name="theme-color" content="#1e3a5f">
 </head>
 <body>
@@ -135,6 +136,19 @@
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="probleemCategorie">Probleemcategorie</label>
+                        <select id="probleemCategorie">
+                            <option value="">Selecteer categorie</option>
+                            <option value="bouwkundig">Bouwkundig</option>
+                            <option value="elektra">Elektra</option>
+                            <option value="installatie">Installatie</option>
+                            <option value="sanitair">Sanitair</option>
+                            <option value="veiligheid">Veiligheid</option>
+                            <option value="overig">Overig</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label for="prioriteit">Prioriteit *</label>
                         <select id="prioriteit" required>
                             <option value="laag">Laag</option>
@@ -157,6 +171,25 @@
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="kostenCategorie">Kosten categorie</label>
+                        <select id="kostenCategorie">
+                            <option value="">Selecteer kosten categorie</option>
+                            <option value="reparatie">Reparatie</option>
+                            <option value="inspectie">Inspectie</option>
+                            <option value="preventief">Preventief onderhoud</option>
+                            <option value="vervanging">Vervanging</option>
+                            <option value="schade">Schadeherstel</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="uitvoerderNaam">Uitvoerder / leverancier</label>
+                        <input type="text" id="uitvoerderNaam" placeholder="Naam onderhoudsbedrijf">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="geplanddatum">Geplande datum</label>
                         <input type="date" id="geplanddatum">
                     </div>
@@ -165,6 +198,23 @@
                         <label for="kosten">Geschatte kosten (€)</label>
                         <input type="number" id="kosten" step="0.01" placeholder="0.00">
                     </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="melderNaam">Melder</label>
+                        <input type="text" id="melderNaam" placeholder="Naam melder">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="melderContact">Contactgegevens melder</label>
+                        <input type="text" id="melderContact" placeholder="Email of telefoonnummer">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="externeReferentie">Externe referentie</label>
+                    <input type="text" id="externeReferentie" placeholder="Ticketnummer of extern dossiernummer">
                 </div>
 
                 <div class="form-group">

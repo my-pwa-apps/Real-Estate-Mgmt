@@ -3,6 +3,16 @@
 let panden = [];
 let filteredPanden = [];
 
+function getObjectSoortLabel(objectSoort) {
+    const labels = {
+        gebouw: 'Gebouw',
+        complex: 'Complex',
+        sectie: 'Sectie',
+        unit: 'Unit'
+    };
+    return labels[objectSoort] || capitalizeFirst(objectSoort || 'onbekend');
+}
+
 // Modal elements
 const modal = document.getElementById('pandModal');
 const addPandBtn = document.getElementById('addPandBtn');
@@ -18,6 +28,7 @@ async function loadPanden() {
         // Sort by address
         panden.sort((a, b) => (a.adres || '').localeCompare(b.adres || ''));
         filteredPanden = [...panden];
+        populateParentObjectOptions();
         renderPanden();
         hideLoading();
     } catch (error) {
@@ -32,14 +43,19 @@ function renderPanden() {
     const tbody = document.getElementById('pandenTableBody');
     
     if (filteredPanden.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Geen panden gevonden</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Geen panden gevonden</td></tr>';
         return;
     }
 
     tbody.innerHTML = filteredPanden.map(pand => {
         const s = sanitizeHTML;
+        const objectLabel = getObjectSoortLabel(pand.objectSoort || 'gebouw');
         return `
         <tr onclick="viewPandDetail('${pand.id}')" style="cursor: pointer;">
+            <td>
+                <div><strong>${s(objectLabel)}</strong></div>
+                <div style="font-size: 12px; color: var(--text-secondary);">${s(pand.objectNummer || '-')}</div>
+            </td>
             <td><span class="status-badge ${s(pand.type)}">${pand.type === 'bedrijfspand' ? 'Bedrijfspand' : 'Woning'}</span></td>
             <td>${s(pand.adres)}</td>
             <td>${s(pand.postcode)}</td>
@@ -55,6 +71,19 @@ function renderPanden() {
     }).join('');
 }
 
+function populateParentObjectOptions(selectedId = '') {
+    const parentSelect = document.getElementById('parentObjectId');
+    if (!parentSelect) return;
+
+    const currentPandId = document.getElementById('pandId').value;
+    const options = panden
+        .filter(pand => pand.id !== currentPandId)
+        .map(pand => `<option value="${pand.id}" ${pand.id === selectedId ? 'selected' : ''}>${sanitizeHTML(pand.adres)} (${sanitizeHTML(getObjectSoortLabel(pand.objectSoort || 'gebouw'))})</option>`)
+        .join('');
+
+    parentSelect.innerHTML = `<option value="">Geen</option>${options}`;
+}
+
 // Open modal for new pand
 addPandBtn.addEventListener('click', () => {
     if (isViewerRole()) {
@@ -64,6 +93,7 @@ addPandBtn.addEventListener('click', () => {
     document.getElementById('modalTitle').textContent = 'Nieuw Pand';
     pandForm.reset();
     document.getElementById('pandId').value = '';
+    populateParentObjectOptions();
     modal.classList.add('show');
 });
 
@@ -87,8 +117,11 @@ pandForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const pandData = {
+        objectSoort: document.getElementById('objectSoort').value,
         type: document.getElementById('type').value,
         status: document.getElementById('status').value,
+        objectNummer: document.getElementById('objectNummer').value.trim(),
+        parentObjectId: document.getElementById('parentObjectId').value || null,
         adres: document.getElementById('adres').value.trim(),
         postcode: document.getElementById('postcode').value.trim(),
         plaats: document.getElementById('plaats').value.trim(),
@@ -96,6 +129,10 @@ pandForm.addEventListener('submit', async (e) => {
         kamers: parseInt(document.getElementById('kamers').value) || null,
         bouwjaar: parseInt(document.getElementById('bouwjaar').value) || null,
         energielabel: document.getElementById('energielabel').value || null,
+        bagId: document.getElementById('bagId').value.trim() || null,
+        streefhuur: parseFloat(document.getElementById('streefhuur').value) || null,
+        ownerNaam: document.getElementById('ownerNaam').value.trim() || null,
+        beheerderNaam: document.getElementById('beheerderNaam').value.trim() || null,
         huurprijs: parseFloat(document.getElementById('huurprijs').value),
         beschrijving: document.getElementById('beschrijving').value.trim()
     };
@@ -113,9 +150,19 @@ pandForm.addEventListener('submit', async (e) => {
         return;
     }
 
+    if (pandData.streefhuur !== null && pandData.streefhuur < 0) {
+        showToast('Streefhuur kan niet negatief zijn', 'error');
+        return;
+    }
+
     // Validate type and status against allowed values
     const validTypes = ['bedrijfspand', 'woning'];
+    const validObjectSoorten = ['gebouw', 'complex', 'sectie', 'unit'];
     const validStatuses = ['verhuurd', 'beschikbaar', 'onderhoud'];
+    if (!validObjectSoorten.includes(pandData.objectSoort)) {
+        showToast('Ongeldige objectsoort geselecteerd', 'error');
+        return;
+    }
     if (!validTypes.includes(pandData.type)) {
         showToast('Ongeldig type geselecteerd', 'error');
         return;
@@ -156,8 +203,11 @@ async function editPand(id) {
 
     document.getElementById('modalTitle').textContent = 'Pand Bewerken';
     document.getElementById('pandId').value = pand.id;
+    document.getElementById('objectSoort').value = pand.objectSoort || 'gebouw';
     document.getElementById('type').value = pand.type;
     document.getElementById('status').value = pand.status;
+    document.getElementById('objectNummer').value = pand.objectNummer || '';
+    populateParentObjectOptions(pand.parentObjectId || '');
     document.getElementById('adres').value = pand.adres;
     document.getElementById('postcode').value = pand.postcode;
     document.getElementById('plaats').value = pand.plaats;
@@ -165,6 +215,10 @@ async function editPand(id) {
     document.getElementById('kamers').value = pand.kamers || '';
     document.getElementById('bouwjaar').value = pand.bouwjaar || '';
     document.getElementById('energielabel').value = pand.energielabel || '';
+    document.getElementById('bagId').value = pand.bagId || '';
+    document.getElementById('streefhuur').value = pand.streefhuur || '';
+    document.getElementById('ownerNaam').value = pand.ownerNaam || '';
+    document.getElementById('beheerderNaam').value = pand.beheerderNaam || '';
     document.getElementById('huurprijs').value = pand.huurprijs;
     document.getElementById('beschrijving').value = pand.beschrijving || '';
 
@@ -208,24 +262,31 @@ async function deletePand(id) {
 }
 
 // Filters
+document.getElementById('objectSoortFilter').addEventListener('change', applyFilters);
 document.getElementById('typeFilter').addEventListener('change', applyFilters);
 document.getElementById('statusFilter').addEventListener('change', applyFilters);
 document.getElementById('searchInput').addEventListener('input', applyFilters);
 
 function applyFilters() {
+    const objectSoortFilter = document.getElementById('objectSoortFilter').value;
     const typeFilter = document.getElementById('typeFilter').value;
     const statusFilter = document.getElementById('statusFilter').value;
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
     filteredPanden = panden.filter(pand => {
+        const matchesObjectSoort = !objectSoortFilter || (pand.objectSoort || 'gebouw') === objectSoortFilter;
         const matchesType = !typeFilter || pand.type === typeFilter;
         const matchesStatus = !statusFilter || pand.status === statusFilter;
         const matchesSearch = !searchTerm || 
             pand.adres.toLowerCase().includes(searchTerm) ||
             pand.plaats.toLowerCase().includes(searchTerm) ||
-            pand.postcode.toLowerCase().includes(searchTerm);
+            pand.postcode.toLowerCase().includes(searchTerm) ||
+            (pand.objectNummer || '').toLowerCase().includes(searchTerm) ||
+            (pand.ownerNaam || '').toLowerCase().includes(searchTerm) ||
+            (pand.beheerderNaam || '').toLowerCase().includes(searchTerm) ||
+            (pand.bagId || '').toLowerCase().includes(searchTerm);
 
-        return matchesType && matchesStatus && matchesSearch;
+        return matchesObjectSoort && matchesType && matchesStatus && matchesSearch;
     });
 
     renderPanden();
@@ -245,7 +306,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 function viewPandDetail(pandId) {
     const pand = panden.find(p => p.id === pandId);
     if (pand) {
-        showDetailPanel('pand', pand);
+        const parentObject = pand.parentObjectId ? panden.find(item => item.id === pand.parentObjectId) : null;
+        showDetailPanel('pand', {
+            ...pand,
+            parentObjectAdres: parentObject ? `${parentObject.adres}, ${parentObject.plaats}` : ''
+        });
     }
 }
 

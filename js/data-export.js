@@ -54,6 +54,8 @@ function exportToCSV(data, filename, columns) {
 async function exportPandenCSV() {
     const data = await dbGetAll('panden');
     exportToCSV(data, 'panden', [
+        { key: 'objectSoort', label: 'Objectsoort' },
+        { key: 'objectNummer', label: 'Objectnummer' },
         { key: 'type', label: 'Type' },
         { key: 'adres', label: 'Adres' },
         { key: 'postcode', label: 'Postcode' },
@@ -63,6 +65,10 @@ async function exportPandenCSV() {
         { key: 'kamers', label: 'Kamers' },
         { key: 'bouwjaar', label: 'Bouwjaar' },
         { key: 'energielabel', label: 'Energielabel' },
+        { key: 'bagId', label: 'BAG ID' },
+        { key: 'streefhuur', label: 'Streefhuur (€/maand)' },
+        { key: 'ownerNaam', label: 'Eigenaar' },
+        { key: 'beheerderNaam', label: 'Beheerder' },
         { key: 'huurprijs', label: 'Huurprijs (€/maand)' },
         { key: 'beschrijving', label: 'Beschrijving' }
     ]);
@@ -94,6 +100,8 @@ async function exportContractenCSV() {
     ]);
     
     exportToCSV(contracten, 'contracten', [
+        { key: 'contractType', label: 'Contracttype' },
+        { key: 'contractFase', label: 'Fase' },
         { key: 'huurderId', label: 'Huurder', formatter: (c) => {
             const h = huurders.find(h => h.id === c.huurderId);
             return h ? `${h.voornaam} ${h.achternaam}` : 'Onbekend';
@@ -107,6 +115,9 @@ async function exportContractenCSV() {
         { key: 'huurprijs', label: 'Huurprijs (€/maand)' },
         { key: 'borg', label: 'Borgsom (€)' },
         { key: 'betalingsdatum', label: 'Betalingsdag' },
+        { key: 'indexatieMethode', label: 'Indexatiemethode' },
+        { key: 'waarborgType', label: 'Waarborgtype' },
+        { key: 'contractReferentie', label: 'Externe referentie' },
         { key: 'voorwaarden', label: 'Voorwaarden' }
     ]);
 }
@@ -147,10 +158,16 @@ async function exportOnderhoudCSV() {
         }},
         { key: 'titel', label: 'Titel' },
         { key: 'beschrijving', label: 'Beschrijving' },
+        { key: 'probleemCategorie', label: 'Probleemcategorie' },
         { key: 'prioriteit', label: 'Prioriteit' },
         { key: 'status', label: 'Status' },
+        { key: 'kostenCategorie', label: 'Kosten categorie' },
+        { key: 'uitvoerderNaam', label: 'Uitvoerder' },
         { key: 'geplande_datum', label: 'Geplande datum' },
         { key: 'kosten', label: 'Kosten (€)' },
+        { key: 'melderNaam', label: 'Melder' },
+        { key: 'melderContact', label: 'Melder contact' },
+        { key: 'externeReferentie', label: 'Externe referentie' },
         { key: 'notities', label: 'Notities' }
     ]);
 }

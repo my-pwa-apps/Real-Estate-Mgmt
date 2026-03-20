@@ -23,7 +23,7 @@ async function globalSearch(query) {
 
         // Search panden
         pandenData.forEach(p => {
-            const fields = [p.adres, p.postcode, p.plaats, p.type, p.beschrijving].filter(Boolean);
+            const fields = [p.adres, p.postcode, p.plaats, p.type, p.objectSoort, p.objectNummer, p.ownerNaam, p.beheerderNaam, p.beschrijving].filter(Boolean);
             const match = fields.find(f => f.toLowerCase().includes(searchTerm));
             if (match) {
                 results.push({
@@ -64,7 +64,7 @@ async function globalSearch(query) {
             const pand = pandenData.find(p => p.id === c.pandId);
             const huurderNaam = huurder ? `${huurder.voornaam} ${huurder.achternaam}` : '';
             const pandAdres = pand ? pand.adres : '';
-            const fields = [huurderNaam, pandAdres, c.voorwaarden].filter(Boolean);
+            const fields = [huurderNaam, pandAdres, c.contractType, c.contractFase, c.contractReferentie, c.voorwaarden].filter(Boolean);
             const match = fields.find(f => f.toLowerCase().includes(searchTerm));
             if (match) {
                 results.push({
@@ -84,7 +84,7 @@ async function globalSearch(query) {
         onderhoudData.forEach(m => {
             const pand = pandenData.find(p => p.id === m.pandId);
             const pandAdres = pand ? pand.adres : '';
-            const fields = [m.titel, m.beschrijving, pandAdres, m.notities].filter(Boolean);
+            const fields = [m.titel, m.beschrijving, pandAdres, m.probleemCategorie, m.kostenCategorie, m.uitvoerderNaam, m.externeReferentie, m.notities].filter(Boolean);
             const match = fields.find(f => f.toLowerCase().includes(searchTerm));
             if (match) {
                 results.push({

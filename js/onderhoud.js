@@ -4,6 +4,18 @@ let meldingen = [];
 let panden = [];
 let filteredMeldingen = [];
 
+function getProbleemCategorieLabel(categorie) {
+    const labels = {
+        bouwkundig: 'Bouwkundig',
+        elektra: 'Elektra',
+        installatie: 'Installatie',
+        sanitair: 'Sanitair',
+        veiligheid: 'Veiligheid',
+        overig: 'Overig'
+    };
+    return labels[categorie] || capitalizeFirst(categorie || 'onbekend');
+}
+
 const modal = document.getElementById('meldingModal');
 const addMeldingBtn = document.getElementById('addMeldingBtn');
 const closeModal = document.getElementById('closeModal');
@@ -70,9 +82,11 @@ function renderMeldingen() {
                 </div>
                 <div class="item-card-body">
                     <p>🏢 ${pand ? s(pand.adres) : 'Onbekend pand'}</p>
+                    ${melding.probleemCategorie ? `<p>🧩 ${s(getProbleemCategorieLabel(melding.probleemCategorie))}</p>` : ''}
                     <p style="margin-top: 8px;">${s(melding.beschrijving)}</p>
                     ${melding.geplande_datum ? `<p>📅 Gepland: ${new Date(melding.geplande_datum).toLocaleDateString('nl-NL')}</p>` : ''}
                     ${melding.kosten ? `<p>💰 Kosten: €${parseFloat(melding.kosten).toLocaleString('nl-NL')}</p>` : ''}
+                    ${melding.uitvoerderNaam ? `<p>🏗️ Uitvoerder: ${s(melding.uitvoerderNaam)}</p>` : ''}
                 </div>
                 <div class="item-card-footer">
                     <span class="priority-badge ${s(priorityClass)}">${capitalizeFirst(s(melding.prioriteit || 'normaal'))}</span>
@@ -113,10 +127,16 @@ meldingForm.addEventListener('submit', async (e) => {
         pandId: document.getElementById('pandId').value,
         titel: document.getElementById('titel').value.trim(),
         beschrijving: document.getElementById('beschrijving').value.trim(),
+        probleemCategorie: document.getElementById('probleemCategorie').value || null,
         prioriteit: document.getElementById('prioriteit').value,
         status: document.getElementById('status').value,
+        kostenCategorie: document.getElementById('kostenCategorie').value || null,
+        uitvoerderNaam: document.getElementById('uitvoerderNaam').value.trim() || null,
         geplande_datum: document.getElementById('geplanddatum').value || null,
         kosten: parseFloat(document.getElementById('kosten').value) || null,
+        melderNaam: document.getElementById('melderNaam').value.trim() || null,
+        melderContact: document.getElementById('melderContact').value.trim() || null,
+        externeReferentie: document.getElementById('externeReferentie').value.trim() || null,
         notities: document.getElementById('notities').value.trim()
     };
 
@@ -171,10 +191,16 @@ async function editMelding(id) {
     document.getElementById('pandId').value = melding.pandId;
     document.getElementById('titel').value = melding.titel;
     document.getElementById('beschrijving').value = melding.beschrijving;
+    document.getElementById('probleemCategorie').value = melding.probleemCategorie || '';
     document.getElementById('prioriteit').value = melding.prioriteit || 'normaal';
     document.getElementById('status').value = melding.status || 'nieuw';
+    document.getElementById('kostenCategorie').value = melding.kostenCategorie || '';
+    document.getElementById('uitvoerderNaam').value = melding.uitvoerderNaam || '';
     document.getElementById('geplanddatum').value = melding.geplande_datum || '';
     document.getElementById('kosten').value = melding.kosten || '';
+    document.getElementById('melderNaam').value = melding.melderNaam || '';
+    document.getElementById('melderContact').value = melding.melderContact || '';
+    document.getElementById('externeReferentie').value = melding.externeReferentie || '';
     document.getElementById('notities').value = melding.notities || '';
 
     modal.classList.add('show');
