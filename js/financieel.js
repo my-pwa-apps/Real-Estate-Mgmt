@@ -33,6 +33,8 @@ async function loadAllData() {
     calculateStatistics();
     renderMaandelijksOverzicht();
     renderRecenteTransacties();
+    renderBudgets();
+    renderFacturen();
     renderFinancialChart();
     hideLoading();
   } catch (error) {
@@ -254,6 +256,10 @@ transactieForm.addEventListener("submit", async (e) => {
     bedrag: parseFloat(document.getElementById("bedrag").value),
     datum: document.getElementById("datum").value,
     categorie: document.getElementById("categorie").value,
+    budgetType: document.getElementById("budgetType").value || "regulier",
+    betalingstermijn:
+      parseInt(document.getElementById("betalingstermijn").value) || 30,
+    factuurStatus: document.getElementById("factuurStatus").value || "open",
     notities: document.getElementById("notities").value.trim(),
   };
 
@@ -338,6 +344,12 @@ function editTransactie(id) {
   document.getElementById("bedrag").value = transactie.bedrag;
   document.getElementById("datum").value = transactie.datum;
   document.getElementById("categorie").value = transactie.categorie || "";
+  document.getElementById("budgetType").value =
+    transactie.budgetType || "regulier";
+  document.getElementById("betalingstermijn").value =
+    transactie.betalingstermijn || "30";
+  document.getElementById("factuurStatus").value =
+    transactie.factuurStatus || "open";
   document.getElementById("notities").value = transactie.notities || "";
   modal.classList.add("show");
 }
@@ -488,3 +500,83 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Initialization error:", error);
   }
 });
+
+function renderBudgets() {
+  const tbody = document.getElementById("budgetsTableBody");
+  if (!tbody) return;
+
+  const budgets = {
+    opex: { naam: "Reguliere exploitatie (OPEX)", totaal: 50000, verbruikt: 0 },
+    capex: { naam: "Investeringen (CAPEX)", totaal: 120000, verbruikt: 0 },
+    regulier: { naam: "Regulier Beheer", totaal: 30000, verbruikt: 0 },
+  };
+
+  // Calculate consumed based on transacties type
+  transacties
+    .filter((t) => t.type === "uitgave")
+    .forEach((t) => {
+      let bt = t.budgetType || "regulier";
+      if (budgets[bt]) {
+        budgets[bt].verbruikt += parseFloat(t.bedrag || 0);
+      }
+    });
+
+  const rows = Object.keys(budgets).map((key) => {
+    const b = budgets[key];
+    const status = b.verbruikt > b.totaal ? "Overschreden" : "Binnen Budget";
+    const statusColor =
+      b.verbruikt > b.totaal ? "var(--danger-color)" : "var(--success-color)";
+    return `
+      <tr>
+        <td>${sanitizeHTML(b.naam)}</td>
+        <td>\u20AC${b.totaal.toLocaleString("nl-NL")}</td>
+        <td>\u20AC${b.verbruikt.toLocaleString("nl-NL")}</td>
+        <td style="color: ${statusColor}; font-weight: 600;">${status}</td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = rows.join("");
+}
+
+function renderFacturen() {
+  const tbody = document.getElementById("facturenTableBody");
+  if (!tbody) return;
+
+  if (transacties.length === 0) {
+    tbody.innerHTML =
+      '<tr><td colspan="6" class="empty-state">Geen facturen geregistreerd</td></tr>';
+    return;
+  }
+
+  // Sort on date desc
+  const sorted = [...transacties].sort(
+    (a, b) => new Date(b.datum) - new Date(a.datum),
+  );
+
+  tbody.innerHTML = sorted
+    .map((t) => {
+      const s = sanitizeHTML;
+      const status = t.factuurStatus || "open";
+      const statusColors = {
+        open: "#f59e0b",
+        betaald: "var(--success-color)",
+        te_laat: "var(--danger-color)",
+        geannuleerd: "#9ca3af",
+      };
+      const sColor = statusColors[status] || "var(--text-color)";
+      const term = t.betalingstermijn || 30;
+
+      return `
+      <tr onclick="viewTransactieDetail('${sanitizeAttr(t.id)}')" style="cursor: pointer;">
+        <td>${s(t.factuurNummer || "-")}</td>
+        <td>${s(t.beschrijving)}</td>
+        <td>${new Date(t.datum).toLocaleDateString("nl-NL")}</td>
+        <td style="font-weight: 600; color: ${sColor};">\u20AC${parseFloat(t.bedrag || 0).toLocaleString("nl-NL")}</td>
+        <td>${term} dagen</td>
+        <td><span style="background: ${sColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; text-transform: capitalize;">${s(status)}</span></td>
+      </tr>
+    `;
+    })
+    .join("");
+}

@@ -38,7 +38,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       errorMessage.textContent = "";
       errorMessage.style.display = "none";
       entraLoginBtn.disabled = true;
-      entraLoginBtn.innerHTML = '<span class="icon">⏳</span> Inloggen...';
+      entraLoginBtn.innerHTML =
+        '<span class="icon"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg></span> Inloggen...';
 
       // Disable demo mode if active
       if (isDemoMode()) {
@@ -66,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       entraLoginBtn.disabled = false;
       entraLoginBtn.innerHTML =
-        '<span class="icon"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span> Inloggen met Microsoft 365';
+        '<span class="icon"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span> Inloggen met Microsoft 365';
     }
   });
 
@@ -83,7 +84,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const successMsg = document.createElement("div");
       successMsg.className = "success-message";
       successMsg.textContent =
-        '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Demo modus geactiveerd! U wordt doorgestuurd...';
+        '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Demo modus geactiveerd! U wordt doorgestuurd...';
       successMsg.style.cssText =
         "background: #28a745; color: white; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;";
 

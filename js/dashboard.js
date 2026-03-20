@@ -200,11 +200,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!isMicrosoftSignedIn()) {
           microsoftBtn.style.display = "block";
           microsoftBtn.textContent =
-            '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Microsoft 365 Inloggen';
+            '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Microsoft 365 Inloggen';
         } else {
           microsoftBtn.style.display = "block";
           microsoftBtn.textContent =
-            '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Microsoft 365';
+            '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Microsoft 365';
           microsoftBtn.disabled = true;
         }
 
@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           try {
             await signInToMicrosoft();
             microsoftBtn.textContent =
-              '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Microsoft 365';
+              '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Microsoft 365';
             microsoftBtn.disabled = true;
             showToast(
               "Succesvol ingelogd bij Microsoft 365! U kunt nu emails versturen en documenten opslaan.",

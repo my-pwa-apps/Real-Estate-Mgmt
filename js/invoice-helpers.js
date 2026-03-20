@@ -216,6 +216,15 @@ async function getPaymentDetails() {
  * Genereert factuur PDF
  */
 async function generateInvoicePDF(invoice) {
+  const s =
+    typeof sanitizeHTML === "function"
+      ? sanitizeHTML
+      : (v) =>
+          String(v ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
   // HTML template voor factuur
   const html = `
 <!DOCTYPE html>
@@ -244,11 +253,11 @@ async function generateInvoicePDF(invoice) {
 </head>
 <body>
     <div class="header">
-        <div class="company-name">${invoice.company.name}</div>
+        <div class="company-name">${s(invoice.company.name)}</div>
         <div class="company-details">
-            ${invoice.company.address} | ${invoice.company.postalCode} ${invoice.company.city}<br>
-            Tel: ${invoice.company.phone} | Email: ${invoice.company.email}<br>
-            KvK: ${invoice.company.kvk} | BTW: ${invoice.company.btw}
+            ${s(invoice.company.address)} | ${s(invoice.company.postalCode)} ${s(invoice.company.city)}<br>
+            Tel: ${s(invoice.company.phone)} | Email: ${s(invoice.company.email)}<br>
+            KvK: ${s(invoice.company.kvk)} | BTW: ${s(invoice.company.btw)}
         </div>
     </div>
 
@@ -257,15 +266,15 @@ async function generateInvoicePDF(invoice) {
     <div class="invoice-meta">
         <div class="customer-details">
             <div class="section-title">Klantgegevens</div>
-            <strong>${invoice.customer.name}</strong><br>
-            ${invoice.customer.address}<br>
-            ${invoice.customer.postalCode} ${invoice.customer.city}<br>
-            ${invoice.customer.email}<br>
-            ${invoice.customer.phone}
+            <strong>${s(invoice.customer.name)}</strong><br>
+            ${s(invoice.customer.address)}<br>
+            ${s(invoice.customer.postalCode)} ${s(invoice.customer.city)}<br>
+            ${s(invoice.customer.email)}<br>
+            ${s(invoice.customer.phone)}
         </div>
         <div class="invoice-details">
             <div class="section-title">Factuurgegevens</div>
-            <strong>Factuurnummer:</strong> ${invoice.invoiceNumber}<br>
+            <strong>Factuurnummer:</strong> ${s(invoice.invoiceNumber)}<br>
             <strong>Factuurdatum:</strong> ${formatDate(invoice.invoiceDate)}<br>
             <strong>Vervaldatum:</strong> ${formatDate(invoice.dueDate)}
         </div>
@@ -286,7 +295,7 @@ async function generateInvoicePDF(invoice) {
               .map(
                 (item) => `
                 <tr>
-                    <td>${item.description}</td>
+                    <td>${s(item.description)}</td>
                     <td style="text-align: center;">${item.quantity}</td>
                     <td class="amount">€ ${item.unitPrice.toFixed(2)}</td>
                     <td class="amount">${item.vatRate}%</td>
@@ -315,15 +324,15 @@ async function generateInvoicePDF(invoice) {
 
     <div class="payment-info">
         <div class="section-title">Betalingsgegevens</div>
-        <strong>IBAN:</strong> ${invoice.paymentDetails.iban}<br>
-        <strong>BIC:</strong> ${invoice.paymentDetails.bic}<br>
-        <strong>Bank:</strong> ${invoice.paymentDetails.bankName}<br>
-        <strong>Onder vermelding van:</strong> ${invoice.invoiceNumber}
-        ${invoice.notes ? `<br><br><strong>Notitie:</strong> ${invoice.notes}` : ""}
+        <strong>IBAN:</strong> ${s(invoice.paymentDetails.iban)}<br>
+        <strong>BIC:</strong> ${s(invoice.paymentDetails.bic)}<br>
+        <strong>Bank:</strong> ${s(invoice.paymentDetails.bankName)}<br>
+        <strong>Onder vermelding van:</strong> ${s(invoice.invoiceNumber)}
+        ${invoice.notes ? `<br><br><strong>Notitie:</strong> ${s(invoice.notes)}` : ""}
     </div>
 
     <div class="footer">
-        ${invoice.company.name} | ${invoice.company.kvk} | ${invoice.company.btw}
+        ${s(invoice.company.name)} | ${s(invoice.company.kvk)} | ${s(invoice.company.btw)}
     </div>
 </body>
 </html>
@@ -341,9 +350,10 @@ async function generateInvoicePDF(invoice) {
  * Converteert HTML naar PDF Blob
  */
 async function htmlToPdfBlob(html, filename) {
-  // Optie 1: Gebruik browser print API (simpel maar beperkt)
-  const printWindow = window.open("", "_blank");
-  printWindow.document.write(html);
+  // Use browser print API with pre-sanitized content
+  const printWindow = window.open("about:blank", "_blank");
+  printWindow.document.open();
+  printWindow.document.write(html); // Content is pre-sanitized in generateInvoicePDF
   printWindow.document.close();
 
   // Return een mock blob voor nu (in productie zou je een PDF library gebruiken)

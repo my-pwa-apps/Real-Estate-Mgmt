@@ -1,4 +1,26 @@
 /* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* Skip-to-content link - only visible on focus for keyboard users */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 10000;
+  padding: 12px 24px;
+  background: var(--primary-color, #1e3a5f);
+  color: #fff;
+  border-radius: 0 0 8px 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: top 0.2s;
+}
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* ========================================
    LOADING & ERROR STATES
    ======================================== */
 

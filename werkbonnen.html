@@ -2,6 +2,10 @@
 <html lang="nl">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://www.gstatic.com https://alcdn.msauth.net 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://login.microsoftonline.com https://*.microsoft.com https://*.openai.azure.com wss://*.firebaseio.com; img-src 'self' data:; font-src 'self';"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Werkbonnen - Stadsgezicht Ontwikkelingen</title>
     <link rel="stylesheet" href="css/styles.css" />
@@ -10,6 +14,7 @@
     <meta name="theme-color" content="#1e3a5f" />
   </head>
   <body>
+    <a href="#main-content" class="skip-to-content">Ga naar inhoud</a>
     <div class="app-container">
       <aside class="sidebar">
         <div class="sidebar-header">
@@ -26,6 +31,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -47,6 +53,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -75,6 +82,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -96,6 +104,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -120,6 +129,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -140,6 +150,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -165,6 +176,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -188,6 +200,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -206,7 +219,7 @@
         </div>
       </aside>
 
-      <main class="main-content">
+      <main id="main-content" class="main-content">
         <header class="page-header">
           <h1>Werkbonnen Overzicht</h1>
           <div class="header-actions">
@@ -214,6 +227,7 @@
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -236,6 +250,7 @@
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"

@@ -2,6 +2,10 @@
 <html lang="nl">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://www.gstatic.com https://alcdn.msauth.net 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://login.microsoftonline.com https://*.microsoft.com https://*.openai.azure.com wss://*.firebaseio.com; img-src 'self' data:; font-src 'self';"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin - Stadsgezicht Ontwikkelingen</title>
     <link rel="stylesheet" href="css/styles.css" />
@@ -10,6 +14,7 @@
     <meta name="theme-color" content="#1e3a5f" />
   </head>
   <body>
+    <a href="#main-content" class="skip-to-content">Ga naar inhoud</a>
     <div class="app-container">
       <aside class="sidebar">
         <div class="sidebar-header">
@@ -26,6 +31,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -47,6 +53,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -75,6 +82,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -96,6 +104,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -120,6 +129,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -140,6 +150,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -161,6 +172,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -197,6 +209,7 @@
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="lucide-icon"
+              aria-hidden="true"
               width="1em"
               height="1em"
               viewBox="0 0 24 24"
@@ -223,6 +236,7 @@
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -241,12 +255,13 @@
         </div>
       </aside>
 
-      <main class="main-content">
+      <main id="main-content" class="main-content">
         <header class="page-header">
           <h1>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="lucide-icon"
+              aria-hidden="true"
               width="1em"
               height="1em"
               viewBox="0 0 24 24"
@@ -278,6 +293,7 @@
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="lucide-icon"
+              aria-hidden="true"
               width="1em"
               height="1em"
               viewBox="0 0 24 24"
@@ -300,11 +316,22 @@
         <!-- Admin Content -->
         <div id="adminContent">
           <!-- Tabs -->
-          <div class="tabs-container">
-            <button class="tab-btn active" data-tab="users">
+          <div
+            class="tabs-container"
+            role="tablist"
+            aria-label="Admin instellingen"
+          >
+            <button
+              class="tab-btn active"
+              data-tab="users"
+              role="tab"
+              aria-selected="true"
+              aria-controls="usersTab"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -321,10 +348,17 @@
               </svg>
               Gebruikers
             </button>
-            <button class="tab-btn" data-tab="settings">
+            <button
+              class="tab-btn"
+              data-tab="settings"
+              role="tab"
+              aria-selected="false"
+              aria-controls="settingsTab"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -341,12 +375,70 @@
               </svg>
               Instellingen
             </button>
-            <button class="tab-btn" data-tab="ai">🤖 AI / Copilot</button>
-            <button class="tab-btn" data-tab="azure">☁️ Azure AD</button>
-            <button class="tab-btn" data-tab="audit">
+            <button
+              class="tab-btn"
+              data-tab="ai"
+              role="tab"
+              aria-selected="false"
+              aria-controls="aiTab"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
+                width="1em"
+                height="1em"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                fill="none"
+              >
+                <path d="M12 8V4H8" />
+                <rect width="16" height="12" x="4" y="8" rx="2" />
+                <path d="M2 14h2" />
+                <path d="M20 14h2" />
+                <path d="M15 13v2" />
+                <path d="M9 13v2" />
+              </svg>
+              AI / Copilot
+            </button>
+            <button
+              class="tab-btn"
+              data-tab="azure"
+              role="tab"
+              aria-selected="false"
+              aria-controls="azureTab"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="lucide-icon"
+                aria-hidden="true"
+                width="1em"
+                height="1em"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                fill="none"
+              >
+                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+              </svg>
+              Azure AD
+            </button>
+            <button
+              class="tab-btn"
+              data-tab="audit"
+              role="tab"
+              aria-selected="false"
+              aria-controls="auditTab"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -367,10 +459,17 @@
               </svg>
               Audit Log
             </button>
-            <button class="tab-btn" data-tab="demo">
+            <button
+              class="tab-btn"
+              data-tab="demo"
+              role="tab"
+              aria-selected="false"
+              aria-controls="demoTab"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="lucide-icon"
+                aria-hidden="true"
                 width="1em"
                 height="1em"
                 viewBox="0 0 24 24"
@@ -395,7 +494,12 @@
           </div>
 
           <!-- Users Tab -->
-          <div id="usersTab" class="tab-content active">
+          <div
+            id="usersTab"
+            class="tab-content active"
+            role="tabpanel"
+            aria-labelledby="users"
+          >
             <div class="section-header">
               <h2>Gebruikersbeheer</h2>
               <p>
@@ -409,6 +513,7 @@
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="lucide-icon"
+                  aria-hidden="true"
                   width="1em"
                   height="1em"
                   viewBox="0 0 24 24"
@@ -484,6 +589,7 @@
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="lucide-icon"
+                    aria-hidden="true"
                     width="1em"
                     height="1em"
                     viewBox="0 0 24 24"
@@ -550,6 +656,7 @@
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="lucide-icon"
+                    aria-hidden="true"
                     width="1em"
                     height="1em"
                     viewBox="0 0 24 24"
@@ -593,6 +700,7 @@
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="lucide-icon"
+                    aria-hidden="true"
                     width="1em"
                     height="1em"
                     viewBox="0 0 24 24"
@@ -640,7 +748,25 @@
               </div>
 
               <div class="setting-item">
-                <h3>🔔 Notificaties</h3>
+                <h3>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="lucide-icon"
+                    aria-hidden="true"
+                    width="1em"
+                    height="1em"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    fill="none"
+                  >
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </svg>
+                  Notificaties
+                </h3>
                 <div class="form-group">
                   <label>
                     <input
@@ -682,7 +808,29 @@
           <!-- AI / Copilot Tab -->
           <div id="aiTab" class="tab-content">
             <div class="section-header">
-              <h2>🤖 AI / Copilot Configuratie</h2>
+              <h2>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="lucide-icon"
+                  aria-hidden="true"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                >
+                  <path d="M12 8V4H8" />
+                  <rect width="16" height="12" x="4" y="8" rx="2" />
+                  <path d="M2 14h2" />
+                  <path d="M20 14h2" />
+                  <path d="M15 13v2" />
+                  <path d="M9 13v2" />
+                </svg>
+                AI / Copilot Configuratie
+              </h2>
               <p>
                 Configureer Azure OpenAI voor geavanceerde AI-functies zoals
                 foto-analyse en document-samenvatting.
@@ -691,7 +839,26 @@
 
             <div class="settings-grid">
               <div class="setting-item">
-                <h3>☁️ Azure OpenAI Configuratie</h3>
+                <h3>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="lucide-icon"
+                    aria-hidden="true"
+                    width="1em"
+                    height="1em"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    fill="none"
+                  >
+                    <path
+                      d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+                    />
+                  </svg>
+                  Azure OpenAI Configuratie
+                </h3>
                 <div class="form-group">
                   <label>Azure OpenAI Endpoint URL</label>
                   <input
@@ -721,17 +888,57 @@
               </div>
 
               <div class="setting-item">
-                <h3>💡 Functionaliteit</h3>
+                <h3>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="lucide-icon"
+                    aria-hidden="true"
+                    width="1em"
+                    height="1em"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    fill="none"
+                  >
+                    <path
+                      d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+                    />
+                    <path d="M9 18h6" />
+                    <path d="M10 22h4" />
+                  </svg>
+                  Functionaliteit
+                </h3>
                 <p>Met Azure OpenAI kunt u:</p>
                 <ul>
                   <li>
-                    📸 <strong>Foto analyse</strong> - Upload foto's van
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="lucide-icon"
+                      aria-hidden="true"
+                      width="1em"
+                      height="1em"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      fill="none"
+                    >
+                      <path
+                        d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"
+                      />
+                      <circle cx="12" cy="13" r="3" />
+                    </svg>
+                    <strong>Foto analyse</strong> - Upload foto's van
                     onderhoudsproblemen en ontvang automatische beschrijvingen
                   </li>
                   <li>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="lucide-icon"
+                      aria-hidden="true"
                       width="1em"
                       height="1em"
                       viewBox="0 0 24 24"
@@ -753,13 +960,30 @@
                     documenten voor samenvatting
                   </li>
                   <li>
-                    ✉️ <strong>Email concepten</strong> - Laat AI email teksten
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="lucide-icon"
+                      aria-hidden="true"
+                      width="1em"
+                      height="1em"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      fill="none"
+                    >
+                      <rect width="20" height="16" x="2" y="4" rx="2" />
+                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                    </svg>
+                    <strong>Email concepten</strong> - Laat AI email teksten
                     voorbereiden
                   </li>
                   <li>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="lucide-icon"
+                      aria-hidden="true"
                       width="1em"
                       height="1em"
                       viewBox="0 0 24 24"
@@ -793,6 +1017,7 @@
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="lucide-icon"
+                  aria-hidden="true"
                   width="1em"
                   height="1em"
                   viewBox="0 0 24 24"
@@ -902,7 +1127,27 @@
             ></div>
 
             <div class="info-box" style="margin-top: 20px">
-              <h3>📚 Setup Instructies</h3>
+              <h3>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="lucide-icon"
+                  aria-hidden="true"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                >
+                  <path d="M12 7v14" />
+                  <path
+                    d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"
+                  />
+                </svg>
+                Setup Instructies
+              </h3>
               <p>
                 Zie <code>AZURE-AD-SETUP.md</code> voor gedetailleerde
                 instructies voor:
@@ -934,6 +1179,7 @@
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="lucide-icon"
+                  aria-hidden="true"
                   width="1em"
                   height="1em"
                   viewBox="0 0 24 24"
@@ -967,12 +1213,35 @@
             <div class="demo-data-actions">
               <h3>Demo Data Acties</h3>
               <button id="resetDemoData" class="btn-secondary">
-                🔄 Reset Demo Data
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="lucide-icon"
+                  aria-hidden="true"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                >
+                  <path
+                    d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                  />
+                  <path d="M21 3v5h-5" />
+                  <path
+                    d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                  />
+                  <path d="M8 16H3v5" />
+                </svg>
+                Reset Demo Data
               </button>
               <button id="exportDemoData" class="btn-secondary">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="lucide-icon"
+                  aria-hidden="true"
                   width="1em"
                   height="1em"
                   viewBox="0 0 24 24"
@@ -989,7 +1258,24 @@
                 Exporteer Demo Data
               </button>
               <button id="importDemoData" class="btn-secondary">
-                📤 Importeer Demo Data
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="lucide-icon"
+                  aria-hidden="true"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" x2="12" y1="3" y2="15" />
+                </svg>
+                Importeer Demo Data
               </button>
             </div>
           </div>
@@ -1007,9 +1293,9 @@
 
     <script src="js/config.js"></script>
     <script src="js/ui-utilities.js"></script>
-    <script src="js/db-helpers.js"></script>
     <script src="js/demo-data.js"></script>
     <script src="js/entra-auth.js"></script>
+    <script src="js/db-helpers.js"></script>
     <script src="js/audit-trail.js"></script>
     <script src="js/data-export.js"></script>
     <script src="js/global-search.js"></script>

@@ -1,6 +1,25 @@
 // Global app initialization
 // Handles authentication, logout, and demo mode across all pages
 
+// Global error handlers - catch unhandled errors and show user-friendly messages
+window.onerror = function (message, source, lineno, colno, error) {
+  console.error("Unhandled error:", { message, source, lineno, colno, error });
+  if (typeof showToast === "function") {
+    showToast("Er is een onverwachte fout opgetreden", "error");
+  }
+  return false; // Allow default browser error logging
+};
+
+window.onunhandledrejection = function (event) {
+  console.error("Unhandled promise rejection:", event.reason);
+  if (typeof showToast === "function") {
+    showToast(
+      "Er is een fout opgetreden bij een achtergrondbewerking",
+      "error",
+    );
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   // Setup logout button on all pages
   const logoutBtn = document.getElementById("logoutBtn");
@@ -31,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
       demoIndicator.id = "demoIndicator";
       demoIndicator.className = "demo-indicator";
       demoIndicator.innerHTML =
-        '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M2 10s3-3 3-8"></path><path d="M22 10s-3-3-3-8"></path><path d="M10 2c0 4.4-3.6 8-8 8"></path><path d="M14 2c0 4.4 3.6 8 8 8"></path><path d="M2 10s2 2 2 5"></path><path d="M22 10s-2 2-2 5"></path><path d="M8 15h8"></path><path d="M2 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path><path d="M14 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path></svg> DEMO MODUS';
+        '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M2 10s3-3 3-8"></path><path d="M22 10s-3-3-3-8"></path><path d="M10 2c0 4.4-3.6 8-8 8"></path><path d="M14 2c0 4.4 3.6 8 8 8"></path><path d="M2 10s2 2 2 5"></path><path d="M22 10s-2 2-2 5"></path><path d="M8 15h8"></path><path d="M2 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path><path d="M14 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path></svg> DEMO MODUS';
       demoIndicator.style.cssText =
         "background: #ffc107; color: #000; padding: 8px; border-radius: 4px; margin-bottom: 10px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer;";
       demoIndicator.title = "Klik om demo modus te verlaten";
@@ -59,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       adminLink.href = "admin.html";
       adminLink.className = "nav-item";
       adminLink.innerHTML =
-        '<span class="icon"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></span> Admin';
+        '<span class="icon"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg></span> Admin';
 
       // Add separator before admin link
       const separator = document.createElement("hr");

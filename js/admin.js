@@ -45,21 +45,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Load admin data
 async function loadAdminData() {
-  // Load settings from localStorage
-  const savedSettings = localStorage.getItem("appSettings");
-  if (savedSettings) {
-    currentSettings = JSON.parse(savedSettings);
+  // Load settings from Firebase (fallback to localStorage for migration)
+  try {
+    const fbSettings = await dbGet("settings", "appSettings");
+    if (fbSettings) {
+      currentSettings = fbSettings;
+    } else {
+      const savedSettings = localStorage.getItem("appSettings");
+      if (savedSettings) {
+        currentSettings = JSON.parse(savedSettings);
+      }
+    }
     populateSettings();
+  } catch (e) {
+    console.warn(
+      "Failed to load settings from Firebase, using localStorage",
+      e,
+    );
+    const savedSettings = localStorage.getItem("appSettings");
+    if (savedSettings) {
+      currentSettings = JSON.parse(savedSettings);
+      populateSettings();
+    }
   }
 
   // Load Azure config
-  loadAzureConfig();
+  await loadAzureConfig();
 
   // Load users list
   loadUsersList();
 
   // Load admin emails
-  loadAdminEmails();
+  await loadAdminEmails();
 
   // Update demo status
   updateDemoStatus();
@@ -109,7 +126,20 @@ function populateSettings() {
 }
 
 // Load Azure config
-function loadAzureConfig() {
+async function loadAzureConfig() {
+  try {
+    const config = await dbGet("settings", "azureConfig");
+    if (config) {
+      document.getElementById("azureClientId").value = config.clientId || "";
+      document.getElementById("azureTenantId").value = config.tenantId || "";
+      document.getElementById("sharePointSiteName").value =
+        config.sharePointSite || "";
+      return;
+    }
+  } catch (e) {
+    console.warn("Failed to load Azure config from Firebase", e);
+  }
+  // Fallback to localStorage for migration
   const azureConfig = localStorage.getItem("azureConfig");
   if (azureConfig) {
     const config = JSON.parse(azureConfig);
@@ -127,7 +157,7 @@ function loadUsersList() {
   if (isDemoMode()) {
     usersList.innerHTML = `
             <div class="info-box">
-                <p><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg> In demo modus worden geen echte gebruikers getoond.</p>
+                <p><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg> In demo modus worden geen echte gebruikers getoond.</p>
                 <p>Na configuratie met Azure AD verschijnen hier de gebruikers die zich hebben aangemeld.</p>
             </div>
         `;
@@ -144,13 +174,22 @@ function loadUsersList() {
 }
 
 // Load admin emails
-function loadAdminEmails() {
-  const savedEmails = localStorage.getItem("adminEmails");
+async function loadAdminEmails() {
   const defaultEmails = [
     "admin@stadsgezicht.onmicrosoft.com",
     "beheer@stadsgezicht.nl",
   ];
-
+  try {
+    const fbEmails = await dbGet("settings", "adminEmails");
+    if (fbEmails && fbEmails.emails) {
+      document.getElementById("adminEmailsList").value =
+        fbEmails.emails.join("\n");
+      return;
+    }
+  } catch (e) {
+    console.warn("Failed to load admin emails from Firebase", e);
+  }
+  const savedEmails = localStorage.getItem("adminEmails");
   const emails = savedEmails ? JSON.parse(savedEmails) : defaultEmails;
   document.getElementById("adminEmailsList").value = emails.join("\n");
 }
@@ -162,7 +201,7 @@ function updateDemoStatus() {
 
   if (isDemoMode()) {
     statusText.innerHTML =
-      '<span class="status-badge actief"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M2 10s3-3 3-8"></path><path d="M22 10s-3-3-3-8"></path><path d="M10 2c0 4.4-3.6 8-8 8"></path><path d="M14 2c0 4.4 3.6 8 8 8"></path><path d="M2 10s2 2 2 5"></path><path d="M22 10s-2 2-2 5"></path><path d="M8 15h8"></path><path d="M2 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path><path d="M14 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path></svg> Demo Modus Actief</span>';
+      '<span class="status-badge actief"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M2 10s3-3 3-8"></path><path d="M22 10s-3-3-3-8"></path><path d="M10 2c0 4.4-3.6 8-8 8"></path><path d="M14 2c0 4.4 3.6 8 8 8"></path><path d="M2 10s2 2 2 5"></path><path d="M22 10s-2 2-2 5"></path><path d="M8 15h8"></path><path d="M2 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path><path d="M14 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path></svg> Demo Modus Actief</span>';
     controls.innerHTML = `
             <button id="exitDemoMode" class="btn-secondary">Verlaat Demo Modus</button>
             <p><small>Let op: Bij verlaten moet u opnieuw inloggen met Microsoft 365</small></p>
@@ -206,11 +245,13 @@ function setupEventListeners() {
     btn.addEventListener("click", () => {
       const tabName = btn.dataset.tab;
 
-      // Update active tab button
-      document
-        .querySelectorAll(".tab-btn")
-        .forEach((b) => b.classList.remove("active"));
+      // Update active tab button and ARIA
+      document.querySelectorAll(".tab-btn").forEach((b) => {
+        b.classList.remove("active");
+        b.setAttribute("aria-selected", "false");
+      });
       btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
 
       // Update active tab content
       document.querySelectorAll(".tab-content").forEach((content) => {
@@ -244,12 +285,8 @@ function setupEventListeners() {
   const saveAIBtn = document.getElementById("saveAIConfig");
   if (saveAIBtn) {
     saveAIBtn.addEventListener("click", saveAIConfig);
-    // Load existing config
-    const aiConfig = storage.get("azureOpenAIConfig", {});
-    if (aiConfig.endpoint)
-      document.getElementById("azureOpenAIEndpoint").value = aiConfig.endpoint;
-    if (aiConfig.apiKey)
-      document.getElementById("azureOpenAIKey").value = "••••••••••";
+    // Load existing config from Firebase
+    loadAIConfig();
   }
   const testAIBtn = document.getElementById("testAIConfig");
   if (testAIBtn) {
@@ -277,7 +314,7 @@ function setupEventListeners() {
 }
 
 // Save settings
-function saveSettings() {
+async function saveSettings() {
   currentSettings = {
     company: {
       name: document.getElementById("companyName").value,
@@ -307,44 +344,68 @@ function saveSettings() {
     },
   };
 
-  localStorage.setItem("appSettings", JSON.stringify(currentSettings));
-  showToast("Instellingen opgeslagen", "success");
+  try {
+    await dbUpdate("settings", "appSettings", currentSettings);
+    // Keep localStorage as fallback cache
+    localStorage.setItem("appSettings", JSON.stringify(currentSettings));
+    showToast("Instellingen opgeslagen", "success");
+  } catch (e) {
+    console.error("Failed to save settings to Firebase", e);
+    localStorage.setItem("appSettings", JSON.stringify(currentSettings));
+    showToast(
+      "Instellingen lokaal opgeslagen (Firebase niet bereikbaar)",
+      "warning",
+    );
+  }
 }
 
 // Save admin emails
-function saveAdminEmails() {
+async function saveAdminEmails() {
   const emailsText = document.getElementById("adminEmailsList").value;
   const emails = emailsText
     .split("\n")
     .map((e) => e.trim())
     .filter((e) => e.length > 0);
 
-  localStorage.setItem("adminEmails", JSON.stringify(emails));
-  showToast("Administrator emails opgeslagen", "success");
+  try {
+    await dbUpdate("settings", "adminEmails", { emails });
+    localStorage.setItem("adminEmails", JSON.stringify(emails));
+    showToast("Administrator emails opgeslagen", "success");
+  } catch (e) {
+    console.error("Failed to save admin emails to Firebase", e);
+    localStorage.setItem("adminEmails", JSON.stringify(emails));
+    showToast("Emails lokaal opgeslagen (Firebase niet bereikbaar)", "warning");
+  }
 }
 
 // Save Azure config
-function saveAzureConfig() {
+async function saveAzureConfig() {
   const config = {
     clientId: document.getElementById("azureClientId").value,
     tenantId: document.getElementById("azureTenantId").value,
     sharePointSite: document.getElementById("sharePointSiteName").value,
   };
 
-  localStorage.setItem("azureConfig", JSON.stringify(config));
-
-  // Update config in entra-auth.js (requires page reload)
-  showToast(
-    "Azure configuratie opgeslagen! Herlaad de pagina om de nieuwe configuratie te gebruiken.",
-    "success",
-    6000,
-  );
+  try {
+    await dbUpdate("settings", "azureConfig", config);
+    // Remove from localStorage (no longer needed there)
+    localStorage.removeItem("azureConfig");
+    showToast(
+      "Azure configuratie opgeslagen! Herlaad de pagina om de nieuwe configuratie te gebruiken.",
+      "success",
+      6000,
+    );
+  } catch (e) {
+    console.error("Failed to save Azure config to Firebase", e);
+    showToast("Fout bij opslaan Azure configuratie", "error");
+  }
 }
 
 // Test Azure config
 async function testAzureConfig() {
   const statusDiv = document.getElementById("azureStatus");
-  statusDiv.innerHTML = "<p>🔄 Verbinding testen...</p>";
+  statusDiv.innerHTML =
+    '<p><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"lucide-icon\" aria-hidden=\"true\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"><path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5\"/><path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\"/><path d=\"M8 16H3v5\"/></svg> Verbinding testen...</p>';
 
   try {
     // Try to get a token
@@ -353,7 +414,7 @@ async function testAzureConfig() {
     if (token) {
       statusDiv.innerHTML = `
                 <div class="success-box">
-                    <h3><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Verbinding Succesvol!</h3>
+                    <h3><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Verbinding Succesvol!</h3>
                     <p>Azure AD configuratie werkt correct.</p>
                     <p><small>Token verkregen: ${token.substring(0, 20)}...</small></p>
                 </div>
@@ -362,7 +423,7 @@ async function testAzureConfig() {
   } catch (error) {
     statusDiv.innerHTML = `
             <div class="error-box">
-                <h3><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg> Verbinding Mislukt</h3>
+                <h3><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg> Verbinding Mislukt</h3>
                 <p>${error.message}</p>
                 <p><small>Controleer de Client ID en Tenant ID in AZURE-AD-SETUP.md</small></p>
             </div>
@@ -444,8 +505,31 @@ function importDemoData() {
   input.click();
 }
 
+// Load AI configuration
+async function loadAIConfig() {
+  try {
+    const aiConfig = await dbGet("settings", "azureOpenAIConfig");
+    if (aiConfig) {
+      if (aiConfig.endpoint)
+        document.getElementById("azureOpenAIEndpoint").value =
+          aiConfig.endpoint;
+      if (aiConfig.apiKey)
+        document.getElementById("azureOpenAIKey").value = "••••••••••";
+      return;
+    }
+  } catch (e) {
+    console.warn("Failed to load AI config from Firebase", e);
+  }
+  // Fallback to localStorage
+  const aiConfig = storage.get("azureOpenAIConfig", {});
+  if (aiConfig.endpoint)
+    document.getElementById("azureOpenAIEndpoint").value = aiConfig.endpoint;
+  if (aiConfig.apiKey)
+    document.getElementById("azureOpenAIKey").value = "••••••••••";
+}
+
 // AI Configuration
-function saveAIConfig() {
+async function saveAIConfig() {
   const endpoint = document.getElementById("azureOpenAIEndpoint").value.trim();
   const apiKey = document.getElementById("azureOpenAIKey").value.trim();
 
@@ -455,18 +539,39 @@ function saveAIConfig() {
   }
 
   // Don't overwrite key if user didn't change it (shows as dots)
-  const existingConfig = storage.get("azureOpenAIConfig", {});
+  let existingKey = null;
+  try {
+    const existing = await dbGet("settings", "azureOpenAIConfig");
+    existingKey = existing?.apiKey;
+  } catch (e) {
+    const existingConfig = storage.get("azureOpenAIConfig", {});
+    existingKey = existingConfig.apiKey;
+  }
+
   const config = {
     endpoint: endpoint,
-    apiKey: apiKey.includes("••") ? existingConfig.apiKey : apiKey,
+    apiKey: apiKey.includes("••") ? existingKey : apiKey,
   };
 
-  storage.set("azureOpenAIConfig", config);
-  showToast("AI configuratie opgeslagen", "success");
+  try {
+    await dbUpdate("settings", "azureOpenAIConfig", config);
+    // Remove from localStorage
+    localStorage.removeItem("azureOpenAIConfig");
+    showToast("AI configuratie opgeslagen", "success");
+  } catch (e) {
+    console.error("Failed to save AI config to Firebase", e);
+    storage.set("azureOpenAIConfig", config);
+    showToast("AI configuratie lokaal opgeslagen", "warning");
+  }
 }
 
 async function testAIConfig() {
-  const config = storage.get("azureOpenAIConfig", null);
+  let config = null;
+  try {
+    config = await dbGet("settings", "azureOpenAIConfig");
+  } catch (e) {
+    config = storage.get("azureOpenAIConfig", null);
+  }
   if (!config || !config.endpoint || !config.apiKey) {
     showToast("Sla eerst de AI configuratie op", "error");
     return;

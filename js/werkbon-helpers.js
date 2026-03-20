@@ -112,6 +112,15 @@ async function generateWerkbonNummer() {
  * @returns {string} HTML content
  */
 function generateWerkbonHTML(werkbon) {
+  const s =
+    typeof sanitizeHTML === "function"
+      ? sanitizeHTML
+      : (v) =>
+          String(v ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
   return `
 <!DOCTYPE html>
 <html lang="nl">
@@ -245,14 +254,14 @@ function generateWerkbonHTML(werkbon) {
     </div>
 
     <div class="section">
-        <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> Locatie</div>
+        <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> Locatie</div>
         <div class="info-grid">
             <div class="info-label">Adres:</div>
-            <div class="info-value"><strong>${werkbon.pandAdres}</strong></div>
+            <div class="info-value"><strong>${s(werkbon.pandAdres)}</strong></div>
             <div class="info-label">Postcode:</div>
-            <div class="info-value">${werkbon.pandPostcode}</div>
+            <div class="info-value">${s(werkbon.pandPostcode)}</div>
             <div class="info-label">Plaats:</div>
-            <div class="info-value">${werkbon.pandPlaats}</div>
+            <div class="info-value">${s(werkbon.pandPlaats)}</div>
         </div>
     </div>
 
@@ -260,15 +269,15 @@ function generateWerkbonHTML(werkbon) {
       werkbon.huurderNaam
         ? `
     <div class="section">
-        <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Huurder</div>
+        <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Huurder</div>
         <div class="info-grid">
             <div class="info-label">Naam:</div>
-            <div class="info-value">${werkbon.huurderNaam}</div>
+            <div class="info-value">${s(werkbon.huurderNaam)}</div>
             ${
               werkbon.huurderTelefoon
                 ? `
             <div class="info-label">Telefoon:</div>
-            <div class="info-value">${werkbon.huurderTelefoon}</div>
+            <div class="info-value">${s(werkbon.huurderTelefoon)}</div>
             `
                 : ""
             }
@@ -276,7 +285,7 @@ function generateWerkbonHTML(werkbon) {
               werkbon.huurderEmail
                 ? `
             <div class="info-label">Email:</div>
-            <div class="info-value">${werkbon.huurderEmail}</div>
+            <div class="info-value">${s(werkbon.huurderEmail)}</div>
             `
                 : ""
             }
@@ -287,10 +296,10 @@ function generateWerkbonHTML(werkbon) {
     }
 
     <div class="section">
-        <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg> Werkzaamheden</div>
+        <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg> Werkzaamheden</div>
         <div class="info-grid">
             <div class="info-label">Titel:</div>
-            <div class="info-value"><strong>${werkbon.titel}</strong></div>
+            <div class="info-value"><strong>${s(werkbon.titel)}</strong></div>
             <div class="info-label">Prioriteit:</div>
             <div class="info-value">
                 <span class="priority-badge priority-${werkbon.prioriteit}">
@@ -316,14 +325,14 @@ function generateWerkbonHTML(werkbon) {
         </div>
         <div class="description-box">
             <strong>Beschrijving:</strong><br>
-            ${werkbon.beschrijving}
+            ${s(werkbon.beschrijving)}
         </div>
         ${
           werkbon.notities
             ? `
         <div class="description-box">
             <strong>Notities:</strong><br>
-            ${werkbon.notities}
+            ${s(werkbon.notities)}
         </div>
         `
             : ""
@@ -334,15 +343,15 @@ function generateWerkbonHTML(werkbon) {
       werkbon.onderhoudsBedrijf
         ? `
     <div class="section">
-        <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M12 6h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M16 6h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path><path d="M8 6h.01"></path><path d="M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><rect x="4" y="2" width="16" height="20" rx="2"></rect></svg> Onderhoudsbedrijf</div>
+        <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M12 6h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M16 6h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path><path d="M8 6h.01"></path><path d="M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><rect x="4" y="2" width="16" height="20" rx="2"></rect></svg> Onderhoudsbedrijf</div>
         <div class="info-grid">
             <div class="info-label">Bedrijf:</div>
-            <div class="info-value">${werkbon.onderhoudsBedrijf}</div>
+            <div class="info-value">${s(werkbon.onderhoudsBedrijf)}</div>
             ${
               werkbon.contactPersoon
                 ? `
             <div class="info-label">Contactpersoon:</div>
-            <div class="info-value">${werkbon.contactPersoon}</div>
+            <div class="info-value">${s(werkbon.contactPersoon)}</div>
             `
                 : ""
             }
@@ -350,7 +359,7 @@ function generateWerkbonHTML(werkbon) {
               werkbon.contactTelefoon
                 ? `
             <div class="info-label">Telefoon:</div>
-            <div class="info-value">${werkbon.contactTelefoon}</div>
+            <div class="info-value">${s(werkbon.contactTelefoon)}</div>
             `
                 : ""
             }
@@ -535,10 +544,12 @@ async function printWerkbon(werkbonId) {
 
     const htmlContent = generateWerkbonHTML(werkbon);
 
-    // Open in new window and print
-    const printWindow = window.open("", "_blank");
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
+    // Open in new window and print using safe DOM insertion
+    const printWindow = window.open("about:blank", "_blank");
+    const doc = printWindow.document;
+    doc.open();
+    doc.write(htmlContent); // Content is pre-sanitized in generateWerkbonHTML
+    doc.close();
 
     printWindow.onload = function () {
       printWindow.print();

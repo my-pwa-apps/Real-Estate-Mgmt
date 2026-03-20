@@ -57,7 +57,7 @@ function renderWerkbonnen() {
       const s = sanitizeHTML;
 
       return `
-            <tr onclick="viewWerkbonDetail('${werkbon.id}')" style="cursor: pointer;">
+            <tr onclick="viewWerkbonDetail('${sanitizeAttr(werkbon.id)}')" style="cursor: pointer;">
                 <td><strong>${s(werkbon.werkbonNummer)}</strong></td>
                 <td>${s(werkbon.pandAdres)}</td>
                 <td>${s(werkbon.titel)}</td>
@@ -66,9 +66,9 @@ function renderWerkbonnen() {
                 <td>${new Date(werkbon.aanmaakDatum).toLocaleDateString("nl-NL")}</td>
                 <td>€${parseFloat(werkbon.werkelijkeKosten || werkbon.geschatteKosten || 0).toLocaleString("nl-NL")}</td>
                 <td onclick="event.stopPropagation();">
-                    <button class="action-btn" onclick="downloadWerkbon('${werkbon.id}')" title="Download">💾</button>
-                    <button class="action-btn" onclick="printWerkbon('${werkbon.id}')" title="Print">🖨️</button>
-                    <button class="action-btn" onclick="resendWerkbon('${werkbon.id}')" title="Opnieuw versturen"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg></button>
+                    <button class="action-btn" onclick="downloadWerkbon('${sanitizeAttr(werkbon.id)}')" title="Download"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg></button>
+                    <button class="action-btn" onclick="printWerkbon('${sanitizeAttr(werkbon.id)}')" title="Print"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg></button>
+                    <button class="action-btn" onclick="resendWerkbon('${sanitizeAttr(werkbon.id)}')" title="Opnieuw versturen"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg></button>
                 </td>
             </tr>
         `;
@@ -85,12 +85,12 @@ function viewWerkbonDetail(werkbonId) {
   // Create detail panel with werkbon info
   const detailHTML = `
         <div class="detail-panel-header">
-            <h2><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg> Werkbon ${s(werkbon.werkbonNummer)}</h2>
+            <h2><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg> Werkbon ${s(werkbon.werkbonNummer)}</h2>
             <button class="detail-panel-close" onclick="closeWerkbonDetail()">×</button>
         </div>
         <div class="detail-panel-body">
             <div class="detail-section">
-                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> Locatie</div>
+                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg> Locatie</div>
                 <div class="detail-row">
                     <div class="detail-label">Adres</div>
                     <div class="detail-value"><strong>${s(werkbon.pandAdres)}</strong></div>
@@ -109,7 +109,7 @@ function viewWerkbonDetail(werkbonId) {
               werkbon.huurderNaam
                 ? `
             <div class="detail-section">
-                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Huurder</div>
+                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Huurder</div>
                 <div class="detail-row">
                     <div class="detail-label">Naam</div>
                     <div class="detail-value">${s(werkbon.huurderNaam)}</div>
@@ -140,7 +140,7 @@ function viewWerkbonDetail(werkbonId) {
             }
 
             <div class="detail-section">
-                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg> Werkzaamheden</div>
+                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg> Werkzaamheden</div>
                 <div class="detail-row">
                     <div class="detail-label">Titel</div>
                     <div class="detail-value"><strong>${s(werkbon.titel)}</strong></div>
@@ -163,7 +163,7 @@ function viewWerkbonDetail(werkbonId) {
               werkbon.onderhoudsBedrijf
                 ? `
             <div class="detail-section">
-                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M12 6h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M16 6h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path><path d="M8 6h.01"></path><path d="M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><rect x="4" y="2" width="16" height="20" rx="2"></rect></svg> Onderhoudsbedrijf</div>
+                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M12 6h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M16 6h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path><path d="M8 6h.01"></path><path d="M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><rect x="4" y="2" width="16" height="20" rx="2"></rect></svg> Onderhoudsbedrijf</div>
                 <div class="detail-row">
                     <div class="detail-label">Bedrijf</div>
                     <div class="detail-value">${s(werkbon.onderhoudsBedrijf)}</div>
@@ -194,7 +194,7 @@ function viewWerkbonDetail(werkbonId) {
             }
 
             <div class="detail-section">
-                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg> Financieel</div>
+                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg> Financieel</div>
                 <div class="detail-row">
                     <div class="detail-label">Geschatte kosten</div>
                     <div class="detail-value">€${parseFloat(werkbon.geschatteKosten || 0).toLocaleString("nl-NL", { minimumFractionDigits: 2 })}</div>
@@ -212,7 +212,7 @@ function viewWerkbonDetail(werkbonId) {
             </div>
 
             <div class="detail-section">
-                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg> Data</div>
+                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg> Data</div>
                 <div class="detail-row">
                     <div class="detail-label">Aangemaakt</div>
                     <div class="detail-value">${new Date(werkbon.aanmaakDatum).toLocaleDateString("nl-NL")}</div>
@@ -251,13 +251,13 @@ function viewWerkbonDetail(werkbonId) {
         </div>
         <div class="detail-actions">
             <button class="btn-secondary" onclick="downloadWerkbon('${werkbon.id}')">
-                💾 Download
+                <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg> Download
             </button>
             <button class="btn-secondary" onclick="printWerkbon('${werkbon.id}')">
-                🖨️ Print
+                <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg> Print
             </button>
             <button class="btn-primary" onclick="resendWerkbon('${werkbon.id}')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg> Opnieuw Versturen
+                <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg> Opnieuw Versturen
             </button>
             <button class="btn-secondary" onclick="closeWerkbonDetail()">
                 Sluiten
@@ -317,7 +317,7 @@ async function resendWerkbon(werkbonId) {
         <div id="resendWerkbonModal" class="modal show" style="display: flex;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg> Werkbon Versturen</h2>
+                    <h2><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg> Werkbon Versturen</h2>
                     <button class="close-btn" onclick="closeResendModal()">&times;</button>
                 </div>
                 
@@ -353,8 +353,8 @@ async function resendWerkbon(werkbonId) {
                     <button type="button" class="btn-secondary" onclick="closeResendModal()">
                         Annuleren
                     </button>
-                    <button type="button" class="btn-primary" onclick="sendResendWerkbon('${werkbon.id}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg> Verstuur
+                    <button type="button" class="btn-primary" onclick="sendResendWerkbon('${sanitizeAttr(werkbon.id)}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path><rect x="2" y="4" width="20" height="16" rx="2"></rect></svg> Verstuur
                     </button>
                 </div>
             </div>

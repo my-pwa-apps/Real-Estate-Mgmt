@@ -18,10 +18,13 @@ function showToast(message, type = "info", duration = 3000) {
 
   // Icons per type
   const icons = {
-    success: "✓",
-    error: "✕",
-    warning: "⚠",
-    info: "ℹ",
+    success:
+      '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M20 6 9 17l-5-5"/></svg>',
+    error:
+      '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+    warning:
+      '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+    info: '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
   };
 
   // Titles per type
@@ -217,6 +220,17 @@ function sanitizeHTML(html) {
   const div = document.createElement("div");
   div.textContent = String(html);
   return div.innerHTML;
+}
+
+/**
+ * Sanitize a value for safe use inside HTML attribute strings (e.g. onclick)
+ * Only allows alphanumeric, hyphens and underscores (safe for Firebase IDs)
+ * @param {string} val - Value to sanitize
+ * @returns {string} - Sanitized value
+ */
+function sanitizeAttr(val) {
+  if (val === null || val === undefined) return "";
+  return String(val).replace(/[^a-zA-Z0-9_-]/g, "");
 }
 
 /**
@@ -420,6 +434,7 @@ if (typeof module !== "undefined" && module.exports) {
     isValidEmail,
     isValidPhone,
     sanitizeHTML,
+    sanitizeAttr,
     generateId,
     capitalizeFirst,
     scrollToElement,
@@ -433,3 +448,4 @@ if (typeof module !== "undefined" && module.exports) {
 
 // Make isViewerRole globally accessible
 window.isViewerRole = isViewerRole;
+window.sanitizeAttr = sanitizeAttr;
