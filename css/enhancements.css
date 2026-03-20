@@ -340,7 +340,9 @@ html {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(15, 27, 45, 0.4);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     z-index: 10000;
     display: flex;
     align-items: flex-start;
@@ -348,7 +350,7 @@ html {
     padding-top: 10vh;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.25s ease;
 }
 
 .global-search-overlay.show {
@@ -357,14 +359,20 @@ html {
 }
 
 .global-search-modal {
-    background: #ffffff;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border-radius: 20px;
     width: 90%;
     max-width: 640px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     overflow: hidden;
     transform: translateY(-20px);
-    transition: transform 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .global-search-overlay.show .global-search-modal {
@@ -420,15 +428,16 @@ html {
     align-items: center;
     gap: 12px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: 12px;
     text-decoration: none;
     color: inherit;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: all 0.2s ease;
 }
 
 .global-search-result:hover {
-    background: #f5f5f5;
+    background: rgba(198, 156, 109, 0.08);
+    transform: translateX(4px);
 }
 
 .result-icon {
@@ -464,49 +473,66 @@ html {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--primary-color);
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     color: white;
     border: none;
     font-size: 28px;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(30, 58, 95, 0.4);
+    box-shadow: 
+        0 8px 24px rgba(30, 58, 95, 0.35),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     z-index: 9998;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .copilot-fab:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 24px rgba(30, 58, 95, 0.5);
+    transform: scale(1.1) rotate(-5deg);
+    box-shadow: 
+        0 12px 32px rgba(30, 58, 95, 0.4),
+        0 0 40px rgba(198, 156, 109, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 22px;
 }
 
 .copilot-fab.active {
-    background: var(--accent-color);
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+    transform: scale(1.05);
+    box-shadow: 
+        0 8px 24px rgba(198, 156, 109, 0.35),
+        0 0 30px rgba(198, 156, 109, 0.15);
 }
 
 .copilot-panel {
     position: fixed;
-    bottom: 90px;
+    bottom: 96px;
     right: 24px;
     width: 420px;
     max-width: calc(100vw - 48px);
     height: 600px;
     max-height: calc(100vh - 120px);
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.88);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border-radius: 24px;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     z-index: 9999;
     display: flex;
     flex-direction: column;
     opacity: 0;
     transform: translateY(20px) scale(0.95);
     pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .copilot-panel.show {
@@ -519,11 +545,24 @@ html {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    background: var(--primary-color);
+    padding: 16px 18px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     color: white;
-    border-radius: 16px 16px 0 0;
+    border-radius: 24px 24px 0 0;
     flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.copilot-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(198, 156, 109, 0.2) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .copilot-header-title {
@@ -591,15 +630,19 @@ html {
 }
 
 .copilot-message.user .copilot-message-content {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     color: white;
     border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 8px rgba(30, 58, 95, 0.2);
 }
 
 .copilot-message.assistant .copilot-message-content {
-    background: #f0f2f5;
+    background: rgba(240, 242, 245, 0.6);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     color: var(--text-primary);
     border-bottom-left-radius: 4px;
+    border: 1px solid rgba(222, 226, 230, 0.3);
 }
 
 .copilot-message-content p { margin: 4px 0; }
@@ -686,37 +729,45 @@ html {
 
 .copilot-input {
     flex: 1;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 8px 12px;
+    border: 1px solid rgba(222, 226, 230, 0.5);
+    border-radius: 14px;
+    padding: 10px 14px;
     font-size: 13px;
     resize: none;
     outline: none;
     font-family: inherit;
     min-height: 36px;
     max-height: 120px;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
 }
 
 .copilot-input:focus {
-    border-color: var(--primary-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(198, 156, 109, 0.1);
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .copilot-send-btn {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     color: white;
     border: none;
-    border-radius: 10px;
-    width: 36px;
-    height: 36px;
+    border-radius: 14px;
+    width: 38px;
+    height: 38px;
     cursor: pointer;
     font-size: 16px;
     flex-shrink: 0;
-    transition: background 0.15s;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .copilot-send-btn:hover {
-    background: #15304f;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    transform: scale(1.08);
+    box-shadow: 0 4px 16px rgba(30, 58, 95, 0.3);
 }
 
 .copilot-quick-actions {
@@ -727,18 +778,23 @@ html {
 }
 
 .copilot-quick-actions button {
-    background: #f0f2f5;
-    border: none;
-    border-radius: 16px;
-    padding: 4px 10px;
+    background: rgba(240, 242, 245, 0.6);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(222, 226, 230, 0.3);
+    border-radius: 20px;
+    padding: 5px 12px;
     font-size: 11px;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: all 0.3s ease;
     white-space: nowrap;
 }
 
 .copilot-quick-actions button:hover {
-    background: #e0e3e8;
+    background: rgba(198, 156, 109, 0.1);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(198, 156, 109, 0.1);
 }
 
 /* Mode Switcher */
@@ -849,22 +905,26 @@ html {
 .copilot-ms-action-btn {
     display: block;
     width: 100%;
-    padding: 10px 14px;
-    margin-bottom: 6px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    background: #ffffff;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(222, 226, 230, 0.4);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.5);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     cursor: pointer;
     font-size: 13px;
     text-align: left;
-    transition: all 0.15s;
+    transition: all 0.3s ease;
     color: var(--text-primary);
 }
 
 .copilot-ms-action-btn:hover {
-    background: #f5f7fa;
-    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.8);
+    border-color: var(--accent-color);
     color: var(--primary-color);
+    transform: translateX(6px);
+    box-shadow: 0 4px 12px rgba(198, 156, 109, 0.1);
 }
 
 .copilot-ms-custom {
@@ -918,38 +978,48 @@ html {
 }
 
 .btn-icon {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.7);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(222, 226, 230, 0.5);
+    border-radius: 12px;
+    padding: 8px 14px;
     cursor: pointer;
     font-size: 14px;
-    transition: background 0.15s;
+    transition: all 0.3s ease;
     white-space: nowrap;
     color: var(--text-primary);
 }
 
 .btn-icon:hover {
-    background: var(--bg-tertiary);
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(198, 156, 109, 0.12);
+    transform: translateY(-2px);
 }
 
 .search-shortcut {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(222, 226, 230, 0.4);
+    border-radius: 12px;
+    padding: 8px 14px;
     cursor: pointer;
     font-size: 13px;
     color: var(--text-muted);
-    transition: background 0.15s, border-color 0.15s;
+    transition: all 0.3s ease;
 }
 
 .search-shortcut:hover {
-    background: var(--bg-tertiary);
-    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(198, 156, 109, 0.12);
+    transform: translateY(-2px);
+    color: var(--primary-color);
 }
 
 .search-shortcut kbd {
