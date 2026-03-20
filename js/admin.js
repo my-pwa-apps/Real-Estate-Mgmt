@@ -514,7 +514,7 @@ async function loadAIConfig() {
         document.getElementById("azureOpenAIEndpoint").value =
           aiConfig.endpoint;
       if (aiConfig.apiKey)
-        document.getElementById("azureOpenAIKey").value = "••••••••••";
+        document.getElementById("azureOpenAIKey").value = "**********";
       return;
     }
   } catch (e) {
@@ -525,7 +525,7 @@ async function loadAIConfig() {
   if (aiConfig.endpoint)
     document.getElementById("azureOpenAIEndpoint").value = aiConfig.endpoint;
   if (aiConfig.apiKey)
-    document.getElementById("azureOpenAIKey").value = "••••••••••";
+    document.getElementById("azureOpenAIKey").value = "**********";
 }
 
 // AI Configuration
@@ -550,7 +550,7 @@ async function saveAIConfig() {
 
   const config = {
     endpoint: endpoint,
-    apiKey: apiKey.includes("••") ? existingKey : apiKey,
+    apiKey: apiKey.includes("**") ? existingKey : apiKey,
   };
 
   try {

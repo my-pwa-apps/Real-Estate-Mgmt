@@ -44,7 +44,7 @@ function showToast(message, type = "info", duration = 3000) {
             <div class="toast-title">${titles[type]}</div>
             <div class="toast-message">${sanitizeHTML(message)}</div>
         </div>
-        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+        <button class="toast-close" onclick="this.parentElement.remove()"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
     `;
 
   container.appendChild(toast);

@@ -133,8 +133,8 @@ function gatherPageContext() {
 
 /**
  * Determine which Copilot endpoint to use based on auth status
- * - Entra ID user → EDP (Enterprise Data Protected) Copilot
- * - No Entra ID → Consumer Copilot
+ * - Entra ID user <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> EDP (Enterprise Data Protected) Copilot
+ * - No Entra ID <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Consumer Copilot
  */
 function getCopilotEndpoint() {
   const isEntraUser =
@@ -714,7 +714,7 @@ async function generateLocalResponse(message, file) {
     if (file.dataUrl) {
       return `<p><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> <strong>Foto ontvangen:</strong> ${s(file.name)}</p>
                 <p>Voor automatische foto-analyse is een Azure OpenAI configuratie nodig. 
-                U kunt dit instellen via <strong>Admin → Instellingen → AI Configuratie</strong>.</p>
+                U kunt dit instellen via <strong>Admin <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Instellingen <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> AI Configuratie</strong>.</p>
                 <p>Handmatig kunt u:</p>
                 <ul>
                     <li>De foto toevoegen aan een <a href="onderhoud.html" style="color:var(--primary-color);">onderhoudsmelding</a></li>
@@ -913,7 +913,12 @@ function generateMaintenanceResponse(onderhoud, panden) {
 
   ["urgent", "hoog", "normaal", "laag"].forEach((prio) => {
     if (byPriority[prio].length > 0) {
-      const icon = { urgent: "●", hoog: "●", normaal: "●", laag: "●" }[prio];
+      const icon = {
+        urgent: '<span style="color:var(--danger-color)">&#9679;</span>',
+        hoog: '<span style="color:var(--warning-color)">&#9679;</span>',
+        normaal: '<span style="color:var(--info-color)">&#9679;</span>',
+        laag: '<span style="color:var(--success-color)">&#9679;</span>',
+      }[prio];
       html += `<p>${icon} <strong>${prio.charAt(0).toUpperCase() + prio.slice(1)} (${byPriority[prio].length}):</strong></p><ul>`;
       byPriority[prio].slice(0, 3).forEach((m) => {
         const pand = panden.find((p) => p.id === m.pandId);
@@ -986,7 +991,7 @@ function generateFinancialResponse(transacties, contracten) {
         </table>
         <p style="margin-top:12px;"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg> <strong>Verwachte maandelijkse huur:</strong> €${monthlyRent.toLocaleString("nl-NL")}</p>
         <p><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg> <strong>Verwacht jaarinkomen:</strong> €${(monthlyRent * 12).toLocaleString("nl-NL")}</p>
-        <p style="margin-top:8px;"><a href="financieel.html" style="color:var(--primary-color);">→ Bekijk volledig financieel overzicht</a></p>`;
+        <p style="margin-top:8px;"><a href="financieel.html" style="color:var(--primary-color);"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Bekijk volledig financieel overzicht</a></p>`;
 }
 
 function generatePropertyResponse(panden) {
@@ -1073,7 +1078,7 @@ function formatCopilotResponse(text) {
   return text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\n/g, "<br>")
-    .replace(/^- /gm, "• ");
+    .replace(/^- /gm, "- ");
 }
 
 async function gatherAppContext() {

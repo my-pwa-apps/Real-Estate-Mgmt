@@ -72,7 +72,7 @@ async function processRentIncrease() {
         const huurder = huurders.find((h) => h.id === contract.huurderId);
         const pand = panden.find((p) => p.id === contract.pandId);
         logAuditEvent("update", "contracten", contract.id, {
-          description: `Huurverhoging ${increasePercent}%: €${oldPrice} → €${newPrice} (${huurder ? huurder.voornaam + " " + huurder.achternaam : ""}, ${pand ? pand.adres : ""})`,
+          description: `Huurverhoging ${increasePercent}%: €${oldPrice} <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> €${newPrice} (${huurder ? huurder.voornaam + " " + huurder.achternaam : ""}, ${pand ? pand.adres : ""})`,
         });
       }
 
