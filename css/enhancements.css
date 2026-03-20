@@ -4,236 +4,255 @@
 
 /* Loading Spinner */
 .loading-spinner {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    border: 4px solid var(--bg-tertiary);
-    border-top-color: var(--primary-color);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--bg-tertiary);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 16px;
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 .loading-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .loading-text {
-    color: var(--text-secondary);
-    font-weight: 500;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 /* Toast Notifications */
 .toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 400px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
 }
 
 .toast {
-    background: white;
-    border-radius: 12px;
-    padding: 16px 20px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transform: translateX(calc(100% + 40px));
-    transition: var(--transition-smooth);
-    border-left: 4px solid var(--primary-color);
+  background: white;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateX(calc(100% + 40px));
+  transition: var(--transition-smooth);
+  border-left: 4px solid var(--primary-color);
 }
 
 .toast.show {
-    transform: translateX(0);
+  transform: translateX(0);
 }
 
 .toast.success {
-    border-left-color: var(--success-color);
+  border-left-color: var(--success-color);
 }
 
 .toast.error {
-    border-left-color: var(--danger-color);
+  border-left-color: var(--danger-color);
 }
 
 .toast.warning {
-    border-left-color: var(--warning-color);
+  border-left-color: var(--warning-color);
 }
 
 .toast.info {
-    border-left-color: var(--info-color);
+  border-left-color: var(--info-color);
 }
 
 .toast-icon {
-    font-size: 24px;
-    flex-shrink: 0;
+  font-size: 24px;
+  flex-shrink: 0;
 }
 
 .toast-content {
-    flex: 1;
+  flex: 1;
 }
 
 .toast-title {
-    font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 4px;
-    color: var(--text-primary);
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: var(--text-primary);
 }
 
 .toast-message {
-    font-size: 13px;
-    color: var(--text-secondary);
+  font-size: 13px;
+  color: var(--text-secondary);
 }
 
 .toast-close {
-    background: none;
-    border: none;
-    font-size: 20px;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 0;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: var(--transition-fast);
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition-fast);
 }
 
 .toast-close:hover {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 /* Skeleton Loading */
 .skeleton {
-    background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s ease-in-out infinite;
-    border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-tertiary) 25%,
+    var(--bg-secondary) 50%,
+    var(--bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+  border-radius: 8px;
 }
 
 @keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skeleton-text {
-    height: 16px;
-    margin-bottom: 8px;
+  height: 16px;
+  margin-bottom: 8px;
 }
 
 .skeleton-title {
-    height: 24px;
-    width: 60%;
-    margin-bottom: 12px;
+  height: 24px;
+  width: 60%;
+  margin-bottom: 12px;
 }
 
 .skeleton-card {
-    height: 120px;
-    border-radius: 16px;
+  height: 120px;
+  border-radius: 16px;
 }
 
 /* Empty States */
 .empty-state-container {
-    text-align: center;
-    padding: 60px 20px;
+  text-align: center;
+  padding: 60px 20px;
 }
 
 .empty-state-icon {
-    font-size: 64px;
-    margin-bottom: 20px;
-    opacity: 0.5;
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
 }
 
 .empty-state-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
 }
 
 .empty-state-message {
-    color: var(--text-secondary);
-    margin-bottom: 24px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
 }
 
 /* Error States */
 .error-banner {
-    background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
-    border: 1px solid var(--danger-color);
-    border-left: 4px solid var(--danger-color);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: start;
-    gap: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(220, 38, 38, 0.1) 0%,
+    rgba(220, 38, 38, 0.05) 100%
+  );
+  border: 1px solid var(--danger-color);
+  border-left: 4px solid var(--danger-color);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: start;
+  gap: 12px;
 }
 
 .error-banner-icon {
-    font-size: 24px;
-    flex-shrink: 0;
+  font-size: 24px;
+  flex-shrink: 0;
 }
 
 .error-banner-content {
-    flex: 1;
+  flex: 1;
 }
 
 .error-banner-title {
-    font-weight: 700;
-    color: var(--danger-color);
-    margin-bottom: 4px;
+  font-weight: 700;
+  color: var(--danger-color);
+  margin-bottom: 4px;
 }
 
 .error-banner-message {
-    color: var(--text-secondary);
-    font-size: 14px;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 /* Success Banner */
 .success-banner {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
-    border: 1px solid var(--success-color);
-    border-left: 4px solid var(--success-color);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: start;
-    gap: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(16, 185, 129, 0.05) 100%
+  );
+  border: 1px solid var(--success-color);
+  border-left: 4px solid var(--success-color);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: start;
+  gap: 12px;
 }
 
 .success-banner-icon {
-    font-size: 24px;
-    flex-shrink: 0;
+  font-size: 24px;
+  flex-shrink: 0;
 }
 
 /* Improved Focus States */
@@ -242,792 +261,843 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
 /* Smooth Scrolling */
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 /* Selection Color */
 ::selection {
-    background: var(--accent-color);
-    color: white;
+  background: var(--accent-color);
+  color: white;
 }
 
 ::-moz-selection {
-    background: var(--accent-color);
-    color: white;
+  background: var(--accent-color);
+  color: white;
 }
 
 /* Improved Scrollbar */
 ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
+  background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 5px;
+  background: var(--border-color);
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-color);
+  background: var(--accent-color);
 }
 
 /* Print Styles */
 @media print {
-    .sidebar,
-    .sidebar-footer,
-    .detail-panel,
-    .detail-panel-overlay,
-    .toast-container,
-    .loading-overlay,
-    button {
-        display: none !important;
-    }
-    
-    .main-content {
-        margin-left: 0;
-        max-width: 100%;
-    }
-    
-    .page-header {
-        border-bottom: 2px solid var(--primary-color);
-    }
+  .sidebar,
+  .sidebar-footer,
+  .detail-panel,
+  .detail-panel-overlay,
+  .toast-container,
+  .loading-overlay,
+  button {
+    display: none !important;
+  }
+
+  .main-content {
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .page-header {
+    border-bottom: 2px solid var(--primary-color);
+  }
 }
 
 /* Accessibility Improvements */
 .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Reduce Motion */
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-    
-    html {
-        scroll-behavior: auto;
-    }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* ========================================
    GLOBAL SEARCH OVERLAY
    ======================================== */
 .global-search-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(15, 27, 45, 0.4);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
-    z-index: 10000;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 10vh;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 27, 45, 0.4);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
 }
 
 .global-search-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .global-search-modal {
-    background: rgba(255, 255, 255, 0.92);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    backdrop-filter: blur(24px) saturate(180%);
-    border-radius: 20px;
-    width: 90%;
-    max-width: 640px;
-    box-shadow: 
-        0 24px 60px rgba(0, 0, 0, 0.2),
-        0 0 0 1px rgba(255, 255, 255, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    overflow: hidden;
-    transform: translateY(-20px);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 640px;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  transform: translateY(-20px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .global-search-overlay.show .global-search-modal {
-    transform: translateY(0);
+  transform: translateY(0);
 }
 
 .global-search-header {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    border-bottom: 1px solid #eee;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  gap: 12px;
 }
 
 .global-search-icon {
-    font-size: 20px;
-    flex-shrink: 0;
+  font-size: 20px;
+  flex-shrink: 0;
 }
 
 .global-search-header input {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    padding: 4px;
-    background: transparent;
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  padding: 4px;
+  background: transparent;
 }
 
 .global-search-close {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: #999;
-    padding: 4px 8px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #999;
+  padding: 4px 8px;
 }
 
 .global-search-results {
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
 }
 
 .global-search-hint {
-    text-align: center;
-    color: #999;
-    padding: 24px;
-    font-size: 14px;
+  text-align: center;
+  color: #999;
+  padding: 24px;
+  font-size: 14px;
 }
 
 .global-search-result {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .global-search-result:hover {
-    background: rgba(198, 156, 109, 0.08);
-    transform: translateX(4px);
+  background: rgba(198, 156, 109, 0.08);
+  transform: translateX(4px);
 }
 
 .result-icon {
-    font-size: 24px;
-    flex-shrink: 0;
+  font-size: 24px;
+  flex-shrink: 0;
 }
 
 .result-content {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .result-title {
-    font-weight: 600;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .result-subtitle {
-    font-size: 12px;
-    color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ========================================
    COPILOT AI ASSISTANT
    ======================================== */
 .copilot-fab {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 60px;
-    height: 60px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-    color: white;
-    border: none;
-    font-size: 28px;
-    cursor: pointer;
-    box-shadow: 
-        0 8px 24px rgba(30, 58, 95, 0.35),
-        0 0 0 1px rgba(255, 255, 255, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    z-index: 9998;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--primary-light) 100%
+  );
+  color: white;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow:
+    0 8px 24px rgba(30, 58, 95, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 9998;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .copilot-fab:hover {
-    transform: scale(1.1) rotate(-5deg);
-    box-shadow: 
-        0 12px 32px rgba(30, 58, 95, 0.4),
-        0 0 40px rgba(198, 156, 109, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    border-radius: 22px;
+  transform: scale(1.1) rotate(-5deg);
+  box-shadow:
+    0 12px 32px rgba(30, 58, 95, 0.4),
+    0 0 40px rgba(198, 156, 109, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border-radius: 22px;
 }
 
 .copilot-fab.active {
-    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
-    transform: scale(1.05);
-    box-shadow: 
-        0 8px 24px rgba(198, 156, 109, 0.35),
-        0 0 30px rgba(198, 156, 109, 0.15);
+  background: linear-gradient(
+    135deg,
+    var(--accent-color) 0%,
+    var(--accent-dark) 100%
+  );
+  transform: scale(1.05);
+  box-shadow:
+    0 8px 24px rgba(198, 156, 109, 0.35),
+    0 0 30px rgba(198, 156, 109, 0.15);
 }
 
 .copilot-panel {
-    position: fixed;
-    bottom: 96px;
-    right: 24px;
-    width: 420px;
-    max-width: calc(100vw - 48px);
-    height: 600px;
-    max-height: calc(100vh - 120px);
-    background: rgba(255, 255, 255, 0.88);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    backdrop-filter: blur(24px) saturate(180%);
-    border-radius: 24px;
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.15),
-        0 0 0 1px rgba(255, 255, 255, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    pointer-events: none;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  width: 420px;
+  max-width: calc(100vw - 48px);
+  height: 600px;
+  max-height: calc(100vh - 120px);
+  background: rgba(255, 255, 255, 0.88);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 24px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .copilot-panel.show {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 .copilot-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 18px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-    color: white;
-    border-radius: 24px 24px 0 0;
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--primary-light) 100%
+  );
+  color: white;
+  border-radius: 24px 24px 0 0;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 
 .copilot-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 120px;
-    height: 120px;
-    background: radial-gradient(circle, rgba(198, 156, 109, 0.2) 0%, transparent 70%);
-    pointer-events: none;
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(
+    circle,
+    rgba(198, 156, 109, 0.2) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
 }
 
 .copilot-header-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .copilot-header-title h3 {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 600;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .copilot-header-actions {
-    display: flex;
-    gap: 4px;
+  display: flex;
+  gap: 4px;
 }
 
 .copilot-btn-icon {
-    background: rgba(255,255,255,0.15);
-    border: none;
-    color: white;
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .copilot-btn-icon:hover {
-    background: rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .copilot-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .copilot-message {
-    display: flex;
-    max-width: 90%;
+  display: flex;
+  max-width: 90%;
 }
 
 .copilot-message.user {
-    align-self: flex-end;
+  align-self: flex-end;
 }
 
 .copilot-message.assistant {
-    align-self: flex-start;
+  align-self: flex-start;
 }
 
 .copilot-message-content {
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 13px;
-    line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .copilot-message.user .copilot-message-content {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-    color: white;
-    border-bottom-right-radius: 4px;
-    box-shadow: 0 2px 8px rgba(30, 58, 95, 0.2);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--primary-light) 100%
+  );
+  color: white;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.2);
 }
 
 .copilot-message.assistant .copilot-message-content {
-    background: rgba(240, 242, 245, 0.6);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    color: var(--text-primary);
-    border-bottom-left-radius: 4px;
-    border: 1px solid rgba(222, 226, 230, 0.3);
+  background: rgba(240, 242, 245, 0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgba(222, 226, 230, 0.3);
 }
 
-.copilot-message-content p { margin: 4px 0; }
-.copilot-message-content ul { margin: 4px 0; padding-left: 18px; }
-.copilot-message-content li { margin: 2px 0; }
-.copilot-message-content table { margin: 8px 0; }
-.copilot-message-content strong { font-weight: 600; }
+.copilot-message-content p {
+  margin: 4px 0;
+}
+.copilot-message-content ul {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+.copilot-message-content li {
+  margin: 2px 0;
+}
+.copilot-message-content table {
+  margin: 8px 0;
+}
+.copilot-message-content strong {
+  font-weight: 600;
+}
 .copilot-message-content kbd {
-    background: #e0e0e0;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-family: monospace;
+  background: #e0e0e0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
 }
 
 .typing-dots {
-    display: flex;
-    gap: 4px;
-    padding: 4px 0;
+  display: flex;
+  gap: 4px;
+  padding: 4px 0;
 }
 
 .typing-dots span {
-    width: 8px;
-    height: 8px;
-    background: #999;
-    border-radius: 50%;
-    animation: typing 1.4s infinite;
+  width: 8px;
+  height: 8px;
+  background: #999;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
 }
 
-.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes typing {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-    30% { transform: translateY(-6px); opacity: 1; }
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
 }
 
 .copilot-input-area {
-    border-top: 1px solid #eee;
-    padding: 12px;
-    flex-shrink: 0;
+  border-top: 1px solid #eee;
+  padding: 12px;
+  flex-shrink: 0;
 }
 
 .copilot-file-preview {
-    margin-bottom: 8px;
+  margin-bottom: 8px;
 }
 
 .copilot-preview-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f5f5f5;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f5f5;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
 }
 
 .copilot-preview-item button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #999;
-    margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  margin-left: auto;
 }
 
 .copilot-input-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 .copilot-upload-btn {
-    cursor: pointer;
-    font-size: 20px;
-    padding: 6px;
-    border-radius: 8px;
-    transition: background 0.15s;
-    flex-shrink: 0;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  flex-shrink: 0;
 }
 
 .copilot-upload-btn:hover {
-    background: #f0f0f0;
+  background: #f0f0f0;
 }
 
 .copilot-input {
-    flex: 1;
-    border: 1px solid rgba(222, 226, 230, 0.5);
-    border-radius: 14px;
-    padding: 10px 14px;
-    font-size: 13px;
-    resize: none;
-    outline: none;
-    font-family: inherit;
-    min-height: 36px;
-    max-height: 120px;
-    background: rgba(255, 255, 255, 0.6);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+  flex: 1;
+  border: 1px solid rgba(222, 226, 230, 0.5);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 13px;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  min-height: 36px;
+  max-height: 120px;
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 .copilot-input:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(198, 156, 109, 0.1);
-    background: rgba(255, 255, 255, 0.9);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(198, 156, 109, 0.1);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .copilot-send-btn {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-    color: white;
-    border: none;
-    border-radius: 14px;
-    width: 38px;
-    height: 38px;
-    cursor: pointer;
-    font-size: 16px;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--primary-light) 100%
+  );
+  color: white;
+  border: none;
+  border-radius: 14px;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .copilot-send-btn:hover {
-    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
-    transform: scale(1.08);
-    box-shadow: 0 4px 16px rgba(30, 58, 95, 0.3);
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark) 0%,
+    var(--primary-color) 100%
+  );
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px rgba(30, 58, 95, 0.3);
 }
 
 .copilot-quick-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
 }
 
 .copilot-quick-actions button {
-    background: rgba(240, 242, 245, 0.6);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(222, 226, 230, 0.3);
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
+  background: rgba(240, 242, 245, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(222, 226, 230, 0.3);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .copilot-quick-actions button:hover {
-    background: rgba(198, 156, 109, 0.1);
-    border-color: var(--accent-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(198, 156, 109, 0.1);
+  background: rgba(198, 156, 109, 0.1);
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(198, 156, 109, 0.1);
 }
 
 /* Mode Switcher */
 .copilot-mode-switcher {
-    display: flex;
-    padding: 6px;
-    gap: 4px;
-    background: #f0f2f5;
-    flex-shrink: 0;
+  display: flex;
+  padding: 6px;
+  gap: 4px;
+  background: #f0f2f5;
+  flex-shrink: 0;
 }
 
 .copilot-mode-btn {
-    flex: 1;
-    padding: 8px 8px;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    transition: all 0.2s;
-    white-space: nowrap;
+  flex: 1;
+  padding: 8px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .copilot-mode-btn:hover {
-    background: rgba(255,255,255,0.7);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .copilot-mode-btn.active {
-    background: #ffffff;
-    color: var(--primary-color);
-    font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  background: #ffffff;
+  color: var(--primary-color);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .copilot-mode-content {
-    display: none;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .copilot-mode-content.active {
-    display: flex;
+  display: flex;
 }
 
 /* Microsoft Copilot Panel */
 .copilot-microsoft-panel {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .copilot-ms-info {
-    text-align: center;
+  text-align: center;
 }
 
 .copilot-ms-badge {
-    background: linear-gradient(135deg, #f0f4ff, #e8ecf5);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 12px;
+  background: linear-gradient(135deg, #f0f4ff, #e8ecf5);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 12px;
 }
 
 .copilot-ms-badge.enterprise {
-    background: linear-gradient(135deg, #e8f5e9, #e3f2fd);
-    border: 1px solid #c8e6c9;
+  background: linear-gradient(135deg, #e8f5e9, #e3f2fd);
+  border: 1px solid #c8e6c9;
 }
 
 .copilot-ms-badge.consumer {
-    background: linear-gradient(135deg, #f3e5f5, #e8eaf6);
-    border: 1px solid #e1bee7;
+  background: linear-gradient(135deg, #f3e5f5, #e8eaf6);
+  border: 1px solid #e1bee7;
 }
 
 .copilot-ms-badge h3 {
-    margin: 8px 0 4px 0;
-    font-size: 15px;
-    color: var(--text-primary);
+  margin: 8px 0 4px 0;
+  font-size: 15px;
+  color: var(--text-primary);
 }
 
 .copilot-ms-badge p {
-    margin: 0;
-    font-size: 12px;
-    color: var(--text-secondary);
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
 .copilot-ms-context-note {
-    font-size: 12px;
-    color: var(--text-secondary);
-    background: #fffde7;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border-left: 3px solid #ffc107;
-    text-align: left;
-    margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: #fffde7;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-left: 3px solid #ffc107;
+  text-align: left;
+  margin-top: 8px;
 }
 
 .copilot-ms-actions h4 {
-    font-size: 13px;
-    margin: 0 0 8px 0;
-    color: var(--text-primary);
+  font-size: 13px;
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
 }
 
 .copilot-ms-action-btn {
-    display: block;
-    width: 100%;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    border: 1px solid rgba(222, 226, 230, 0.4);
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.5);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    cursor: pointer;
-    font-size: 13px;
-    text-align: left;
-    transition: all 0.3s ease;
-    color: var(--text-primary);
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(222, 226, 230, 0.4);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
 }
 
 .copilot-ms-action-btn:hover {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: var(--accent-color);
-    color: var(--primary-color);
-    transform: translateX(6px);
-    box-shadow: 0 4px 12px rgba(198, 156, 109, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--accent-color);
+  color: var(--primary-color);
+  transform: translateX(6px);
+  box-shadow: 0 4px 12px rgba(198, 156, 109, 0.1);
 }
 
 .copilot-ms-custom {
-    border-top: 1px solid #eee;
-    padding-top: 12px;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
 }
 
 .copilot-ms-custom h4 {
-    font-size: 13px;
-    margin: 0 0 8px 0;
-    color: var(--text-primary);
+  font-size: 13px;
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
 }
 
 .copilot-ms-footer {
-    border-top: 1px solid #eee;
-    padding-top: 12px;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
 }
 
 .copilot-ms-footer p {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin: 0;
-    line-height: 1.5;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
 }
 
 /* ========================================
    CHART CONTAINER
    ======================================== */
 .chart-container {
-    position: relative;
-    width: 100%;
-    max-height: 300px;
-    margin: 16px 0;
+  position: relative;
+  width: 100%;
+  max-height: 300px;
+  margin: 16px 0;
 }
 
 /* ========================================
    EXPORT & SEARCH BUTTONS IN HEADER
    ======================================== */
 .page-header {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .header-actions {
-    display: flex;
-    gap: 8px;
-    margin-left: auto;
-    align-items: center;
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  align-items: center;
 }
 
 .btn-icon {
-    background: rgba(255, 255, 255, 0.7);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(222, 226, 230, 0.5);
-    border-radius: 12px;
-    padding: 8px 14px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(222, 226, 230, 0.5);
+  border-radius: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  color: var(--text-primary);
 }
 
 .btn-icon:hover {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: var(--accent-color);
-    box-shadow: 0 4px 12px rgba(198, 156, 109, 0.12);
-    transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 12px rgba(198, 156, 109, 0.12);
+  transform: translateY(-2px);
 }
 
 .search-shortcut {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.6);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(222, 226, 230, 0.4);
-    border-radius: 12px;
-    padding: 8px 14px;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--text-muted);
-    transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(222, 226, 230, 0.4);
+  border-radius: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
 }
 
 .search-shortcut:hover {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: var(--accent-color);
-    box-shadow: 0 4px 12px rgba(198, 156, 109, 0.12);
-    transform: translateY(-2px);
-    color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 12px rgba(198, 156, 109, 0.12);
+  transform: translateY(-2px);
+  color: var(--primary-color);
 }
 
 .search-shortcut kbd {
-    background: #e0e0e0;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-family: monospace;
+  background: #e0e0e0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
 }
 
 /* Dark Mode Support - DISABLED (Light mode only) */
@@ -1042,3 +1112,32 @@ html {
         --border-color: #444444;
     }
 } */
+
+.lucide-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1em;
+  stroke-width: 2;
+  stroke: currentColor;
+}
+.nav-item .lucide-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+}
+.btn-primary .lucide-icon,
+.btn-secondary .lucide-icon {
+  margin-right: 8px;
+}
+.header-actions button .lucide-icon {
+  margin-right: 6px;
+  width: 16px;
+  height: 16px;
+}
+/* Ensure the action icons inside cards look okay */
+.action-icon .lucide-icon {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}

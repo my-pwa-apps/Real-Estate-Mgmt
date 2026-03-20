@@ -5,18 +5,21 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 ## 🚀 Nieuwe Features
 
 ### 🔐 Microsoft Entra ID Single Sign-On
+
 - **Enterprise SSO**: Eén login voor webapp én Microsoft 365
 - **Edge for Business**: Optimale integratie met Edge for Business browser
 - **Rol-gebaseerd**: Automatische rol toewijzing via Azure AD groups (Admin/Manager/Viewer)
 - **Veilig**: MFA en Conditional Access ondersteuning
 
 ### 🎭 Demo Modus
+
 - **Geen configuratie**: Verken de app zonder Azure AD of Firebase setup
 - **Realistische data**: Volledige dummy dataset voor demonstraties
 - **Volledig functioneel**: Alle features beschikbaar voor testen
 - **Perfect voor**: Training, presentaties en quick previews
 
 ### ⚙️ Administrator Module
+
 - **Gebruikersbeheer**: Overzicht van ingelogde gebruikers en rollen
 - **Instellingen**: Bedrijfsgegevens, email templates, notificaties
 - **Azure configuratie**: Client ID, Tenant ID en SharePoint instellingen
@@ -25,6 +28,7 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 ## 🏢 Functionaliteiten
 
 ### 📊 Dashboard
+
 - Overzicht van alle panden (bedrijfspanden en woningen)
 - Actieve huurders en bezettingsgraad
 - Open onderhoudsmeldingen
@@ -33,6 +37,7 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 - Verlopende contracten (binnen 3 maanden)
 
 ### 🏢 Panden Beheer
+
 - Toevoegen, bewerken en verwijderen van panden
 - Onderscheid tussen bedrijfspanden en woningen
 - Status tracking (verhuurd, beschikbaar, onderhoud)
@@ -42,6 +47,7 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 - Zoeken op adres, plaats of postcode
 
 ### 👥 Huurders Beheer
+
 - Complete huurdersdatabase
 - Contactgegevens (email, telefoon)
 - Persoonlijke gegevens (geboortedatum)
@@ -49,6 +55,7 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 - Zoekfunctie op naam, email of telefoon
 
 ### 📄 Huurcontracten
+
 - Contract aanmaken en beheren
 - Koppeling tussen huurder en pand
 - Start- en einddatum
@@ -60,6 +67,7 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 - **📄 Contract documenten** opslaan in SharePoint
 
 ### 🔧 Onderhoud & Reparaties
+
 - Onderhoudsmeldingen registreren
 - Prioriteit instellen (laag, normaal, hoog, urgent)
 - Status tracking (nieuw, in behandeling, gepland, afgerond)
@@ -71,6 +79,7 @@ Een complete webapplicatie voor het beheren van vastgoed, huurders, contracten, 
 - **📁 Documentatie opslaan** in SharePoint per pand
 
 ### 💰 Financieel Overzicht
+
 - Totaaloverzicht inkomsten en uitgaven per jaar
 - Netto resultaat berekening
 - Maandoverzicht met details
@@ -107,7 +116,7 @@ De applicatie is al geconfigureerd met de Stadsgezicht Firebase Realtime Databas
   "rules": {
     ".read": "auth != null",
     ".write": "auth != null",
-    
+
     "panden": {
       ".indexOn": ["adres", "type", "status"]
     },
@@ -235,6 +244,7 @@ Data wordt automatisch aangemaakt wanneer u items toevoegt via de applicatie.
 ## 🔗 Microsoft 365 Integratie
 
 ### 📧 Email Functionaliteit
+
 - **Email versturen** via Exchange Online
 - **Email templates** voor veelvoorkomende scenario's:
   - Huurcontract verzenden
@@ -245,6 +255,7 @@ Data wordt automatisch aangemaakt wanneer u items toevoegt via de applicatie.
 - **Automatisch archiveren** van emails naar SharePoint
 
 ### 📁 Document Management (SharePoint/OneDrive)
+
 - **Automatische folder structuur**:
   - `Panden/[Adres-Postcode]/` (Foto's, Documenten, Technisch, Verbouwing)
   - `Huurders/[Naam]/` (Contracten, Correspondentie, Documenten)
@@ -256,6 +267,7 @@ Data wordt automatisch aangemaakt wanneer u items toevoegt via de applicatie.
 - **Zoeken** in SharePoint documenten
 
 ### 🤖 Microsoft Copilot Ready
+
 - Alle documenten en emails worden geïndexeerd door Copilot
 - Vind informatie met natural language queries
 - Automatische insights in documenten en correspondentie
@@ -266,6 +278,7 @@ Data wordt automatisch aangemaakt wanneer u items toevoegt via de applicatie.
 **Zie:** `AZURE-AD-SETUP.md` voor complete setup instructies
 
 **Stappen:**
+
 1. Azure AD app registreren
 2. API permissions instellen (Files, Sites, Mail)
 3. Admin consent geven
@@ -289,6 +302,7 @@ Data wordt automatisch aangemaakt wanneer u items toevoegt via de applicatie.
 ## 📱 Responsive Design
 
 De applicatie is volledig responsive:
+
 - **Desktop**: Volledige sidebar met labels
 - **Tablet**: Compacte sidebar
 - **Mobiel**: Geoptimaliseerde layouts en touch-friendly controls
@@ -303,6 +317,7 @@ De applicatie is volledig responsive:
 ## 🆘 Support & Contact
 
 Voor vragen of problemen:
+
 - Controleer of Firebase correct is geconfigureerd
 - Controleer de browser console voor error messages
 - Zorg dat je bent ingelogd met een geldig account

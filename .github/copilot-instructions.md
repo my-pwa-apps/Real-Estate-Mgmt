@@ -3,11 +3,13 @@
 ## Architecture Overview
 
 **Hybrid Data Strategy**: Firebase Realtime Database + Microsoft 365 SharePoint
+
 - **Firebase**: Real-time operational data (panden, huurders, contracten, onderhoud, transacties)
 - **SharePoint**: Document storage, email archival, Copilot indexing
 - **No backend server**: Pure client-side SPA with Firebase SDK and Microsoft Graph API
 
 **Authentication Modes**:
+
 1. **Entra ID SSO**: Microsoft 365 enterprise login (production)
 2. **Demo Mode**: localStorage-based in-memory database (no auth required)
 
@@ -20,15 +22,15 @@ ALL database operations MUST check for demo mode first:
 ```javascript
 // ✅ CORRECT - Always check demo mode
 async function dbGet(path, id) {
-    if (typeof isDemoMode === 'function' && isDemoMode()) {
-        const demoHelpers = getDemoDbHelpers();
-        return demoHelpers.dbGet(path, id);
-    }
-    // Firebase operations...
+  if (typeof isDemoMode === "function" && isDemoMode()) {
+    const demoHelpers = getDemoDbHelpers();
+    return demoHelpers.dbGet(path, id);
+  }
+  // Firebase operations...
 }
 
 // ❌ WRONG - Direct Firebase access
-const data = await database.ref('panden').once('value');
+const data = await database.ref("panden").once("value");
 ```
 
 **Key Files**: `js/db-helpers.js` (wrapper functions), `js/demo-data.js` (demo DB implementation)
@@ -36,10 +38,11 @@ const data = await database.ref('panden').once('value');
 ### Authentication Flow
 
 Pages use `ensureAuthenticated()` from `js/app-init.js` on DOMContentLoaded:
+
 ```javascript
-document.addEventListener('DOMContentLoaded', async () => {
-    await ensureAuthenticated(); // Redirects to login if not authenticated
-    await loadData();
+document.addEventListener("DOMContentLoaded", async () => {
+  await ensureAuthenticated(); // Redirects to login if not authenticated
+  await loadData();
 });
 ```
 
@@ -48,12 +51,14 @@ Demo mode activated via `#demo` hash or clicking "Demo Modus" button on login.
 ### CSS Architecture - Light Mode Only
 
 **IMPORTANT**: Dark mode media query is DISABLED in `css/enhancements.css`:
+
 ```css
 /* Dark Mode Support - DISABLED (Light mode only) */
 /* @media (prefers-color-scheme: dark) { ... } */
 ```
 
 **Color Scheme**:
+
 - CSS variables in `:root` (styles.css): `--primary-color: #1e3a5f`, `--accent-color: #c69c6d`
 - Background: `#fafbfc` (off-white), cards: `#ffffff`
 - NO black backgrounds anywhere (user requirement)
@@ -62,25 +67,34 @@ Demo mode activated via `#demo` hash or clicking "Demo Modus" button on login.
 ## File Structure
 
 **HTML Pages**: Each page follows same structure:
+
 1. Sidebar navigation (`<aside class="sidebar">`)
 2. Main content (`<main class="main-content">`)
 3. Firebase + MSAL.js scripts at bottom
 4. Page-specific JS last
 
 **JavaScript Loading Order** (critical):
+
 ```html
 <!-- Core libraries -->
 <script src="firebase-*.js"></script>
 <script src="msal-browser.min.js"></script>
 
 <!-- App core (order matters!) -->
-<script src="js/config.js"></script>           <!-- Firebase config -->
-<script src="js/ui-utilities.js"></script>     <!-- Toast, loading -->
-<script src="js/demo-data.js"></script>        <!-- Demo DB -->
-<script src="js/entra-auth.js"></script>       <!-- Auth functions -->
-<script src="js/db-helpers.js"></script>       <!-- DB wrappers -->
-<script src="js/app-init.js"></script>         <!-- Global init -->
-<script src="js/detail-panel.js"></script>     <!-- Detail panels -->
+<script src="js/config.js"></script>
+<!-- Firebase config -->
+<script src="js/ui-utilities.js"></script>
+<!-- Toast, loading -->
+<script src="js/demo-data.js"></script>
+<!-- Demo DB -->
+<script src="js/entra-auth.js"></script>
+<!-- Auth functions -->
+<script src="js/db-helpers.js"></script>
+<!-- DB wrappers -->
+<script src="js/app-init.js"></script>
+<!-- Global init -->
+<script src="js/detail-panel.js"></script>
+<!-- Detail panels -->
 
 <!-- M365 integration (if needed) -->
 <script src="js/microsoft-auth.js"></script>
@@ -104,17 +118,21 @@ Demo mode activated via `#demo` hash or clicking "Demo Modus" button on login.
 ### Microsoft 365 Integration
 
 **Email Sending** (`js/email-helpers.js`):
+
 ```javascript
 await sendEmail({
-    to: ['user@example.com'],
-    subject: 'Subject',
-    body: 'Body text',
-    contentType: 'Text', // or 'HTML'
-    attachments: [{ name: 'file.pdf', contentBytes: base64, contentType: 'application/pdf' }]
+  to: ["user@example.com"],
+  subject: "Subject",
+  body: "Body text",
+  contentType: "Text", // or 'HTML'
+  attachments: [
+    { name: "file.pdf", contentBytes: base64, contentType: "application/pdf" },
+  ],
 });
 ```
 
 **SharePoint Upload** (`js/sharepoint-helpers.js`):
+
 ```javascript
 await saveFileToSharePoint(fileName, content, folderPath, contentType);
 // Creates folders automatically if they don't exist
@@ -125,12 +143,13 @@ await saveFileToSharePoint(fileName, content, folderPath, contentType);
 ### Werkbon System (Work Orders)
 
 Located in `js/werkbon-helpers.js`. Generate from onderhoud items:
+
 ```javascript
 const werkbon = await generateWerkbon(meldingId);
 await sendWerkbon(werkbonId, {
-    sendToHuurder: true,
-    sendToOnderhoudsBedrijf: true,
-    onderhoudsBedrijfEmail: 'company@example.com'
+  sendToHuurder: true,
+  sendToOnderhoudsBedrijf: true,
+  onderhoudsBedrijfEmail: "company@example.com",
 });
 ```
 
@@ -148,11 +167,13 @@ Auto-generates HTML werkbon with signature sections, saves to Firebase `werkbonn
 ## Debugging
 
 **Demo Mode Issues**:
+
 - Check console for "Error getting [path]/[id]: permission_denied" → Missing demo mode check
 - Reset demo data: `getDemoDatabase().reset(); location.reload();`
 - Clear demo mode: `localStorage.removeItem('demoMode')`
 
 **CSS Issues**:
+
 - Browser may cache aggressively → Hard refresh: `Ctrl+Shift+R`
 - Check for dark mode override in devtools → Should be disabled
 - Select dropdowns appearing black → Missing `option { background: #ffffff; }` rule
@@ -193,10 +214,10 @@ Navigate to `http://localhost:8000/#demo` for instant demo mode.
 
 ## New Feature Files
 
-| File | Purpose |
-|------|---------|
-| `js/audit-trail.js` | Tracks all data modifications with user, timestamp, and action |
-| `js/global-search.js` | Cross-entity search overlay (Ctrl+K) |
-| `js/data-export.js` | CSV export for all entity types |
-| `js/copilot-assistant.js` | AI assistant panel with photo/document upload |
-| `js/rent-increase.js` | Annual rent increase processing |
+| File                      | Purpose                                                        |
+| ------------------------- | -------------------------------------------------------------- |
+| `js/audit-trail.js`       | Tracks all data modifications with user, timestamp, and action |
+| `js/global-search.js`     | Cross-entity search overlay (Ctrl+K)                           |
+| `js/data-export.js`       | CSV export for all entity types                                |
+| `js/copilot-assistant.js` | AI assistant panel with photo/document upload                  |
+| `js/rent-increase.js`     | Annual rent increase processing                                |

@@ -18,8 +18,12 @@
     ".write": "auth != null",
     "panden": { ".indexOn": ["adres", "type", "status"] },
     "huurders": { ".indexOn": ["achternaam", "email"] },
-    "contracten": { ".indexOn": ["startdatum", "einddatum", "huurderId", "pandId"] },
-    "onderhoud": { ".indexOn": ["status", "prioriteit", "pandId", "createdAt"] },
+    "contracten": {
+      ".indexOn": ["startdatum", "einddatum", "huurderId", "pandId"]
+    },
+    "onderhoud": {
+      ".indexOn": ["status", "prioriteit", "pandId", "createdAt"]
+    },
     "transacties": { ".indexOn": ["datum", "type", "categorie"] }
   }
 }
@@ -41,16 +45,19 @@
 ### Stap 3: Applicatie Starten (1 minuut)
 
 #### Optie A: VS Code Live Server (Aanbevolen)
+
 1. Installeer extensie "Live Server" in VS Code
 2. Rechtermuisklik op `index.html`
 3. Selecteer "Open with Live Server"
 4. Browser opent automatisch! 🎉
 
 #### Optie B: PowerShell
+
 ```powershell
 cd "c:\Users\bartm\OneDrive - Microsoft\Documents\Git Repos\Real Estate Mgmt"
 python -m http.server 8000
 ```
+
 Open: http://localhost:8000
 
 ### Stap 4: Inloggen en Gebruiken! (1 minuut)
@@ -69,31 +76,37 @@ Open: http://localhost:8000
 ## 🎯 Snelle Tips
 
 ### Dashboard
+
 - Zie direct alle belangrijke statistieken
 - Verlopende contracten worden automatisch getoond
 - Open onderhoudsmeldingen met prioriteit
 
 ### Panden Beheer
+
 - Filter op type (bedrijfspand/woning) en status
 - Zoek snel op adres of plaats
 - Status update automatisch bij contract
 
 ### Huurders
+
 - Bewaar alle contactgegevens
 - Zoek op naam, email of telefoon
 - Voeg notities toe per huurder
 
 ### Contracten
+
 - Automatische status: actief, verloopt, verlopen
 - Waarschuwing bij contracten die binnen 3 maanden aflopen
 - Borg en betalingsdatum tracking
 
 ### Onderhoud
+
 - 4 prioriteiten: laag, normaal, hoog, urgent
 - 4 statussen: nieuw, in behandeling, gepland, afgerond
 - Koppel aan specifiek pand
 
 ### Financieel
+
 - Automatische berekening netto resultaat
 - Maandoverzicht per jaar
 - Track huurinkomsten en kosten
@@ -103,6 +116,7 @@ Open: http://localhost:8000
 ## 📱 Gebruik op Mobiel/Tablet
 
 De applicatie is volledig responsive en werkt perfect op:
+
 - 📱 Smartphones
 - 📲 Tablets
 - 💻 Laptops
@@ -113,16 +127,20 @@ De applicatie is volledig responsive en werkt perfect op:
 ## 🆘 Problemen?
 
 ### Kan niet inloggen?
+
 ✅ Controleer of je een gebruiker hebt aangemaakt in Firebase Authentication
 
 ### "Permission denied" error?
+
 ✅ Controleer of de Rules zijn ingesteld in Realtime Database
 
 ### Data wordt niet opgeslagen?
+
 ✅ Controleer of je bent ingelogd
 ✅ Controleer Firebase Console → Realtime Database → Data
 
 ### Logo wordt niet getoond?
+
 ✅ Geen probleem! De tekst "Stadsgezicht" wordt dan getoond
 
 ---
@@ -138,4 +156,4 @@ De applicatie is volledig responsive en werkt perfect op:
 
 **Succes met het beheren van uw vastgoedportefeuille! 🏢**
 
-*Stadsgezicht Ontwikkelingen en Beleggingen B.V.*
+_Stadsgezicht Ontwikkelingen en Beleggingen B.V._

@@ -12,6 +12,7 @@
 ## 📊 Data Strategie
 
 ### Firebase (Real-time Operationele Data)
+
 ```
 ✅ Panden (metadata, status, prijzen)
 ✅ Huurders (contactgegevens, notities)
@@ -22,12 +23,14 @@
 ```
 
 **Waarom Firebase hier?**
+
 - Real-time updates voor dashboard
 - Snelle queries en filters
 - Offline support
 - Geen file size limits voor metadata
 
 ### Microsoft 365 SharePoint (Documenten & Archief)
+
 ```
 📁 Stadsgezicht Vastgoedbeheer/
    ├── 📁 Panden/
@@ -85,6 +88,7 @@
 ```
 
 **Waarom SharePoint hier?**
+
 - Copilot kan alle documenten doorzoeken
 - Versiehistorie van documenten
 - Compliance en audit trails
@@ -92,6 +96,7 @@
 - Gestructureerde metadata voor AI
 
 ### Exchange Online (Communicatie)
+
 ```
 📧 Alle emails met huurders → Geindexeerd voor Copilot
 📧 Email templates voor standaard communicatie
@@ -160,6 +165,7 @@ Copilot geeft samenvatting + link naar document
 **Benodigde Permissions:**
 
 **Delegated (Gebruiker aanwezig):**
+
 ```
 Files.ReadWrite.All          → OneDrive/SharePoint
 Sites.ReadWrite.All          → SharePoint sites
@@ -169,6 +175,7 @@ User.Read                   → Gebruiker info
 ```
 
 **Application (Background tasks):**
+
 ```
 Sites.ReadWrite.All          → Automatische folder aanmaken
 Files.ReadWrite.All          → Document management
@@ -178,6 +185,7 @@ Mail.Send                    → Automatische emails
 ### Authentication Flow
 
 **MSAL.js (Microsoft Authentication Library)**
+
 ```javascript
 // Single Sign-On met Microsoft 365
 // Gebruikers loggen in met @stadsgezicht.nl account
@@ -191,6 +199,7 @@ Mail.Send                    → Automatische emails
 ### 1. Intelligente Document Categorisatie
 
 **Automatische metadata bij upload:**
+
 ```javascript
 {
   "Type": "Huurcontract",
@@ -207,10 +216,11 @@ Mail.Send                    → Automatische emails
 ### 2. Email Templates met Merge Fields
 
 **Template: Huurverhoging.docx**
+
 ```
 Beste {{Huurder.Voornaam}},
 
-Hierbij informeren wij u dat de huurprijs van {{Pand.Adres}} 
+Hierbij informeren wij u dat de huurprijs van {{Pand.Adres}}
 per {{Contract.Wijzigingsdatum}} wordt verhoogd naar €{{Contract.NieuweHuur}}.
 
 Dit is een verhoging van {{Berekening.Percentage}}% conform...
@@ -219,6 +229,7 @@ Dit is een verhoging van {{Berekening.Percentage}}% conform...
 ### 3. Copilot Prompts in SharePoint
 
 **Metadata voor betere AI resultaten:**
+
 ```json
 {
   "ContentType": "Huurcontract",
@@ -236,6 +247,7 @@ Dit is een verhoging van {{Berekening.Percentage}}% conform...
 ## 🏗️ Implementatie Architectuur
 
 ### Frontend (Browser)
+
 ```
 HTML/CSS/JS WebApp
    ↓
@@ -250,6 +262,7 @@ HTML/CSS/JS WebApp
 ### Data Flow Strategie
 
 **CREATE (Nieuw item):**
+
 ```
 1. Save to Firebase (instant, real-time)
 2. Generate document (if needed)
@@ -259,6 +272,7 @@ HTML/CSS/JS WebApp
 ```
 
 **READ (Data ophalen):**
+
 ```
 1. Firebase → Snelle metadata
 2. SharePoint → Document links
@@ -266,6 +280,7 @@ HTML/CSS/JS WebApp
 ```
 
 **UPDATE (Wijzigen):**
+
 ```
 1. Update Firebase (instant UI update)
 2. Version document in SharePoint
@@ -273,6 +288,7 @@ HTML/CSS/JS WebApp
 ```
 
 **DELETE (Verwijderen):**
+
 ```
 1. Soft delete in Firebase
 2. Move to Archief in SharePoint
@@ -284,6 +300,7 @@ HTML/CSS/JS WebApp
 ## 📱 User Experience
 
 ### Document Upload
+
 ```
 [Upload Knop] → Browser file picker
    ↓
@@ -297,6 +314,7 @@ HTML/CSS/JS WebApp
 ```
 
 ### Email Verzenden
+
 ```
 [Email Knop] → Template selector
    ↓
@@ -314,18 +332,22 @@ HTML/CSS/JS WebApp
 ## 🎯 Copilot Optimalisatie
 
 ### 1. Rijke Metadata
+
 Elk document krijgt uitgebreide properties zodat Copilot context begrijpt
 
 ### 2. Naamgevingsconventies
+
 ```
 [Type]_[Adres]_[Huurder]_[Datum].pdf
 Contract_Stadionkade94_JanJansen_2025-01-01.pdf
 ```
 
 ### 3. Taxonomy & Tags
+
 Gebruik SharePoint managed metadata voor consistente categorisatie
 
 ### 4. Content Types
+
 Custom SharePoint content types voor elk document type
 
 ---
@@ -333,6 +355,7 @@ Custom SharePoint content types voor elk document type
 ## 🔄 Migratie & Synchronisatie
 
 ### Firebase ↔ SharePoint Link
+
 ```javascript
 // Firebase document
 {
@@ -344,6 +367,7 @@ Custom SharePoint content types voor elk document type
 ```
 
 ### Sync Strategy
+
 - Firebase = "source of truth" voor operationele data
 - SharePoint = "source of truth" voor documenten
 - Bidirectional links, maar geen duplicate data
@@ -359,7 +383,7 @@ Custom SharePoint content types voor elk document type
 ✅ **Schaalbaarheid** - Beide systemen groeien mee  
 ✅ **Disaster recovery** - Microsoft 365 backup + Firebase backup  
 ✅ **Mobile ready** - Beide hebben mobiele toegang  
-✅ **Audit trail** - Alle acties traceerbaar  
+✅ **Audit trail** - Alle acties traceerbaar
 
 ---
 

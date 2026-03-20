@@ -16,6 +16,7 @@ Demo Mode stelt u in staat om de Stadsgezicht Vastgoedbeheer applicatie volledig
 ## Wanneer Demo Mode Gebruiken?
 
 ### ✅ Geschikt voor:
+
 - **Product demonstraties** aan klanten of stakeholders
 - **Training** van nieuwe gebruikers
 - **Testen** van nieuwe features zonder productie data te beïnvloeden
@@ -23,6 +24,7 @@ Demo Mode stelt u in staat om de Stadsgezicht Vastgoedbeheer applicatie volledig
 - **Quick preview** voor besluitvormers
 
 ### ❌ Niet geschikt voor:
+
 - Productie gebruik
 - Opslaan van echte data
 - Multiple gebruikers (data is lokaal per browser)
@@ -52,6 +54,7 @@ Demo mode wordt automatisch geactiveerd.
 ## Wat zit er in Demo Data?
 
 ### 🏢 Panden (5 stuks)
+
 - Keizersgracht 123 - Bedrijfspand (verhuurd, €3.500/maand)
 - Prinsengracht 456 - Woning (verhuurd, €2.100/maand)
 - Herengracht 789 - Bedrijfspand (verhuurd, €2.800/maand)
@@ -59,16 +62,19 @@ Demo mode wordt automatisch geactiveerd.
 - Nieuwezijds Voorburgwal 234 - Bedrijfspand (onderhoud, €4.200/maand)
 
 ### 👥 Huurders (3 stuks)
+
 - Jan de Vries - Huurder van Herengracht 789
 - Maria Jansen - Huurder van Prinsengracht 456
 - Tech Solutions B.V. - Zakelijke huurder van Keizersgracht 123
 
 ### 📄 Contracten (3 actief)
+
 - Tech Solutions B.V. - 5-jarig contract
 - Maria Jansen - 2-jarig contract
 - Jan de Vries - 1-jarig contract
 
 ### 🔧 Onderhoud (5 meldingen)
+
 - CV ketel onderhoudsbeurt (gepland)
 - Lekkage badkamer (in behandeling, hoog prioriteit)
 - Renovatie elektrische bedrading (in behandeling)
@@ -76,6 +82,7 @@ Demo mode wordt automatisch geactiveerd.
 - Kapotte ruit (nieuw, urgent)
 
 ### 💰 Financieel (2024 data)
+
 - Maandelijkse huurinkomsten: ~€9.200
 - Onderhoudskosten: €17.790 (YTD)
 - Overige kosten: €6.575 (verzekering, administratie, belasting)
@@ -103,7 +110,7 @@ In demo mode kunt u:
 ❌ **Email verzenden**: Wordt gesimuleerd (geen echte emails)  
 ❌ **Document opslag**: SharePoint integratie niet beschikbaar  
 ❌ **Microsoft 365 features**: Enkel demo mode zonder M365 backend  
-❌ **Multi-user**: Data is lokaal, niet gedeeld tussen gebruikers  
+❌ **Multi-user**: Data is lokaal, niet gedeeld tussen gebruikers
 
 ---
 
@@ -131,6 +138,7 @@ In demo mode kunt u:
 1. Open Developer Tools (F12)
 2. Console tab
 3. Run:
+
 ```javascript
 getDemoDatabase().reset();
 location.reload();
@@ -184,6 +192,7 @@ Eerder geëxporteerde data kan worden geïmporteerd:
 ### Tips voor Effectieve Demo's
 
 **1. Prep Work**
+
 - Open applicatie vooraf en laat demo data laden
 - Maak browser fullscreen (F11)
 - Sluit onnodige tabs
@@ -213,19 +222,19 @@ Eerder geëxporteerde data kan worden geïmporteerd:
 
 ## Demo Mode vs Productie
 
-| Feature | Demo Mode | Productie (Entra ID) |
-|---------|-----------|----------------------|
-| Login vereist | ❌ Nee | ✅ Ja (Microsoft 365) |
-| Azure AD configuratie | ❌ Niet nodig | ✅ Vereist |
-| Firebase setup | ❌ Niet nodig | ✅ Vereist |
-| M365 integratie | ❌ Gesimuleerd | ✅ Volledig functioneel |
-| Data persistence | 📱 Lokaal (browser) | ☁️ Cloud (Firebase) |
-| Multi-user | ❌ Nee | ✅ Ja |
-| Email verzenden | ❌ Gesimuleerd | ✅ Echt (Exchange) |
-| SharePoint docs | ❌ Niet beschikbaar | ✅ Volledig |
-| Copilot indexing | ❌ Niet beschikbaar | ✅ Ja |
-| Rol-based access | 🎭 Altijd admin | ✅ Via Azure AD groups |
-| Data backup | ❌ Handmatig export | ✅ Automatisch |
+| Feature               | Demo Mode           | Productie (Entra ID)    |
+| --------------------- | ------------------- | ----------------------- |
+| Login vereist         | ❌ Nee              | ✅ Ja (Microsoft 365)   |
+| Azure AD configuratie | ❌ Niet nodig       | ✅ Vereist              |
+| Firebase setup        | ❌ Niet nodig       | ✅ Vereist              |
+| M365 integratie       | ❌ Gesimuleerd      | ✅ Volledig functioneel |
+| Data persistence      | 📱 Lokaal (browser) | ☁️ Cloud (Firebase)     |
+| Multi-user            | ❌ Nee              | ✅ Ja                   |
+| Email verzenden       | ❌ Gesimuleerd      | ✅ Echt (Exchange)      |
+| SharePoint docs       | ❌ Niet beschikbaar | ✅ Volledig             |
+| Copilot indexing      | ❌ Niet beschikbaar | ✅ Ja                   |
+| Rol-based access      | 🎭 Altijd admin     | ✅ Via Azure AD groups  |
+| Data backup           | ❌ Handmatig export | ✅ Automatisch          |
 
 ---
 
@@ -260,11 +269,11 @@ Demo mode gebruikt een in-memory database wrapper:
 ```javascript
 // Check if demo mode
 if (isDemoMode()) {
-    // Use demo database
-    const data = await getDemoDatabase().getAll('panden');
+  // Use demo database
+  const data = await getDemoDatabase().getAll("panden");
 } else {
-    // Use Firebase
-    const data = await dbGetAll('panden');
+  // Use Firebase
+  const data = await dbGetAll("panden");
 }
 ```
 
@@ -285,6 +294,7 @@ const DEMO_DATA = {
 ### localStorage Keys
 
 Demo mode gebruikt:
+
 - `demoMode`: 'true' wanneer actief
 - Demo data wordt opgeslagen in DemoDatabase class instance
 
@@ -295,6 +305,7 @@ Demo mode gebruikt:
 **Probleem: Demo data laadt niet**
 
 Oplossing:
+
 1. Check browser console (F12) voor errors
 2. Clear browser cache
 3. Hard refresh (Ctrl+Shift+R)
@@ -303,6 +314,7 @@ Oplossing:
 **Probleem: Kan demo mode niet verlaten**
 
 Oplossing:
+
 1. Open browser console
 2. Run: `localStorage.removeItem('demoMode')`
 3. Herlaad pagina
@@ -311,6 +323,7 @@ Oplossing:
 **Probleem: Demo data is corrupt**
 
 Oplossing:
+
 1. Reset demo data via Admin pagina
 2. Of via console: `getDemoDatabase().reset()`
 3. Of clear localStorage: `localStorage.clear()`
@@ -318,4 +331,3 @@ Oplossing:
 ---
 
 **Demo Mode maakt het mogelijk om de applicatie direct te ervaren zonder configuratie!** 🎭
-

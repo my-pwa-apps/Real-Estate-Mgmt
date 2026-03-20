@@ -24,6 +24,7 @@
 Wanneer je een nieuw pand of huurder aanmaakt, wordt automatisch een folder structuur aangemaakt in SharePoint:
 
 **Voor Panden:**
+
 ```
 Panden/
   └── [Adres-Postcode]/
@@ -34,6 +35,7 @@ Panden/
 ```
 
 **Voor Huurders:**
+
 ```
 Huurders/
   └── [Achternaam_Voornaam]/
@@ -64,12 +66,14 @@ Functionaliteit om documenten direct vanuit de app te uploaden komt binnenkort b
 ### Permissions Geaccepteerd?
 
 De volgende permissions zijn nodig:
+
 - ✅ Bestanden lezen en schrijven in SharePoint/OneDrive
 - ✅ SharePoint sites lezen en schrijven
 - ✅ Emails versturen namens u
 - ✅ Emails lezen en schrijven
 
 Deze permissions zijn nodig om:
+
 - Contracten en documenten op te slaan
 - Correspondentie te archiveren
 - Emails te versturen naar huurders
@@ -78,31 +82,37 @@ Deze permissions zijn nodig om:
 ## 📧 Beschikbare Email Templates
 
 ### 1. Huurcontract
+
 - **Wanneer:** Contract emailen naar huurder
 - **Bevat:** Adres, huurprijs, start/einddatum
 - **Trigger:** 📧 icoon in contracten lijst
 
 ### 2. Huurverhoging
+
 - **Wanneer:** Huurprijs verhogen
 - **Bevat:** Oude/nieuwe huur, verschil, percentage
 - **Gebruik:** Via code (binnenkort in UI)
 
 ### 3. Onderhoud Bevestiging
+
 - **Wanneer:** Nieuwe onderhoudsmelding ontvangen
 - **Bevat:** Melding details, prioriteit, adres
 - **Trigger:** Bevestig knop bij melding
 
 ### 4. Onderhoud Gepland
+
 - **Wanneer:** Afspraak inplannen voor onderhoud
 - **Bevat:** Datum, tijd, werkzaamheden
 - **Gebruik:** Via code (binnenkort in UI)
 
 ### 5. Huur Herinnering
+
 - **Wanneer:** Huur niet ontvangen
 - **Bevat:** Bedrag, maand, betaalinstructies
 - **Gebruik:** Via code (binnenkort in UI)
 
 ### 6. Welkom Nieuwe Huurder
+
 - **Wanneer:** Nieuw contract start
 - **Bevat:** Welkomstbericht, contact info, belangrijke zaken
 - **Gebruik:** Via code (binnenkort in UI)
@@ -130,6 +140,7 @@ Na het archiveren van documenten en emails in SharePoint, kun je Copilot gebruik
 ### "U moet eerst inloggen met Microsoft 365"
 
 **Oplossing:**
+
 - Klik op "🔐 Microsoft 365 Inloggen" in het dashboard
 - Volg de login stappen
 - Probeer opnieuw
@@ -137,6 +148,7 @@ Na het archiveren van documenten en emails in SharePoint, kun je Copilot gebruik
 ### "Access token invalid"
 
 **Oplossing:**
+
 - Token is verlopen (geldig voor 1 uur)
 - Log opnieuw in met Microsoft 365
 - Als probleem blijft: check Azure AD app permissions
@@ -144,22 +156,26 @@ Na het archiveren van documenten en emails in SharePoint, kun je Copilot gebruik
 ### "Fout bij versturen email"
 
 **Mogelijke oorzaken:**
+
 1. Niet ingelogd → Log in met Microsoft 365
 2. Geen mailbox → Controleer of gebruiker Exchange Online heeft
 3. Huurder email ontbreekt → Voeg email toe aan huurder gegevens
 
 **Oplossing:**
+
 - Check browser console (F12) voor details
 - Controleer of Mail.Send permission is granted in Azure AD
 
 ### "SharePoint folder aanmaken mislukt"
 
 **Mogelijke oorzaken:**
+
 1. SharePoint site bestaat niet
 2. Geen toegang tot site
 3. Sites.ReadWrite.All permission niet granted
 
 **Oplossing:**
+
 - Check `js/sharepoint-helpers.js` → SHAREPOINT_SITE_NAME moet juist zijn
 - Controleer site toegang in SharePoint
 - Controleer Azure AD permissions
@@ -167,6 +183,7 @@ Na het archiveren van documenten en emails in SharePoint, kun je Copilot gebruik
 ### Popup Blocker
 
 Als de Microsoft login popup niet verschijnt:
+
 1. Sta popups toe voor deze site
 2. Browser settings → Popups toestaan voor localhost/jouw domein
 3. Probeer opnieuw
@@ -215,11 +232,13 @@ Voordat je begint met M365 integratie:
 ### Naamgeving Conventies
 
 **Folders:**
+
 - Panden: `[Adres-Postcode]` bijv. `Keizersgracht_123-1015_CJ`
 - Huurders: `[Achternaam_Voornaam]` bijv. `Jansen_Piet`
 - Jaren: `[YYYY]` bijv. `2024`
 
 **Bestanden:**
+
 - Contracten: `Contract_[Adres]_[Startdatum].pdf`
 - Emails: `Email_[Datum]_[Onderwerp].html`
 - Onderhoud: `Melding_[Datum]_[Adres]_[Beschrijving].pdf`
@@ -227,6 +246,7 @@ Voordat je begint met M365 integratie:
 ### Metadata
 
 Voeg altijd metadata toe aan documenten voor betere Copilot indexering:
+
 - **description**: Korte omschrijving van document
 - **keywords**: Relevante zoektermen
 - Custom properties (zie `updateFileMetadata()` in sharepoint-helpers.js)

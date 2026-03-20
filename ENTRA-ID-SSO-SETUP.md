@@ -8,7 +8,7 @@ Deze applicatie gebruikt **Microsoft Entra ID (voorheen Azure AD)** voor authent
 ✅ **Veilige authenticatie**: Enterprise-grade beveiliging via Microsoft identity platform  
 ✅ **Geen aparte wachtwoorden**: Geen extra credentials om te onthouden  
 ✅ **Rol-gebaseerde toegang**: Automatische rol toewijzing via Azure AD groups  
-✅ **Edge for Business optimaal**: Naadloze SSO ervaring in Edge for Business browser  
+✅ **Edge for Business optimaal**: Naadloze SSO ervaring in Edge for Business browser
 
 ---
 

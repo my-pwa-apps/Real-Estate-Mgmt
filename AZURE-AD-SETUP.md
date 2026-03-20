@@ -29,10 +29,12 @@ Vul de volgende gegevens in:
 **Name**: `Stadsgezicht Vastgoedbeheer`
 
 **Supported account types**: Selecteer één van:
+
 - **Single tenant** (aanbevolen): Alleen accounts uit jouw organisatie
 - **Multi-tenant**: Als je meerdere organisaties moet ondersteunen
 
 **Redirect URI**:
+
 - Platform: **Single-page application (SPA)**
 - URL: `http://localhost:5500` (voor lokale ontwikkeling)
 
@@ -50,6 +52,7 @@ Na registratie zie je de **Overview** pagina:
 2. **Kopieer de Directory (tenant) ID** (GUID format)
 
 Voorbeeld:
+
 ```
 Application (client) ID: 12345678-1234-1234-1234-123456789abc
 Directory (tenant) ID: 87654321-4321-4321-4321-cba987654321
@@ -69,14 +72,17 @@ Deze waarden heb je nodig voor `js/microsoft-auth.js`.
 Voeg de volgende permissions toe:
 
 ### Voor SharePoint/OneDrive:
+
 - ✅ **Files.ReadWrite.All** - Lezen en schrijven van alle bestanden
 - ✅ **Sites.ReadWrite.All** - Lezen en schrijven van alle SharePoint sites
 
 ### Voor Email:
+
 - ✅ **Mail.Send** - Email versturen namens de gebruiker
 - ✅ **Mail.ReadWrite** - Email lezen en schrijven
 
 ### Basis:
+
 - ✅ **User.Read** - Gebruikersprofiel lezen
 
 5. Klik na elke permission op **Add permissions**
@@ -96,12 +102,14 @@ Na consent zie je groene vinkjes bij alle permissions.
 ### Voeg extra redirect URIs toe:
 
 **Voor productie**:
+
 ```
 https://jouwdomein.nl
 https://www.jouwdomein.nl
 ```
 
 **Voor lokale development**:
+
 ```
 http://localhost:5500
 http://localhost:8080
@@ -111,6 +119,7 @@ http://127.0.0.1:5500
 ### Implicit grant and hybrid flows:
 
 Zorg dat de volgende **NIET** zijn aangevinkt (MSAL.js 2.0 gebruikt Auth Code Flow):
+
 - ❌ Access tokens
 - ❌ ID tokens
 
@@ -128,19 +137,21 @@ Open `js/microsoft-auth.js` en update de configuratie:
 
 ```javascript
 const msalConfig = {
-    auth: {
-        clientId: "12345678-1234-1234-1234-123456789abc", // Jouw Application (client) ID
-        authority: "https://login.microsoftonline.com/87654321-4321-4321-4321-cba987654321", // Jouw Tenant ID
-        redirectUri: window.location.origin // Of specifieke URL
-    },
-    cache: {
-        cacheLocation: "sessionStorage",
-        storeAuthStateInCookie: false
-    }
+  auth: {
+    clientId: "12345678-1234-1234-1234-123456789abc", // Jouw Application (client) ID
+    authority:
+      "https://login.microsoftonline.com/87654321-4321-4321-4321-cba987654321", // Jouw Tenant ID
+    redirectUri: window.location.origin, // Of specifieke URL
+  },
+  cache: {
+    cacheLocation: "sessionStorage",
+    storeAuthStateInCookie: false,
+  },
 };
 ```
 
-**Let op**: 
+**Let op**:
+
 - Vervang `clientId` met jouw Application (client) ID uit stap 3
 - Vervang de GUID in `authority` met jouw Directory (tenant) ID uit stap 3
 
@@ -156,15 +167,18 @@ const msalConfig = {
 ### Mogelijke problemen:
 
 **"AADSTS50011: The redirect URI ... does not match"**
+
 - ✅ Check of de URL exact overeenkomt in Azure AD Authentication settings
 - ✅ Let op http vs https
 - ✅ Let op trailing slashes
 
 **"AADSTS65001: The user or administrator has not consented"**
+
 - ✅ Ga naar Azure AD > App registrations > API permissions
 - ✅ Klik op "Grant admin consent"
 
 **"Access token invalid"**
+
 - ✅ Check of alle scopes zijn toegevoegd in API permissions
 - ✅ Check of admin consent is gegeven
 
@@ -181,7 +195,7 @@ Voor document opslag heb je een SharePoint site nodig:
 3. Update in `js/sharepoint-helpers.js`:
 
 ```javascript
-const SHAREPOINT_SITE_NAME = 'vastgoedbeheer'; // Jouw site naam
+const SHAREPOINT_SITE_NAME = "vastgoedbeheer"; // Jouw site naam
 ```
 
 ### Optie B: Nieuwe Site Aanmaken
@@ -246,21 +260,25 @@ Voordat je live gaat:
 ## Beveiliging & Best Practices
 
 ### Access Tokens
+
 - Tokens worden opgeslagen in sessionStorage (niet localStorage)
 - Tokens verlopen na 1 uur (automatische refresh)
 - Log uit bij beëindigen sessie
 
 ### Permissions
+
 - Gebruik **minste privileges principe**: vraag alleen permissions die echt nodig zijn
 - Delegated permissions: gebruiker moet zelf ingelogd zijn
 - Application permissions: alleen als achtergrond processen nodig zijn (niet voor deze app)
 
 ### SharePoint
+
 - Stel folder permissions in per huurder als privacy vereist is
 - Gebruik versioning voor documenten (ingeschakeld standaard)
 - Backup strategie: SharePoint heeft ingebouwde backup (30 dagen recycle bin)
 
 ### Compliance
+
 - Alle documenten en emails worden gearchiveerd in M365 voor Copilot
 - AVG compliant door gebruik van Microsoft 365 (DPA agreements)
 - Audit logs beschikbaar via Microsoft 365 Compliance Center
@@ -270,12 +288,15 @@ Voordat je live gaat:
 ## Troubleshooting
 
 ### CORS Errors
+
 Als je CORS errors krijgt bij Graph API calls:
+
 - Check of redirect URI correct is ingesteld
 - Check of je MSAL.js versie 2.x gebruikt (niet 1.x)
 - Single-page application (SPA) flow moet zijn ingesteld, niet "Web"
 
 ### Token Acquisition Fails
+
 ```javascript
 // Check in browser console:
 console.log(await msalInstance.getAllAccounts());
@@ -284,11 +305,13 @@ console.log(await msalInstance.getAllAccounts());
 Als leeg: gebruiker is niet ingelogd, roep `signInToMicrosoft()` aan.
 
 ### SharePoint Access Denied
+
 - Check of user toegang heeft tot de SharePoint site
 - Check of Sites.ReadWrite.All permission is granted
 - Check of admin consent is gegeven
 
 ### Email Sending Fails
+
 - Check of Mail.Send permission is granted
 - Check of user een mailbox heeft in Exchange Online
 - Test met een eenvoudige email zonder bijlagen eerst

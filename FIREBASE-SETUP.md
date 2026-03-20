@@ -5,16 +5,19 @@
 Deze rules zorgen ervoor dat alleen ingelogde gebruikers toegang hebben tot de database.
 
 ### Stap 1: Open Firebase Console
+
 1. Ga naar https://console.firebase.google.com/
 2. Selecteer je project: **stadsgezicht-8af8b**
 
 ### Stap 2: Navigeer naar Realtime Database
+
 1. Klik in het linker menu op **Realtime Database**
 2. Als de database nog niet bestaat, klik dan op **Create Database**
    - Kies locatie: **europe-west1**
    - Start in **locked mode** (we gaan de rules aanpassen)
 
 ### Stap 3: Rules Instellen
+
 1. Klik op het tabblad **Rules**
 2. Vervang de inhoud met onderstaande rules:
 
@@ -23,23 +26,23 @@ Deze rules zorgen ervoor dat alleen ingelogde gebruikers toegang hebben tot de d
   "rules": {
     ".read": "auth != null",
     ".write": "auth != null",
-    
+
     "panden": {
       ".indexOn": ["adres", "type", "status"]
     },
-    
+
     "huurders": {
       ".indexOn": ["achternaam", "email"]
     },
-    
+
     "contracten": {
       ".indexOn": ["startdatum", "einddatum", "huurderId", "pandId"]
     },
-    
+
     "onderhoud": {
       ".indexOn": ["status", "prioriteit", "pandId", "createdAt"]
     },
-    
+
     "transacties": {
       ".indexOn": ["datum", "type", "categorie"]
     }

@@ -2,33 +2,33 @@
 // MSAL.js (Microsoft Authentication Library)
 
 const msalConfig = {
-    auth: {
-        clientId: "YOUR_AZURE_APP_CLIENT_ID", // Vervang met uw Azure AD App Client ID
-        authority: "https://login.microsoftonline.com/YOUR_TENANT_ID", // Vervang met uw Tenant ID
-        redirectUri: window.location.origin,
-    },
-    cache: {
-        cacheLocation: "localStorage",
-        storeAuthStateInCookie: false,
-    }
+  auth: {
+    clientId: "YOUR_AZURE_APP_CLIENT_ID", // Vervang met uw Azure AD App Client ID
+    authority: "https://login.microsoftonline.com/YOUR_TENANT_ID", // Vervang met uw Tenant ID
+    redirectUri: window.location.origin,
+  },
+  cache: {
+    cacheLocation: "localStorage",
+    storeAuthStateInCookie: false,
+  },
 };
 
 // Microsoft Graph API scopes
 const loginRequest = {
-    scopes: [
-        "User.Read",
-        "Files.ReadWrite.All",
-        "Sites.ReadWrite.All",
-        "Mail.Send",
-        "Mail.ReadWrite"
-    ]
+  scopes: [
+    "User.Read",
+    "Files.ReadWrite.All",
+    "Sites.ReadWrite.All",
+    "Mail.Send",
+    "Mail.ReadWrite",
+  ],
 };
 
 // SharePoint configuration
 const sharePointConfig = {
-    siteUrl: "https://stadsgezicht.sharepoint.com/sites/Vastgoedbeheer",
-    driveId: "", // Wordt automatisch opgehaald
-    documentLibrary: "Gedeelde documenten"
+  siteUrl: "https://stadsgezicht.sharepoint.com/sites/Vastgoedbeheer",
+  driveId: "", // Wordt automatisch opgehaald
+  documentLibrary: "Gedeelde documenten",
 };
 
 // Initialize MSAL
@@ -36,119 +36,122 @@ let msalInstance = null;
 let graphAccessToken = null;
 
 function initializeMSAL() {
-    msalInstance = new msal.PublicClientApplication(msalConfig);
-    return msalInstance;
+  msalInstance = new msal.PublicClientApplication(msalConfig);
+  return msalInstance;
 }
 
 // Sign in to Microsoft 365
 async function signInToMicrosoft() {
-    try {
-        const loginResponse = await msalInstance.loginPopup(loginRequest);
-        console.log("Microsoft login successful:", loginResponse);
-        
-        // Get access token
-        await getGraphAccessToken();
-        
-        return loginResponse.account;
-    } catch (error) {
-        console.error("Microsoft login error:", error);
-        throw error;
-    }
+  try {
+    const loginResponse = await msalInstance.loginPopup(loginRequest);
+    console.log("Microsoft login successful:", loginResponse);
+
+    // Get access token
+    await getGraphAccessToken();
+
+    return loginResponse.account;
+  } catch (error) {
+    console.error("Microsoft login error:", error);
+    throw error;
+  }
 }
 
 // Get access token for Microsoft Graph API
 async function getGraphAccessToken() {
-    try {
-        const account = msalInstance.getAllAccounts()[0];
-        
-        if (!account) {
-            throw new Error("No account found. Please sign in first.");
-        }
+  try {
+    const account = msalInstance.getAllAccounts()[0];
 
-        const tokenRequest = {
-            scopes: loginRequest.scopes,
-            account: account
-        };
-
-        const response = await msalInstance.acquireTokenSilent(tokenRequest);
-        graphAccessToken = response.accessToken;
-        
-        return graphAccessToken;
-    } catch (error) {
-        // If silent token acquisition fails, try interactive
-        if (error instanceof msal.InteractionRequiredAuthError) {
-            const response = await msalInstance.acquireTokenPopup(tokenRequest);
-            graphAccessToken = response.accessToken;
-            return graphAccessToken;
-        }
-        throw error;
+    if (!account) {
+      throw new Error("No account found. Please sign in first.");
     }
+
+    const tokenRequest = {
+      scopes: loginRequest.scopes,
+      account: account,
+    };
+
+    const response = await msalInstance.acquireTokenSilent(tokenRequest);
+    graphAccessToken = response.accessToken;
+
+    return graphAccessToken;
+  } catch (error) {
+    // If silent token acquisition fails, try interactive
+    if (error instanceof msal.InteractionRequiredAuthError) {
+      const response = await msalInstance.acquireTokenPopup(tokenRequest);
+      graphAccessToken = response.accessToken;
+      return graphAccessToken;
+    }
+    throw error;
+  }
 }
 
 // Check if user is signed in to Microsoft
 function isMicrosoftSignedIn() {
-    const accounts = msalInstance.getAllAccounts();
-    return accounts.length > 0;
+  const accounts = msalInstance.getAllAccounts();
+  return accounts.length > 0;
 }
 
 // Get current Microsoft account
 function getCurrentMicrosoftAccount() {
-    const accounts = msalInstance.getAllAccounts();
-    return accounts.length > 0 ? accounts[0] : null;
+  const accounts = msalInstance.getAllAccounts();
+  return accounts.length > 0 ? accounts[0] : null;
 }
 
 // Sign out from Microsoft
 async function signOutFromMicrosoft() {
-    const account = getCurrentMicrosoftAccount();
-    if (account) {
-        await msalInstance.logoutPopup({
-            account: account
-        });
-    }
+  const account = getCurrentMicrosoftAccount();
+  if (account) {
+    await msalInstance.logoutPopup({
+      account: account,
+    });
+  }
 }
 
 // Make Microsoft Graph API call
-async function callMicrosoftGraph(endpoint, method = 'GET', body = null) {
-    try {
-        const token = await getGraphAccessToken();
-        
-        const headers = {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        };
+async function callMicrosoftGraph(endpoint, method = "GET", body = null) {
+  try {
+    const token = await getGraphAccessToken();
 
-        const options = {
-            method: method,
-            headers: headers
-        };
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
 
-        if (body && method !== 'GET') {
-            options.body = JSON.stringify(body);
-        }
+    const options = {
+      method: method,
+      headers: headers,
+    };
 
-        const response = await fetch(`https://graph.microsoft.com/v1.0${endpoint}`, options);
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error.message || 'Graph API call failed');
-        }
-
-        // Handle different response types
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            return await response.json();
-        }
-        
-        return await response.blob();
-    } catch (error) {
-        console.error('Microsoft Graph API error:', error);
-        throw error;
+    if (body && method !== "GET") {
+      options.body = JSON.stringify(body);
     }
+
+    const response = await fetch(
+      `https://graph.microsoft.com/v1.0${endpoint}`,
+      options,
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message || "Graph API call failed");
+    }
+
+    // Handle different response types
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    }
+
+    return await response.blob();
+  } catch (error) {
+    console.error("Microsoft Graph API error:", error);
+    throw error;
+  }
 }
 
 // Initialize on load
-if (typeof msal !== 'undefined') {
-    initializeMSAL();
+if (typeof msal !== "undefined") {
+  initializeMSAL();
 }
 
 // Export functions
