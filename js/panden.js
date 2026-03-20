@@ -36,24 +36,31 @@ function renderPanden() {
         return;
     }
 
-    tbody.innerHTML = filteredPanden.map(pand => `
+    tbody.innerHTML = filteredPanden.map(pand => {
+        const s = sanitizeHTML;
+        return `
         <tr onclick="viewPandDetail('${pand.id}')" style="cursor: pointer;">
-            <td><span class="status-badge ${pand.type}">${pand.type === 'bedrijfspand' ? 'Bedrijfspand' : 'Woning'}</span></td>
-            <td>${pand.adres}</td>
-            <td>${pand.postcode}</td>
-            <td>${pand.plaats}</td>
-            <td><span class="status-badge ${pand.status}">${capitalizeFirst(pand.status)}</span></td>
+            <td><span class="status-badge ${s(pand.type)}">${pand.type === 'bedrijfspand' ? 'Bedrijfspand' : 'Woning'}</span></td>
+            <td>${s(pand.adres)}</td>
+            <td>${s(pand.postcode)}</td>
+            <td>${s(pand.plaats)}</td>
+            <td><span class="status-badge ${s(pand.status)}">${capitalizeFirst(s(pand.status))}</span></td>
             <td>€${parseFloat(pand.huurprijs).toLocaleString('nl-NL')}</td>
             <td class="actions" onclick="event.stopPropagation();">
-                <span class="action-icon" onclick="editPand('${pand.id}')" title="Bewerken">✏️</span>
-                <span class="action-icon" onclick="deletePand('${pand.id}')" title="Verwijderen">🗑️</span>
+                ${!isViewerRole() ? `<span class="action-icon" onclick="editPand('${pand.id}')" title="Bewerken">✏️</span>
+                <span class="action-icon" onclick="deletePand('${pand.id}')" title="Verwijderen">🗑️</span>` : ''}
             </td>
         </tr>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // Open modal for new pand
 addPandBtn.addEventListener('click', () => {
+    if (isViewerRole()) {
+        showToast('U heeft geen rechten om panden toe te voegen', 'error');
+        return;
+    }
     document.getElementById('modalTitle').textContent = 'Nieuw Pand';
     pandForm.reset();
     document.getElementById('pandId').value = '';
@@ -82,14 +89,41 @@ pandForm.addEventListener('submit', async (e) => {
     const pandData = {
         type: document.getElementById('type').value,
         status: document.getElementById('status').value,
-        adres: document.getElementById('adres').value,
-        postcode: document.getElementById('postcode').value,
-        plaats: document.getElementById('plaats').value,
+        adres: document.getElementById('adres').value.trim(),
+        postcode: document.getElementById('postcode').value.trim(),
+        plaats: document.getElementById('plaats').value.trim(),
         oppervlakte: parseInt(document.getElementById('oppervlakte').value) || null,
         kamers: parseInt(document.getElementById('kamers').value) || null,
+        bouwjaar: parseInt(document.getElementById('bouwjaar').value) || null,
+        energielabel: document.getElementById('energielabel').value || null,
         huurprijs: parseFloat(document.getElementById('huurprijs').value),
-        beschrijving: document.getElementById('beschrijving').value
+        beschrijving: document.getElementById('beschrijving').value.trim()
     };
+
+    // Validate postcode (Dutch format: 1234 AB)
+    const postcodeRegex = /^[1-9]\d{3}\s?[A-Za-z]{2}$/;
+    if (!postcodeRegex.test(pandData.postcode)) {
+        showToast('Voer een geldige postcode in (bijv. 1234 AB)', 'error');
+        return;
+    }
+
+    // Validate huurprijs is positive
+    if (pandData.huurprijs <= 0) {
+        showToast('Huurprijs moet een positief bedrag zijn', 'error');
+        return;
+    }
+
+    // Validate type and status against allowed values
+    const validTypes = ['bedrijfspand', 'woning'];
+    const validStatuses = ['verhuurd', 'beschikbaar', 'onderhoud'];
+    if (!validTypes.includes(pandData.type)) {
+        showToast('Ongeldig type geselecteerd', 'error');
+        return;
+    }
+    if (!validStatuses.includes(pandData.status)) {
+        showToast('Ongeldige status geselecteerd', 'error');
+        return;
+    }
 
     const pandId = document.getElementById('pandId').value;
 
@@ -129,18 +163,39 @@ async function editPand(id) {
     document.getElementById('plaats').value = pand.plaats;
     document.getElementById('oppervlakte').value = pand.oppervlakte || '';
     document.getElementById('kamers').value = pand.kamers || '';
+    document.getElementById('bouwjaar').value = pand.bouwjaar || '';
+    document.getElementById('energielabel').value = pand.energielabel || '';
     document.getElementById('huurprijs').value = pand.huurprijs;
     document.getElementById('beschrijving').value = pand.beschrijving || '';
 
     modal.classList.add('show');
 }
 
-// Delete pand
+// Delete pand (with cascading delete protection)
 async function deletePand(id) {
-    const confirmed = await showConfirm('Weet u zeker dat u dit pand wilt verwijderen?', 'Pand verwijderen');
-    if (!confirmed) return;
-
     try {
+        // Check for active contracts linked to this pand
+        const contracten = await dbGetAll('contracten');
+        const activeContracts = contracten.filter(c => c.pandId === id);
+        if (activeContracts.length > 0) {
+            showToast('Dit pand kan niet worden verwijderd omdat er nog contracten aan gekoppeld zijn. Verwijder eerst de contracten.', 'error');
+            return;
+        }
+
+        // Check for maintenance requests
+        const onderhoudItems = await dbGetAll('onderhoud');
+        const linkedOnderhoud = onderhoudItems.filter(o => o.pandId === id && o.status !== 'afgerond');
+        if (linkedOnderhoud.length > 0) {
+            const proceed = await showConfirm(
+                `Er zijn nog ${linkedOnderhoud.length} openstaande onderhoudsmeldingen voor dit pand. Wilt u toch doorgaan met verwijderen?`,
+                'Waarschuwing'
+            );
+            if (!proceed) return;
+        }
+
+        const confirmed = await showConfirm('Weet u zeker dat u dit pand wilt verwijderen?', 'Pand verwijderen');
+        if (!confirmed) return;
+
         showLoading('Pand verwijderen...');
         await dbDelete('panden', id);
         showToast('Pand succesvol verwijderd', 'success');

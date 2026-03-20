@@ -1,26 +1,70 @@
 {
   "rules": {
     ".read": "auth != null",
-    ".write": "auth != null",
+    ".write": false,
     
     "panden": {
-      ".indexOn": ["adres", "type", "status"]
+      ".indexOn": ["adres", "type", "status"],
+      ".read": "auth != null",
+      ".write": "auth != null"
     },
     
     "huurders": {
-      ".indexOn": ["achternaam", "email"]
+      ".indexOn": ["achternaam", "email"],
+      ".read": "auth != null",
+      ".write": "auth != null"
     },
     
     "contracten": {
-      ".indexOn": ["startdatum", "einddatum", "huurderId", "pandId"]
+      ".indexOn": ["startdatum", "einddatum", "huurderId", "pandId"],
+      ".read": "auth != null",
+      ".write": "auth != null"
     },
     
     "onderhoud": {
-      ".indexOn": ["status", "prioriteit", "pandId", "createdAt"]
+      ".indexOn": ["status", "prioriteit", "pandId", "createdAt"],
+      ".read": "auth != null",
+      ".write": "auth != null"
     },
     
     "transacties": {
-      ".indexOn": ["datum", "type", "categorie"]
+      ".indexOn": ["datum", "type", "categorie"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "werkbonnen": {
+      ".indexOn": ["werkbonNummer", "meldingId", "pandId", "status", "aanmaakDatum"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "invoices": {
+      ".indexOn": ["invoiceNumber", "invoiceDate", "dueDate"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "auditLog": {
+      ".indexOn": ["timestamp", "entityType", "action", "userId"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "betalingen": {
+      ".indexOn": ["contractId", "datum", "status"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    
+    "settings": {
+      ".read": "auth != null",
+      ".write": "root.child('admins').child(auth.uid).exists()"
+    },
+    
+    "admins": {
+      ".read": "auth != null",
+      ".write": "root.child('admins').child(auth.uid).exists()"
     }
   }
 }

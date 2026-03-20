@@ -209,6 +209,26 @@ function setupEventListeners() {
     // Test Azure config
     document.getElementById('testAzureConfig').addEventListener('click', testAzureConfig);
     
+    // AI config handlers
+    const saveAIBtn = document.getElementById('saveAIConfig');
+    if (saveAIBtn) {
+        saveAIBtn.addEventListener('click', saveAIConfig);
+        // Load existing config
+        const aiConfig = storage.get('azureOpenAIConfig', {});
+        if (aiConfig.endpoint) document.getElementById('azureOpenAIEndpoint').value = aiConfig.endpoint;
+        if (aiConfig.apiKey) document.getElementById('azureOpenAIKey').value = '••••••••••';
+    }
+    const testAIBtn = document.getElementById('testAIConfig');
+    if (testAIBtn) {
+        testAIBtn.addEventListener('click', testAIConfig);
+    }
+    
+    // Audit log filters
+    const auditEntityFilter = document.getElementById('auditEntityFilter');
+    const auditActionFilter = document.getElementById('auditActionFilter');
+    if (auditEntityFilter) auditEntityFilter.addEventListener('change', loadAuditLogEntries);
+    if (auditActionFilter) auditActionFilter.addEventListener('change', loadAuditLogEntries);
+    
     // Demo data actions
     document.getElementById('resetDemoData').addEventListener('click', resetDemoData);
     document.getElementById('exportDemoData').addEventListener('click', exportDemoData);
@@ -368,3 +388,93 @@ function importDemoData() {
     
     input.click();
 }
+
+// AI Configuration
+function saveAIConfig() {
+    const endpoint = document.getElementById('azureOpenAIEndpoint').value.trim();
+    const apiKey = document.getElementById('azureOpenAIKey').value.trim();
+    
+    if (!endpoint) {
+        showToast('Voer een Azure OpenAI endpoint URL in', 'error');
+        return;
+    }
+    
+    // Don't overwrite key if user didn't change it (shows as dots)
+    const existingConfig = storage.get('azureOpenAIConfig', {});
+    const config = {
+        endpoint: endpoint,
+        apiKey: apiKey.includes('••') ? existingConfig.apiKey : apiKey
+    };
+    
+    storage.set('azureOpenAIConfig', config);
+    showToast('AI configuratie opgeslagen', 'success');
+}
+
+async function testAIConfig() {
+    const config = storage.get('azureOpenAIConfig', null);
+    if (!config || !config.endpoint || !config.apiKey) {
+        showToast('Sla eerst de AI configuratie op', 'error');
+        return;
+    }
+    
+    try {
+        showLoading('Verbinding testen...');
+        const response = await fetch(config.endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': config.apiKey
+            },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: 'Zeg hallo in het Nederlands' }],
+                max_tokens: 50
+            })
+        });
+        
+        hideLoading();
+        
+        if (response.ok) {
+            showToast('Verbinding met Azure OpenAI succesvol!', 'success');
+        } else {
+            const errorData = await response.json().catch(() => ({}));
+            showToast(`Verbinding mislukt: ${response.status} - ${errorData.error?.message || 'Onbekende fout'}`, 'error');
+        }
+    } catch (error) {
+        hideLoading();
+        showToast('Verbinding mislukt: ' + error.message, 'error');
+    }
+}
+
+// Audit Log Display
+async function loadAuditLogEntries() {
+    const container = document.getElementById('auditLogContainer');
+    if (!container) return;
+    
+    container.innerHTML = '<p class="empty-state">Laden...</p>';
+    
+    try {
+        const filters = {
+            entityType: document.getElementById('auditEntityFilter')?.value || '',
+            action: document.getElementById('auditActionFilter')?.value || '',
+            limit: 100
+        };
+        
+        const entries = await getAuditLog(filters);
+        
+        if (entries.length === 0) {
+            container.innerHTML = '<p class="empty-state">Geen audit logboek items gevonden</p>';
+            return;
+        }
+        
+        container.innerHTML = entries.map(entry => {
+            return `<div style="padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 13px;">
+                ${formatAuditEntry(entry)}
+            </div>`;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading audit log:', error);
+        container.innerHTML = '<p class="empty-state">Fout bij het laden van het audit logboek</p>';
+    }
+}
+
+window.loadAuditLogEntries = loadAuditLogEntries;

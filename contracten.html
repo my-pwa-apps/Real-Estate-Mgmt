@@ -6,6 +6,8 @@
     <title>Contracten - Stadsgezicht Ontwikkelingen</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/enhancements.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a5f">
 </head>
 <body>
     <div class="app-container">
@@ -56,9 +58,20 @@
         <main class="main-content">
             <header class="page-header">
                 <h1>Huurcontracten</h1>
-                <button id="addContractBtn" class="btn-primary">
-                    ➕ Nieuw Contract
-                </button>
+                <div class="header-actions">
+                    <button class="search-shortcut" onclick="openGlobalSearch()">
+                        🔍 Zoeken... <kbd>Ctrl+K</kbd>
+                    </button>
+                    <button class="btn-icon" onclick="exportContractenCSV()" title="Exporteer naar CSV">
+                        📥 CSV Export
+                    </button>
+                    <button class="btn-icon" onclick="processRentIncrease()" title="Jaarlijkse huurverhoging toepassen">
+                        📈 Huurverhoging
+                    </button>
+                    <button id="addContractBtn" class="btn-primary">
+                        ➕ Nieuw Contract
+                    </button>
+                </div>
             </header>
 
             <div class="filters-bar">
@@ -182,9 +195,11 @@
     <script src="js/db-helpers.js"></script>
     <script src="js/app-init.js"></script>
     <script src="js/detail-panel.js"></script>
-    <script src="js/contracten.js"></script>
     <script src="js/sharepoint-helpers.js"></script>
     <script src="js/email-helpers.js"></script>
-    <script src="js/contracten.js"></script>
+    <script src="js/audit-trail.js"></script>
+    <script src="js/data-export.js"></script>
+    <script src="js/global-search.js"></script>
+    <script src="js/copilot-assistant.js"></script>    <script src=\"js/rent-increase.js\"></script>    <script src="js/contracten.js"></script>
 </body>
 </html>

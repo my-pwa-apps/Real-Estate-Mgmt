@@ -276,7 +276,13 @@ const DEMO_DATA = {
         { id: 'demo-trans-90', datum: '2026-01-10', type: 'uitgave', categorie: 'verzekering',    bedrag: 2645,  omschrijving: 'WA verzekering alle panden (jaar 2026)',                  createdAt: new Date('2026-01-10').toISOString() },
         { id: 'demo-trans-91', datum: '2026-01-01', type: 'uitgave', categorie: 'administratie',  bedrag: 145,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2026-01-01').toISOString() },
         { id: 'demo-trans-92', datum: '2026-02-01', type: 'uitgave', categorie: 'administratie',  bedrag: 145,   omschrijving: 'Accountant - maandelijkse administratie',                 createdAt: new Date('2026-02-01').toISOString() }
-    ]
+    ],
+
+    werkbonnen: [],
+    auditLog: [],
+    betalingen: [],
+    invoices: [],
+    settings: {}
 };
 
 // Demo mode database operations

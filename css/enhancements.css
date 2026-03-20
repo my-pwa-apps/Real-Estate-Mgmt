@@ -331,6 +331,635 @@ html {
     }
 }
 
+/* ========================================
+   GLOBAL SEARCH OVERLAY
+   ======================================== */
+.global-search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 10vh;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.global-search-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.global-search-modal {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 640px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transform: translateY(-20px);
+    transition: transform 0.2s ease;
+}
+
+.global-search-overlay.show .global-search-modal {
+    transform: translateY(0);
+}
+
+.global-search-header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+    gap: 12px;
+}
+
+.global-search-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.global-search-header input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 4px;
+    background: transparent;
+}
+
+.global-search-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #999;
+    padding: 4px 8px;
+}
+
+.global-search-results {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.global-search-hint {
+    text-align: center;
+    color: #999;
+    padding: 24px;
+    font-size: 14px;
+}
+
+.global-search-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.global-search-result:hover {
+    background: #f5f5f5;
+}
+
+.result-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.result-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.result-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.result-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ========================================
+   COPILOT AI ASSISTANT
+   ======================================== */
+.copilot-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(30, 58, 95, 0.4);
+    z-index: 9998;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.copilot-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 24px rgba(30, 58, 95, 0.5);
+}
+
+.copilot-fab.active {
+    background: var(--accent-color);
+}
+
+.copilot-panel {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    width: 420px;
+    max-width: calc(100vw - 48px);
+    height: 600px;
+    max-height: calc(100vh - 120px);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.copilot-panel.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.copilot-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    flex-shrink: 0;
+}
+
+.copilot-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.copilot-header-title h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.copilot-header-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.copilot-btn-icon {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.copilot-btn-icon:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+.copilot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.copilot-message {
+    display: flex;
+    max-width: 90%;
+}
+
+.copilot-message.user {
+    align-self: flex-end;
+}
+
+.copilot-message.assistant {
+    align-self: flex-start;
+}
+
+.copilot-message-content {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.copilot-message.user .copilot-message-content {
+    background: var(--primary-color);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.copilot-message.assistant .copilot-message-content {
+    background: #f0f2f5;
+    color: var(--text-primary);
+    border-bottom-left-radius: 4px;
+}
+
+.copilot-message-content p { margin: 4px 0; }
+.copilot-message-content ul { margin: 4px 0; padding-left: 18px; }
+.copilot-message-content li { margin: 2px 0; }
+.copilot-message-content table { margin: 8px 0; }
+.copilot-message-content strong { font-weight: 600; }
+.copilot-message-content kbd {
+    background: #e0e0e0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: monospace;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 4px;
+    padding: 4px 0;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    background: #999;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+}
+
+.copilot-input-area {
+    border-top: 1px solid #eee;
+    padding: 12px;
+    flex-shrink: 0;
+}
+
+.copilot-file-preview {
+    margin-bottom: 8px;
+}
+
+.copilot-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5f5f5;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.copilot-preview-item button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    margin-left: auto;
+}
+
+.copilot-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.copilot-upload-btn {
+    cursor: pointer;
+    font-size: 20px;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.copilot-upload-btn:hover {
+    background: #f0f0f0;
+}
+
+.copilot-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    min-height: 36px;
+    max-height: 120px;
+    background: #ffffff;
+}
+
+.copilot-input:focus {
+    border-color: var(--primary-color);
+}
+
+.copilot-send-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.copilot-send-btn:hover {
+    background: #15304f;
+}
+
+.copilot-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.copilot-quick-actions button {
+    background: #f0f2f5;
+    border: none;
+    border-radius: 16px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.copilot-quick-actions button:hover {
+    background: #e0e3e8;
+}
+
+/* Mode Switcher */
+.copilot-mode-switcher {
+    display: flex;
+    padding: 6px;
+    gap: 4px;
+    background: #f0f2f5;
+    flex-shrink: 0;
+}
+
+.copilot-mode-btn {
+    flex: 1;
+    padding: 8px 8px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.copilot-mode-btn:hover {
+    background: rgba(255,255,255,0.7);
+}
+
+.copilot-mode-btn.active {
+    background: #ffffff;
+    color: var(--primary-color);
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.copilot-mode-content {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.copilot-mode-content.active {
+    display: flex;
+}
+
+/* Microsoft Copilot Panel */
+.copilot-microsoft-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.copilot-ms-info {
+    text-align: center;
+}
+
+.copilot-ms-badge {
+    background: linear-gradient(135deg, #f0f4ff, #e8ecf5);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+}
+
+.copilot-ms-badge.enterprise {
+    background: linear-gradient(135deg, #e8f5e9, #e3f2fd);
+    border: 1px solid #c8e6c9;
+}
+
+.copilot-ms-badge.consumer {
+    background: linear-gradient(135deg, #f3e5f5, #e8eaf6);
+    border: 1px solid #e1bee7;
+}
+
+.copilot-ms-badge h3 {
+    margin: 8px 0 4px 0;
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.copilot-ms-badge p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.copilot-ms-context-note {
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: #fffde7;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border-left: 3px solid #ffc107;
+    text-align: left;
+    margin-top: 8px;
+}
+
+.copilot-ms-actions h4 {
+    font-size: 13px;
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+}
+
+.copilot-ms-action-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+    transition: all 0.15s;
+    color: var(--text-primary);
+}
+
+.copilot-ms-action-btn:hover {
+    background: #f5f7fa;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.copilot-ms-custom {
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+}
+
+.copilot-ms-custom h4 {
+    font-size: 13px;
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+}
+
+.copilot-ms-footer {
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+}
+
+.copilot-ms-footer p {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ========================================
+   CHART CONTAINER
+   ======================================== */
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-height: 300px;
+    margin: 16px 0;
+}
+
+/* ========================================
+   EXPORT & SEARCH BUTTONS IN HEADER
+   ======================================== */
+.page-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    align-items: center;
+}
+
+.btn-icon {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.15s;
+    white-space: nowrap;
+    color: var(--text-primary);
+}
+
+.btn-icon:hover {
+    background: var(--bg-tertiary);
+}
+
+.search-shortcut {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-muted);
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.search-shortcut:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary-color);
+}
+
+.search-shortcut kbd {
+    background: #e0e0e0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: monospace;
+}
+
 /* Dark Mode Support - DISABLED (Light mode only) */
 /* @media (prefers-color-scheme: dark) {
     :root {

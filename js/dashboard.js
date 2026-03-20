@@ -92,17 +92,18 @@ function loadRecentMeldingen() {
     container.innerHTML = recentMeldingen.map(m => {
         const pand = panden.find(p => p.id === m.pandId);
         const priorityClass = m.prioriteit || 'normaal';
+        const s = sanitizeHTML;
         
         return `
             <div class="list-item" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
                 <div style="display: flex; justify-content: space-between; align-items: start;">
                     <div>
-                        <strong style="color: var(--text-primary);">${m.titel}</strong>
+                        <strong style="color: var(--text-primary);">${s(m.titel)}</strong>
                         <p style="color: var(--text-secondary); font-size: 13px; margin: 4px 0;">
-                            ${pand ? pand.adres : 'Onbekend pand'}
+                            ${pand ? s(pand.adres) : 'Onbekend pand'}
                         </p>
                     </div>
-                    <span class="priority-badge ${priorityClass}">${m.prioriteit || 'normaal'}</span>
+                    <span class="priority-badge ${s(priorityClass)}">${s(m.prioriteit || 'normaal')}</span>
                 </div>
             </div>
         `;
@@ -133,15 +134,16 @@ function loadVerlopendeContracten() {
         const huurder = huurders.find(h => h.id === c.huurderId);
         const pand = panden.find(p => p.id === c.pandId);
         const eindDatum = new Date(c.einddatum).toLocaleDateString('nl-NL');
+        const s = sanitizeHTML;
         
         return `
             <div class="list-item" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
                 <div>
                     <strong style="color: var(--text-primary);">
-                        ${huurder ? `${huurder.voornaam} ${huurder.achternaam}` : 'Onbekende huurder'}
+                        ${huurder ? `${s(huurder.voornaam)} ${s(huurder.achternaam)}` : 'Onbekende huurder'}
                     </strong>
                     <p style="color: var(--text-secondary); font-size: 13px; margin: 4px 0;">
-                        ${pand ? pand.adres : 'Onbekend pand'}
+                        ${pand ? s(pand.adres) : 'Onbekend pand'}
                     </p>
                     <small style="color: var(--text-muted);">Verloopt op ${eindDatum}</small>
                 </div>

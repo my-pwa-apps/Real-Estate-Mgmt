@@ -6,6 +6,8 @@
     <title>Huurders - Stadsgezicht Ontwikkelingen</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/enhancements.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a5f">
 </head>
 <body>
     <div class="app-container">
@@ -56,9 +58,17 @@
         <main class="main-content">
             <header class="page-header">
                 <h1>Huurders Beheer</h1>
-                <button id="addHuurderBtn" class="btn-primary">
-                    ➕ Nieuwe Huurder
-                </button>
+                <div class="header-actions">
+                    <button class="search-shortcut" onclick="openGlobalSearch()">
+                        🔍 Zoeken... <kbd>Ctrl+K</kbd>
+                    </button>
+                    <button class="btn-icon" onclick="exportHuurdersCSV()" title="Exporteer naar CSV">
+                        📥 CSV Export
+                    </button>
+                    <button id="addHuurderBtn" class="btn-primary">
+                        ➕ Nieuwe Huurder
+                    </button>
+                </div>
             </header>
 
             <div class="filters-bar">
@@ -140,6 +150,10 @@
     <script src="js/db-helpers.js"></script>
     <script src="js/app-init.js"></script>
     <script src="js/detail-panel.js"></script>
+    <script src="js/audit-trail.js"></script>
+    <script src="js/data-export.js"></script>
+    <script src="js/global-search.js"></script>
+    <script src="js/copilot-assistant.js"></script>
     <script src="js/huurders.js"></script>
 </body>
 </html>

@@ -6,6 +6,8 @@
     <title>Admin - Stadsgezicht Ontwikkelingen</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/enhancements.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a5f">
 </head>
 <body>
     <div class="app-container">
@@ -79,7 +81,9 @@
                 <div class="tabs-container">
                     <button class="tab-btn active" data-tab="users">👥 Gebruikers</button>
                     <button class="tab-btn" data-tab="settings">⚙️ Instellingen</button>
+                    <button class="tab-btn" data-tab="ai">🤖 AI / Copilot</button>
                     <button class="tab-btn" data-tab="azure">☁️ Azure AD</button>
+                    <button class="tab-btn" data-tab="audit">📋 Audit Log</button>
                     <button class="tab-btn" data-tab="demo">🎭 Demo Modus</button>
                 </div>
 
@@ -203,6 +207,79 @@
                     <button id="saveSettings" class="btn-primary" style="margin-top: 20px;">Instellingen Opslaan</button>
                 </div>
 
+                <!-- AI / Copilot Tab -->
+                <div id="aiTab" class="tab-content">
+                    <div class="section-header">
+                        <h2>🤖 AI / Copilot Configuratie</h2>
+                        <p>Configureer Azure OpenAI voor geavanceerde AI-functies zoals foto-analyse en document-samenvatting.</p>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <h3>☁️ Azure OpenAI Configuratie</h3>
+                            <div class="form-group">
+                                <label>Azure OpenAI Endpoint URL</label>
+                                <input type="url" id="azureOpenAIEndpoint" placeholder="https://uw-resource.openai.azure.com/openai/deployments/uw-model/chat/completions?api-version=2024-02-15-preview">
+                            </div>
+                            <div class="form-group">
+                                <label>API Key</label>
+                                <input type="password" id="azureOpenAIKey" placeholder="Uw Azure OpenAI API key">
+                            </div>
+                            <button id="saveAIConfig" class="btn-primary">AI Configuratie Opslaan</button>
+                            <button id="testAIConfig" class="btn-secondary" style="margin-left:8px;">Verbinding Testen</button>
+                        </div>
+
+                        <div class="setting-item">
+                            <h3>💡 Functionaliteit</h3>
+                            <p>Met Azure OpenAI kunt u:</p>
+                            <ul>
+                                <li>📸 <strong>Foto analyse</strong> - Upload foto's van onderhoudsproblemen en ontvang automatische beschrijvingen</li>
+                                <li>📄 <strong>Document analyse</strong> - Upload contracten of documenten voor samenvatting</li>
+                                <li>✉️ <strong>Email concepten</strong> - Laat AI email teksten voorbereiden</li>
+                                <li>📊 <strong>Data-inzichten</strong> - Stel vragen over uw vastgoedportefeuille</li>
+                            </ul>
+                            <p><strong>Zonder Azure OpenAI</strong> werkt de Copilot assistent met lokale data-analyse (basis functionaliteit).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Trail Tab -->
+                <div id="auditTab" class="tab-content">
+                    <div class="section-header">
+                        <h2>📋 Audit Trail</h2>
+                        <p>Overzicht van alle wijzigingen in het systeem</p>
+                    </div>
+                    <div class="filters-bar" style="margin-bottom: 16px;">
+                        <div class="filter-group">
+                            <label for="auditEntityFilter">Type:</label>
+                            <select id="auditEntityFilter">
+                                <option value="">Alle</option>
+                                <option value="panden">Panden</option>
+                                <option value="huurders">Huurders</option>
+                                <option value="contracten">Contracten</option>
+                                <option value="onderhoud">Onderhoud</option>
+                                <option value="transacties">Transacties</option>
+                                <option value="werkbonnen">Werkbonnen</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="auditActionFilter">Actie:</label>
+                            <select id="auditActionFilter">
+                                <option value="">Alle</option>
+                                <option value="create">Aangemaakt</option>
+                                <option value="update">Bijgewerkt</option>
+                                <option value="delete">Verwijderd</option>
+                                <option value="export">Export</option>
+                                <option value="email">Email</option>
+                            </select>
+                        </div>
+                        <button class="btn-secondary" onclick="loadAuditLogEntries()">Vernieuwen</button>
+                    </div>
+                    <div id="auditLogContainer" class="list-container" style="max-height: 500px; overflow-y: auto;">
+                        <p class="empty-state">Klik op 'Vernieuwen' om het audit log te laden</p>
+                    </div>
+                </div>
+
                 <!-- Azure AD Tab -->
                 <div id="azureTab" class="tab-content">
                     <div class="section-header">
@@ -290,6 +367,10 @@
     <script src="js/db-helpers.js"></script>
     <script src="js/demo-data.js"></script>
     <script src="js/entra-auth.js"></script>
+    <script src="js/audit-trail.js"></script>
+    <script src="js/data-export.js"></script>
+    <script src="js/global-search.js"></script>
+    <script src="js/copilot-assistant.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

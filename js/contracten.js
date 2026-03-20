@@ -64,24 +64,25 @@ function renderContracten() {
         const huurder = huurders.find(h => h.id === contract.huurderId);
         const pand = panden.find(p => p.id === contract.pandId);
         const status = getContractStatus(contract);
+        const s = sanitizeHTML;
         
         return `
             <tr onclick="viewContractDetail('${contract.id}')" style="cursor: pointer;">
-                <td>${huurder ? `${huurder.voornaam} ${huurder.achternaam}` : 'Onbekend'}</td>
-                <td>${pand ? pand.adres : 'Onbekend'}</td>
+                <td>${huurder ? `${s(huurder.voornaam)} ${s(huurder.achternaam)}` : 'Onbekend'}</td>
+                <td>${pand ? s(pand.adres) : 'Onbekend'}</td>
                 <td>${new Date(contract.startdatum).toLocaleDateString('nl-NL')}</td>
                 <td>${new Date(contract.einddatum).toLocaleDateString('nl-NL')}</td>
                 <td>€${parseFloat(contract.huurprijs).toLocaleString('nl-NL')}</td>
-                <td><span class="status-badge ${status}">${capitalizeFirst(status)}</span></td>
+                <td><span class="status-badge ${s(status)}">${capitalizeFirst(s(status))}</span></td>
                 <td>
                     ${contract.documentUrl ? 
-                        `<a href="${contract.documentUrl}" target="_blank" title="Document openen">📄</a>` : 
+                        `<a href="${s(contract.documentUrl)}" target="_blank" rel="noopener noreferrer" title="Document openen">📄</a>` : 
                         '<span style="color: #999;" title="Geen document">-</span>'}
                 </td>
                 <td class="actions" onclick="event.stopPropagation();">
-                    <span class="action-icon" onclick="emailContract('${contract.id}')" title="Email versturen">📧</span>
+                    ${!isViewerRole() ? `<span class="action-icon" onclick="emailContract('${contract.id}')" title="Email versturen">📧</span>
                     <span class="action-icon" onclick="editContract('${contract.id}')" title="Bewerken">✏️</span>
-                    <span class="action-icon" onclick="deleteContract('${contract.id}')" title="Verwijderen">🗑️</span>
+                    <span class="action-icon" onclick="deleteContract('${contract.id}')" title="Verwijderen">🗑️</span>` : ''}
                 </td>
             </tr>
         `;
@@ -143,8 +144,32 @@ contractForm.addEventListener('submit', async (e) => {
         huurprijs: parseFloat(document.getElementById('huurprijs').value),
         borg: parseFloat(document.getElementById('borg').value) || 0,
         betalingsdatum: parseInt(document.getElementById('betalingsdatum').value) || 1,
-        voorwaarden: document.getElementById('voorwaarden').value
+        voorwaarden: document.getElementById('voorwaarden').value.trim()
     };
+
+    // Validate einddatum is after startdatum
+    if (new Date(contractData.einddatum) <= new Date(contractData.startdatum)) {
+        showToast('Einddatum moet na de startdatum liggen', 'error');
+        return;
+    }
+
+    // Validate huurprijs is positive
+    if (contractData.huurprijs <= 0) {
+        showToast('Huurprijs moet een positief bedrag zijn', 'error');
+        return;
+    }
+
+    // Validate borg is not negative
+    if (contractData.borg < 0) {
+        showToast('Borgsom kan niet negatief zijn', 'error');
+        return;
+    }
+
+    // Validate betalingsdatum (1-28)
+    if (contractData.betalingsdatum < 1 || contractData.betalingsdatum > 28) {
+        showToast('Betalingsdatum moet tussen 1 en 28 liggen', 'error');
+        return;
+    }
 
     const contractId = document.getElementById('contractId').value;
 
@@ -294,7 +319,8 @@ async function emailContract(contractId) {
 
         showToast('Email succesvol verstuurd naar ' + huurder.email, 'success');
         
-        // Save email to SharePoint Correspondentie folderconst folderPath = `Huurders/${huurder.achternaam}_${huurder.voornaam}/Correspondentie`;
+        // Save email to SharePoint Correspondentie folder
+        const folderPath = `Huurders/${huurder.achternaam}_${huurder.voornaam}/Correspondentie`;
         await saveEmailToSharePoint(emailData, folderPath);
 
     } catch (error) {

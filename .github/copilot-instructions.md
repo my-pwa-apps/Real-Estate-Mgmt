@@ -183,3 +183,20 @@ Navigate to `http://localhost:8000/#demo` for instant demo mode.
 4. **Select options**: Browser defaults to black dropdown menus; must override with explicit white background
 5. **Detail panels**: Use `showDetailPanel(entityType, data)` not custom implementations
 6. **Firebase paths**: Use singular names: `onderhoud`, `panden`, `huurders` (not plural forms with s)
+7. **XSS Prevention**: Always use `sanitizeHTML()` when injecting user data into innerHTML
+8. **VIEWER Role**: Use `isViewerRole()` to hide edit/delete buttons for read-only users
+9. **Cascading deletes**: Check for linked contracts before deleting panden or huurders
+10. **Audit trail**: Use `logAuditEvent()` for important operations (available via `js/audit-trail.js`)
+11. **Global Search**: Available via Ctrl+K on all pages (via `js/global-search.js`)
+12. **Copilot AI**: Floating assistant button on all pages (via `js/copilot-assistant.js`), configurable via Admin → AI tab
+13. **CSV Export**: Each page has export capability via `js/data-export.js`
+
+## New Feature Files
+
+| File | Purpose |
+|------|---------|
+| `js/audit-trail.js` | Tracks all data modifications with user, timestamp, and action |
+| `js/global-search.js` | Cross-entity search overlay (Ctrl+K) |
+| `js/data-export.js` | CSV export for all entity types |
+| `js/copilot-assistant.js` | AI assistant panel with photo/document upload |
+| `js/rent-increase.js` | Annual rent increase processing |

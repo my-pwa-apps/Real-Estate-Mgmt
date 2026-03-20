@@ -33,6 +33,7 @@ async function loadAllData() {
         calculateStatistics();
         renderMaandelijksOverzicht();
         renderRecenteTransacties();
+        renderFinancialChart();
         hideLoading();
     } catch (error) {
         console.error('Error loading data:', error);
@@ -141,11 +142,13 @@ function renderRecenteTransacties() {
     if (recenteInkomsten.length === 0) {
         inkomstenContainer.innerHTML = '<p class="empty-state">Geen recente inkomsten</p>';
     } else {
-        inkomstenContainer.innerHTML = recenteInkomsten.map(t => `
+        inkomstenContainer.innerHTML = recenteInkomsten.map(t => {
+            const s = sanitizeHTML;
+            return `
             <div class="list-item" onclick="viewTransactieDetail('${t.id}')" style="padding: 12px 0; border-bottom: 1px solid var(--border-color); cursor: pointer;">
                 <div style="display: flex; justify-content: space-between;">
                     <div>
-                        <strong>${t.omschrijving || t.beschrijving}</strong>
+                        <strong>${s(t.omschrijving || t.beschrijving)}</strong>
                         <p style="font-size: 12px; color: var(--text-muted);">
                             ${new Date(t.datum).toLocaleDateString('nl-NL')}
                         </p>
@@ -153,7 +156,8 @@ function renderRecenteTransacties() {
                     <strong style="color: var(--success-color);">€${parseFloat(t.bedrag).toLocaleString('nl-NL')}</strong>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 
     // Render uitgaven
@@ -161,11 +165,13 @@ function renderRecenteTransacties() {
     if (recenteUitgaven.length === 0) {
         uitgavenContainer.innerHTML = '<p class="empty-state">Geen recente uitgaven</p>';
     } else {
-        uitgavenContainer.innerHTML = recenteUitgaven.map(t => `
+        uitgavenContainer.innerHTML = recenteUitgaven.map(t => {
+            const s = sanitizeHTML;
+            return `
             <div class="list-item" onclick="viewTransactieDetail('${t.id}')" style="padding: 12px 0; border-bottom: 1px solid var(--border-color); cursor: pointer;">
                 <div style="display: flex; justify-content: space-between;">
                     <div>
-                        <strong>${t.omschrijving || t.beschrijving}</strong>
+                        <strong>${s(t.omschrijving || t.beschrijving)}</strong>
                         <p style="font-size: 12px; color: var(--text-muted);">
                             ${new Date(t.datum).toLocaleDateString('nl-NL')}
                         </p>
@@ -173,7 +179,8 @@ function renderRecenteTransacties() {
                     <strong style="color: var(--danger-color);">€${parseFloat(t.bedrag).toLocaleString('nl-NL')}</strong>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 }
 
@@ -215,12 +222,31 @@ transactieForm.addEventListener('submit', async (e) => {
     
     const transactieData = {
         type: document.getElementById('transactieType').value,
-        beschrijving: document.getElementById('beschrijving').value,
+        beschrijving: document.getElementById('beschrijving').value.trim(),
         bedrag: parseFloat(document.getElementById('bedrag').value),
         datum: document.getElementById('datum').value,
         categorie: document.getElementById('categorie').value,
-        notities: document.getElementById('notities').value
+        notities: document.getElementById('notities').value.trim()
     };
+
+    // Validate bedrag is positive
+    if (transactieData.bedrag <= 0) {
+        showToast('Bedrag moet een positief getal zijn', 'error');
+        return;
+    }
+
+    // Validate type
+    if (!['inkomst', 'uitgave'].includes(transactieData.type)) {
+        showToast('Ongeldig transactietype', 'error');
+        return;
+    }
+
+    // Validate categorie
+    const validCategories = ['huur', 'onderhoud', 'verzekering', 'administratie', 'belasting', 'overig'];
+    if (transactieData.categorie && !validCategories.includes(transactieData.categorie)) {
+        showToast('Ongeldige categorie geselecteerd', 'error');
+        return;
+    }
 
     const transactieId = document.getElementById('transactieId').value;
 
@@ -259,6 +285,142 @@ function viewTransactieDetail(transactieId) {
 }
 
 window.viewTransactieDetail = viewTransactieDetail;
+
+// Edit transactie (open modal with pre-filled data)
+function editTransactie(id) {
+    const transactie = transacties.find(t => t.id === id);
+    if (!transactie) return;
+
+    document.getElementById('modalTitle').textContent = transactie.type === 'inkomst' ? 'Inkomst Bewerken' : 'Uitgave Bewerken';
+    document.getElementById('transactieId').value = transactie.id;
+    document.getElementById('transactieType').value = transactie.type;
+    document.getElementById('beschrijving').value = transactie.beschrijving || transactie.omschrijving || '';
+    document.getElementById('bedrag').value = transactie.bedrag;
+    document.getElementById('datum').value = transactie.datum;
+    document.getElementById('categorie').value = transactie.categorie || '';
+    document.getElementById('notities').value = transactie.notities || '';
+    modal.classList.add('show');
+}
+
+// Delete transactie
+async function deleteTransactie(id) {
+    const confirmed = await showConfirm('Weet u zeker dat u deze transactie wilt verwijderen?', 'Transactie verwijderen');
+    if (!confirmed) return;
+
+    try {
+        showLoading('Transactie verwijderen...');
+        await dbDelete('transacties', id);
+        showToast('Transactie succesvol verwijderd', 'success');
+        await loadAllData();
+    } catch (error) {
+        console.error('Error deleting transactie:', error);
+        hideLoading();
+        showToast('Fout bij het verwijderen van de transactie', 'error');
+    }
+}
+
+window.editTransactie = editTransactie;
+window.deleteTransactie = deleteTransactie;
+
+// Chart.js financial visualization
+let financialChartInstance = null;
+
+function renderFinancialChart() {
+    const canvas = document.getElementById('financialChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    const maanden = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
+    
+    const inkomstenData = [];
+    const uitgavenData = [];
+    const nettoData = [];
+
+    maanden.forEach((_, index) => {
+        const maandNummer = (index + 1).toString().padStart(2, '0');
+        const maandTransacties = transacties.filter(t =>
+            t.datum && t.datum.startsWith(`${currentYear}-${maandNummer}`)
+        );
+
+        const inkomsten = maandTransacties
+            .filter(t => t.type === 'inkomst')
+            .reduce((sum, t) => sum + parseFloat(t.bedrag || 0), 0);
+        const uitgaven = maandTransacties
+            .filter(t => t.type === 'uitgave')
+            .reduce((sum, t) => sum + parseFloat(t.bedrag || 0), 0);
+
+        inkomstenData.push(inkomsten);
+        uitgavenData.push(uitgaven);
+        nettoData.push(inkomsten - uitgaven);
+    });
+
+    if (financialChartInstance) {
+        financialChartInstance.destroy();
+    }
+
+    financialChartInstance = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: maanden,
+            datasets: [
+                {
+                    label: 'Inkomsten',
+                    data: inkomstenData,
+                    backgroundColor: 'rgba(34, 139, 34, 0.7)',
+                    borderColor: 'rgba(34, 139, 34, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                },
+                {
+                    label: 'Uitgaven',
+                    data: uitgavenData,
+                    backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                },
+                {
+                    label: 'Netto',
+                    data: nettoData,
+                    type: 'line',
+                    borderColor: 'rgba(30, 58, 95, 1)',
+                    backgroundColor: 'rgba(30, 58, 95, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(30, 58, 95, 1)',
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { usePointStyle: true, padding: 20 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: €${context.parsed.y.toLocaleString('nl-NL')}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '€' + value.toLocaleString('nl-NL');
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {

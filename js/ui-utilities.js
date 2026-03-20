@@ -39,7 +39,7 @@ function showToast(message, type = 'info', duration = 3000) {
         <div class="toast-icon">${icons[type]}</div>
         <div class="toast-content">
             <div class="toast-title">${titles[type]}</div>
-            <div class="toast-message">${message}</div>
+            <div class="toast-message">${sanitizeHTML(message)}</div>
         </div>
         <button class="toast-close" onclick="this.parentElement.remove()">×</button>
     `;
@@ -213,9 +213,24 @@ function isValidPhone(phone) {
  * @returns {string} - Sanitized HTML
  */
 function sanitizeHTML(html) {
+    if (html === null || html === undefined) return '';
     const div = document.createElement('div');
-    div.textContent = html;
+    div.textContent = String(html);
     return div.innerHTML;
+}
+
+/**
+ * Check if current user has VIEWER (read-only) role
+ * @returns {boolean} - True if user is a viewer with no write access
+ */
+function isViewerRole() {
+    // In demo mode, grant full access
+    if (typeof isDemoMode === 'function' && isDemoMode()) return false;
+    // Check if hasRole function exists and user has only VIEWER role
+    if (typeof hasRole === 'function') {
+        return !hasRole('MANAGER');
+    }
+    return false;
 }
 
 /**
@@ -406,6 +421,10 @@ if (typeof module !== 'undefined' && module.exports) {
         isInViewport,
         trapFocus,
         handleAsync,
-        storage
+        storage,
+        isViewerRole
     };
 }
+
+// Make isViewerRole globally accessible
+window.isViewerRole = isViewerRole;

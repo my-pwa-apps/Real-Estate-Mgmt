@@ -56,26 +56,27 @@ function renderMeldingen() {
         const pand = panden.find(p => p.id === melding.pandId);
         const priorityClass = melding.prioriteit || 'normaal';
         const statusClass = melding.status || 'nieuw';
+        const s = sanitizeHTML;
         
         return `
             <div class="item-card" onclick="viewOnderhoudDetail('${melding.id}')">
                 <div class="item-card-header">
-                    <h3>${melding.titel}</h3>
+                    <h3>${s(melding.titel)}</h3>
                     <div class="item-card-actions" onclick="event.stopPropagation();">
-                        ${!melding.werkbonId ? `<span class="action-icon" onclick="createWerkbon('${melding.id}')" title="Werkbon Aanmaken">📄</span>` : `<span class="action-icon" style="opacity: 0.5;" title="Werkbon aangemaakt">✅</span>`}
+                        ${!isViewerRole() ? `${!melding.werkbonId ? `<span class="action-icon" onclick="createWerkbon('${melding.id}')" title="Werkbon Aanmaken">📄</span>` : `<span class="action-icon" style="opacity: 0.5;" title="Werkbon aangemaakt">✅</span>`}
                         <span class="action-icon" onclick="editMelding('${melding.id}')" title="Bewerken">✏️</span>
-                        <span class="action-icon" onclick="deleteMelding('${melding.id}')" title="Verwijderen">🗑️</span>
+                        <span class="action-icon" onclick="deleteMelding('${melding.id}')" title="Verwijderen">🗑️</span>` : `${melding.werkbonId ? `<span class="action-icon" style="opacity: 0.5;" title="Werkbon aangemaakt">✅</span>` : ''}`}
                     </div>
                 </div>
                 <div class="item-card-body">
-                    <p>🏢 ${pand ? pand.adres : 'Onbekend pand'}</p>
-                    <p style="margin-top: 8px;">${melding.beschrijving}</p>
+                    <p>🏢 ${pand ? s(pand.adres) : 'Onbekend pand'}</p>
+                    <p style="margin-top: 8px;">${s(melding.beschrijving)}</p>
                     ${melding.geplande_datum ? `<p>📅 Gepland: ${new Date(melding.geplande_datum).toLocaleDateString('nl-NL')}</p>` : ''}
                     ${melding.kosten ? `<p>💰 Kosten: €${parseFloat(melding.kosten).toLocaleString('nl-NL')}</p>` : ''}
                 </div>
                 <div class="item-card-footer">
-                    <span class="priority-badge ${priorityClass}">${capitalizeFirst(melding.prioriteit || 'normaal')}</span>
-                    <span class="status-badge ${statusClass}">${capitalizeFirst(melding.status || 'nieuw')}</span>
+                    <span class="priority-badge ${s(priorityClass)}">${capitalizeFirst(s(melding.prioriteit || 'normaal'))}</span>
+                    <span class="status-badge ${s(statusClass)}">${capitalizeFirst(s(melding.status || 'nieuw'))}</span>
                 </div>
             </div>
         `;
@@ -110,14 +111,34 @@ meldingForm.addEventListener('submit', async (e) => {
     
     const meldingData = {
         pandId: document.getElementById('pandId').value,
-        titel: document.getElementById('titel').value,
-        beschrijving: document.getElementById('beschrijving').value,
+        titel: document.getElementById('titel').value.trim(),
+        beschrijving: document.getElementById('beschrijving').value.trim(),
         prioriteit: document.getElementById('prioriteit').value,
         status: document.getElementById('status').value,
         geplande_datum: document.getElementById('geplanddatum').value || null,
         kosten: parseFloat(document.getElementById('kosten').value) || null,
-        notities: document.getElementById('notities').value
+        notities: document.getElementById('notities').value.trim()
     };
+
+    // Validate prioriteit against allowed values
+    const validPrioriteiten = ['laag', 'normaal', 'hoog', 'urgent'];
+    if (!validPrioriteiten.includes(meldingData.prioriteit)) {
+        showToast('Ongeldige prioriteit geselecteerd', 'error');
+        return;
+    }
+
+    // Validate status against allowed values
+    const validStatuses = ['nieuw', 'in-behandeling', 'gepland', 'afgerond'];
+    if (!validStatuses.includes(meldingData.status)) {
+        showToast('Ongeldige status geselecteerd', 'error');
+        return;
+    }
+
+    // Validate kosten is not negative
+    if (meldingData.kosten !== null && meldingData.kosten < 0) {
+        showToast('Kosten kunnen niet negatief zijn', 'error');
+        return;
+    }
 
     const meldingId = document.getElementById('meldingId').value;
 

@@ -88,6 +88,7 @@ function closeDetailPanel() {
  * Generate Pand detail view
  */
 function generatePandDetail(pand) {
+    const s = sanitizeHTML;
     return `
         <div class="detail-panel-header">
             <h2>🏢 Pand Details</h2>
@@ -98,15 +99,15 @@ function generatePandDetail(pand) {
                 <div class="detail-section-title">📍 Locatie</div>
                 <div class="detail-row">
                     <div class="detail-label">Adres</div>
-                    <div class="detail-value"><strong>${pand.adres}</strong></div>
+                    <div class="detail-value"><strong>${s(pand.adres)}</strong></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Postcode</div>
-                    <div class="detail-value">${pand.postcode}</div>
+                    <div class="detail-value">${s(pand.postcode)}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Plaats</div>
-                    <div class="detail-value">${pand.plaats}</div>
+                    <div class="detail-value">${s(pand.plaats)}</div>
                 </div>
             </div>
 
@@ -114,11 +115,11 @@ function generatePandDetail(pand) {
                 <div class="detail-section-title">🏗️ Eigenschappen</div>
                 <div class="detail-row">
                     <div class="detail-label">Type</div>
-                    <div class="detail-value"><span class="status-badge ${pand.type}">${pand.type === 'bedrijfspand' ? 'Bedrijfspand' : 'Woning'}</span></div>
+                    <div class="detail-value"><span class="status-badge ${s(pand.type)}">${pand.type === 'bedrijfspand' ? 'Bedrijfspand' : 'Woning'}</span></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Status</div>
-                    <div class="detail-value"><span class="status-badge ${pand.status}">${capitalizeFirst(pand.status)}</span></div>
+                    <div class="detail-value"><span class="status-badge ${s(pand.status)}">${capitalizeFirst(s(pand.status))}</span></div>
                 </div>
                 ${pand.oppervlakte ? `
                 <div class="detail-row">
@@ -141,7 +142,7 @@ function generatePandDetail(pand) {
                 ${pand.energielabel ? `
                 <div class="detail-row">
                     <div class="detail-label">Energielabel</div>
-                    <div class="detail-value"><strong>${pand.energielabel}</strong></div>
+                    <div class="detail-value"><strong>${s(pand.energielabel)}</strong></div>
                 </div>
                 ` : ''}
             </div>
@@ -157,7 +158,7 @@ function generatePandDetail(pand) {
             ${pand.beschrijving ? `
             <div class="detail-section">
                 <div class="detail-section-title">📝 Beschrijving</div>
-                <p style="color: var(--text-secondary); line-height: 1.6;">${pand.beschrijving}</p>
+                <p style="color: var(--text-secondary); line-height: 1.6;">${s(pand.beschrijving)}</p>
             </div>
             ` : ''}
 
@@ -190,6 +191,7 @@ function generatePandDetail(pand) {
  * Generate Huurder detail view
  */
 function generateHuurderDetail(huurder) {
+    const s = sanitizeHTML;
     return `
         <div class="detail-panel-header">
             <h2>👤 Huurder Details</h2>
@@ -200,7 +202,7 @@ function generateHuurderDetail(huurder) {
                 <div class="detail-section-title">👤 Persoonlijke Gegevens</div>
                 <div class="detail-row">
                     <div class="detail-label">Naam</div>
-                    <div class="detail-value"><strong>${huurder.voornaam} ${huurder.achternaam}</strong></div>
+                    <div class="detail-value"><strong>${s(huurder.voornaam)} ${s(huurder.achternaam)}</strong></div>
                 </div>
                 ${huurder.geboortedatum ? `
                 <div class="detail-row">
@@ -218,18 +220,18 @@ function generateHuurderDetail(huurder) {
                 <div class="detail-section-title">📞 Contactgegevens</div>
                 <div class="detail-row">
                     <div class="detail-label">Email</div>
-                    <div class="detail-value"><a href="mailto:${huurder.email}" style="color: var(--primary-color);">${huurder.email}</a></div>
+                    <div class="detail-value"><a href="mailto:${s(huurder.email)}" style="color: var(--primary-color);">${s(huurder.email)}</a></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Telefoon</div>
-                    <div class="detail-value"><a href="tel:${huurder.telefoon}" style="color: var(--primary-color);">${huurder.telefoon}</a></div>
+                    <div class="detail-value"><a href="tel:${s(huurder.telefoon)}" style="color: var(--primary-color);">${s(huurder.telefoon)}</a></div>
                 </div>
             </div>
 
             ${huurder.notities ? `
             <div class="detail-section">
                 <div class="detail-section-title">📝 Notities</div>
-                <p style="color: var(--text-secondary); line-height: 1.6;">${huurder.notities}</p>
+                <p style="color: var(--text-secondary); line-height: 1.6;">${s(huurder.notities)}</p>
             </div>
             ` : ''}
 
@@ -262,6 +264,7 @@ function generateHuurderDetail(huurder) {
  * Generate Contract detail view
  */
 function generateContractDetail(contract) {
+    const s = sanitizeHTML;
     return `
         <div class="detail-panel-header">
             <h2>📄 Contract Details</h2>
@@ -272,7 +275,7 @@ function generateContractDetail(contract) {
                 <div class="detail-section-title">📋 Contract Informatie</div>
                 <div class="detail-row">
                     <div class="detail-label">Status</div>
-                    <div class="detail-value"><span class="status-badge ${contract.status}">${capitalizeFirst(contract.status)}</span></div>
+                    <div class="detail-value"><span class="status-badge ${s(contract.status)}">${capitalizeFirst(s(contract.status))}</span></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Startdatum</div>
@@ -297,7 +300,7 @@ function generateContractDetail(contract) {
             ${contract.opmerkingen ? `
             <div class="detail-section">
                 <div class="detail-section-title">📝 Opmerkingen</div>
-                <p style="color: var(--text-secondary); line-height: 1.6;">${contract.opmerkingen}</p>
+                <p style="color: var(--text-secondary); line-height: 1.6;">${s(contract.opmerkingen)}</p>
             </div>
             ` : ''}
         </div>
@@ -316,6 +319,7 @@ function generateContractDetail(contract) {
  * Generate Onderhoud detail view
  */
 function generateOnderhoudDetail(onderhoud) {
+    const s = sanitizeHTML;
     return `
         <div class="detail-panel-header">
             <h2>🔧 Onderhoud Details</h2>
@@ -326,16 +330,16 @@ function generateOnderhoudDetail(onderhoud) {
                 <div class="detail-section-title">🔧 Melding Informatie</div>
                 <div class="detail-row">
                     <div class="detail-label">Status</div>
-                    <div class="detail-value"><span class="status-badge ${onderhoud.status}">${capitalizeFirst(onderhoud.status)}</span></div>
+                    <div class="detail-value"><span class="status-badge ${s(onderhoud.status)}">${capitalizeFirst(s(onderhoud.status))}</span></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Prioriteit</div>
-                    <div class="detail-value"><span class="priority-badge ${onderhoud.prioriteit}">${capitalizeFirst(onderhoud.prioriteit)}</span></div>
+                    <div class="detail-value"><span class="priority-badge ${s(onderhoud.prioriteit)}">${capitalizeFirst(s(onderhoud.prioriteit))}</span></div>
                 </div>
                 ${onderhoud.categorie ? `
                 <div class="detail-row">
                     <div class="detail-label">Categorie</div>
-                    <div class="detail-value">${onderhoud.categorie}</div>
+                    <div class="detail-value">${s(onderhoud.categorie)}</div>
                 </div>
                 ` : ''}
                 ${onderhoud.datum ? `
@@ -348,7 +352,7 @@ function generateOnderhoudDetail(onderhoud) {
 
             <div class="detail-section">
                 <div class="detail-section-title">📝 Beschrijving</div>
-                <p style="color: var(--text-secondary); line-height: 1.6;">${onderhoud.beschrijving || 'Geen beschrijving'}</p>
+                <p style="color: var(--text-secondary); line-height: 1.6;">${s(onderhoud.beschrijving || 'Geen beschrijving')}</p>
             </div>
 
             ${onderhoud.kosten ? `
@@ -371,7 +375,7 @@ function generateOnderhoudDetail(onderhoud) {
                 📋 Bekijk Werkbon
             </button>
             `}
-            <button class="btn-primary" onclick="editOnderhoud('${onderhoud.id}'); closeDetailPanel();">
+            <button class="btn-primary" onclick="editMelding('${onderhoud.id}'); closeDetailPanel();">
                 ✏️ Bewerken
             </button>
             <button class="btn-secondary" onclick="closeDetailPanel()">
@@ -385,6 +389,7 @@ function generateOnderhoudDetail(onderhoud) {
  * Generate Transactie detail view
  */
 function generateTransactieDetail(transactie) {
+    const s = sanitizeHTML;
     return `
         <div class="detail-panel-header">
             <h2>💰 Transactie Details</h2>
@@ -395,7 +400,7 @@ function generateTransactieDetail(transactie) {
                 <div class="detail-section-title">💳 Transactie Informatie</div>
                 <div class="detail-row">
                     <div class="detail-label">Type</div>
-                    <div class="detail-value"><span class="status-badge ${transactie.type}">${capitalizeFirst(transactie.type)}</span></div>
+                    <div class="detail-value"><span class="status-badge ${s(transactie.type)}">${capitalizeFirst(s(transactie.type))}</span></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Bedrag</div>
@@ -412,7 +417,7 @@ function generateTransactieDetail(transactie) {
                 ${transactie.categorie ? `
                 <div class="detail-row">
                     <div class="detail-label">Categorie</div>
-                    <div class="detail-value">${transactie.categorie}</div>
+                    <div class="detail-value">${s(transactie.categorie)}</div>
                 </div>
                 ` : ''}
             </div>
@@ -420,7 +425,7 @@ function generateTransactieDetail(transactie) {
             ${transactie.beschrijving ? `
             <div class="detail-section">
                 <div class="detail-section-title">📝 Beschrijving</div>
-                <p style="color: var(--text-secondary); line-height: 1.6;">${transactie.beschrijving}</p>
+                <p style="color: var(--text-secondary); line-height: 1.6;">${s(transactie.beschrijving)}</p>
             </div>
             ` : ''}
         </div>
@@ -439,12 +444,13 @@ function generateTransactieDetail(transactie) {
  * Generate generic detail view
  */
 function generateGenericDetail(data) {
+    const s = sanitizeHTML;
     const rows = Object.entries(data)
         .filter(([key]) => key !== 'id')
         .map(([key, value]) => `
             <div class="detail-row">
-                <div class="detail-label">${capitalizeFirst(key)}</div>
-                <div class="detail-value">${value}</div>
+                <div class="detail-label">${capitalizeFirst(s(key))}</div>
+                <div class="detail-value">${s(String(value))}</div>
             </div>
         `).join('');
 

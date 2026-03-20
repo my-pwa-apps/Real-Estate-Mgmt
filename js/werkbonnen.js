@@ -47,14 +47,15 @@ function renderWerkbonnen() {
     tbody.innerHTML = filteredWerkbonnen.map(werkbon => {
         const priorityClass = werkbon.prioriteit || 'normaal';
         const statusClass = werkbon.status || 'aangemaakt';
+        const s = sanitizeHTML;
         
         return `
             <tr onclick="viewWerkbonDetail('${werkbon.id}')" style="cursor: pointer;">
-                <td><strong>${werkbon.werkbonNummer}</strong></td>
-                <td>${werkbon.pandAdres}</td>
-                <td>${werkbon.titel}</td>
-                <td><span class="priority-badge ${priorityClass}">${capitalizeFirst(werkbon.prioriteit || 'normaal')}</span></td>
-                <td><span class="status-badge ${statusClass}">${capitalizeFirst(werkbon.status || 'aangemaakt')}</span></td>
+                <td><strong>${s(werkbon.werkbonNummer)}</strong></td>
+                <td>${s(werkbon.pandAdres)}</td>
+                <td>${s(werkbon.titel)}</td>
+                <td><span class="priority-badge ${s(priorityClass)}">${capitalizeFirst(s(werkbon.prioriteit || 'normaal'))}</span></td>
+                <td><span class="status-badge ${s(statusClass)}">${capitalizeFirst(s(werkbon.status || 'aangemaakt'))}</span></td>
                 <td>${new Date(werkbon.aanmaakDatum).toLocaleDateString('nl-NL')}</td>
                 <td>€${parseFloat(werkbon.werkelijkeKosten || werkbon.geschatteKosten || 0).toLocaleString('nl-NL')}</td>
                 <td onclick="event.stopPropagation();">
@@ -72,10 +73,11 @@ function viewWerkbonDetail(werkbonId) {
     const werkbon = werkbonnen.find(w => w.id === werkbonId);
     if (!werkbon) return;
     
+    const s = sanitizeHTML;
     // Create detail panel with werkbon info
     const detailHTML = `
         <div class="detail-panel-header">
-            <h2>📋 Werkbon ${werkbon.werkbonNummer}</h2>
+            <h2>📋 Werkbon ${s(werkbon.werkbonNummer)}</h2>
             <button class="detail-panel-close" onclick="closeWerkbonDetail()">×</button>
         </div>
         <div class="detail-panel-body">
@@ -83,15 +85,15 @@ function viewWerkbonDetail(werkbonId) {
                 <div class="detail-section-title">📍 Locatie</div>
                 <div class="detail-row">
                     <div class="detail-label">Adres</div>
-                    <div class="detail-value"><strong>${werkbon.pandAdres}</strong></div>
+                    <div class="detail-value"><strong>${s(werkbon.pandAdres)}</strong></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Postcode</div>
-                    <div class="detail-value">${werkbon.pandPostcode}</div>
+                    <div class="detail-value">${s(werkbon.pandPostcode)}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Plaats</div>
-                    <div class="detail-value">${werkbon.pandPlaats}</div>
+                    <div class="detail-value">${s(werkbon.pandPlaats)}</div>
                 </div>
             </div>
 
@@ -100,18 +102,18 @@ function viewWerkbonDetail(werkbonId) {
                 <div class="detail-section-title">👤 Huurder</div>
                 <div class="detail-row">
                     <div class="detail-label">Naam</div>
-                    <div class="detail-value">${werkbon.huurderNaam}</div>
+                    <div class="detail-value">${s(werkbon.huurderNaam)}</div>
                 </div>
                 ${werkbon.huurderTelefoon ? `
                 <div class="detail-row">
                     <div class="detail-label">Telefoon</div>
-                    <div class="detail-value">${werkbon.huurderTelefoon}</div>
+                    <div class="detail-value">${s(werkbon.huurderTelefoon)}</div>
                 </div>
                 ` : ''}
                 ${werkbon.huurderEmail ? `
                 <div class="detail-row">
                     <div class="detail-label">Email</div>
-                    <div class="detail-value">${werkbon.huurderEmail}</div>
+                    <div class="detail-value">${s(werkbon.huurderEmail)}</div>
                 </div>
                 ` : ''}
             </div>
@@ -121,19 +123,19 @@ function viewWerkbonDetail(werkbonId) {
                 <div class="detail-section-title">🔧 Werkzaamheden</div>
                 <div class="detail-row">
                     <div class="detail-label">Titel</div>
-                    <div class="detail-value"><strong>${werkbon.titel}</strong></div>
+                    <div class="detail-value"><strong>${s(werkbon.titel)}</strong></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Prioriteit</div>
-                    <div class="detail-value"><span class="priority-badge ${werkbon.prioriteit}">${capitalizeFirst(werkbon.prioriteit)}</span></div>
+                    <div class="detail-value"><span class="priority-badge ${s(werkbon.prioriteit)}">${capitalizeFirst(s(werkbon.prioriteit))}</span></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Status</div>
-                    <div class="detail-value"><span class="status-badge ${werkbon.status}">${capitalizeFirst(werkbon.status)}</span></div>
+                    <div class="detail-value"><span class="status-badge ${s(werkbon.status)}">${capitalizeFirst(s(werkbon.status))}</span></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Beschrijving</div>
-                    <div class="detail-value">${werkbon.beschrijving}</div>
+                    <div class="detail-value">${s(werkbon.beschrijving)}</div>
                 </div>
             </div>
 
@@ -142,18 +144,18 @@ function viewWerkbonDetail(werkbonId) {
                 <div class="detail-section-title">🏢 Onderhoudsbedrijf</div>
                 <div class="detail-row">
                     <div class="detail-label">Bedrijf</div>
-                    <div class="detail-value">${werkbon.onderhoudsBedrijf}</div>
+                    <div class="detail-value">${s(werkbon.onderhoudsBedrijf)}</div>
                 </div>
                 ${werkbon.contactPersoon ? `
                 <div class="detail-row">
                     <div class="detail-label">Contact</div>
-                    <div class="detail-value">${werkbon.contactPersoon}</div>
+                    <div class="detail-value">${s(werkbon.contactPersoon)}</div>
                 </div>
                 ` : ''}
                 ${werkbon.contactTelefoon ? `
                 <div class="detail-row">
                     <div class="detail-label">Telefoon</div>
-                    <div class="detail-value">${werkbon.contactTelefoon}</div>
+                    <div class="detail-value">${s(werkbon.contactTelefoon)}</div>
                 </div>
                 ` : ''}
             </div>

@@ -2,6 +2,19 @@
 // Helper functions to work with Firebase Realtime Database
 // Automatically uses demo data when in demo mode
 
+// Enable Firebase offline persistence
+try {
+    if (typeof database !== 'undefined' && database && database.ref) {
+        database.ref('.info/connected').on('value', (snap) => {
+            if (snap.val() === true) {
+                console.log('Firebase: Connected');
+            } else {
+                console.log('Firebase: Offline - using cached data');
+            }
+        });
+    }
+} catch (e) { /* silently handle if Firebase not initialized */ }
+
 // Get all items from a path
 async function dbGetAll(path) {
     // Use demo database if in demo mode

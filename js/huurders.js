@@ -35,23 +35,26 @@ function renderHuurders() {
         return;
     }
 
-    container.innerHTML = filteredHuurders.map(huurder => `
+    container.innerHTML = filteredHuurders.map(huurder => {
+        const s = sanitizeHTML;
+        return `
         <div class="item-card" onclick="viewHuurderDetail('${huurder.id}')">
             <div class="item-card-header">
-                <h3>${huurder.voornaam} ${huurder.achternaam}</h3>
+                <h3>${s(huurder.voornaam)} ${s(huurder.achternaam)}</h3>
                 <div class="item-card-actions" onclick="event.stopPropagation();">
-                    <span class="action-icon" onclick="editHuurder('${huurder.id}')" title="Bewerken">✏️</span>
-                    <span class="action-icon" onclick="deleteHuurder('${huurder.id}')" title="Verwijderen">🗑️</span>
+                    ${!isViewerRole() ? `<span class="action-icon" onclick="editHuurder('${huurder.id}')" title="Bewerken">✏️</span>
+                    <span class="action-icon" onclick="deleteHuurder('${huurder.id}')" title="Verwijderen">🗑️</span>` : ''}
                 </div>
             </div>
             <div class="item-card-body">
-                <p>📧 ${huurder.email}</p>
-                <p>📞 ${huurder.telefoon}</p>
+                <p>📧 ${s(huurder.email)}</p>
+                <p>📞 ${s(huurder.telefoon)}</p>
                 ${huurder.geboortedatum ? `<p>🎂 ${new Date(huurder.geboortedatum).toLocaleDateString('nl-NL')}</p>` : ''}
-                ${huurder.notities ? `<p style="margin-top: 8px; font-style: italic; color: var(--text-muted);">${huurder.notities}</p>` : ''}
+                ${huurder.notities ? `<p style="margin-top: 8px; font-style: italic; color: var(--text-muted);">${s(huurder.notities)}</p>` : ''}
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // Open modal for new huurder
@@ -81,13 +84,25 @@ huurderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const huurderData = {
-        voornaam: document.getElementById('voornaam').value,
-        achternaam: document.getElementById('achternaam').value,
-        email: document.getElementById('email').value,
-        telefoon: document.getElementById('telefoon').value,
+        voornaam: document.getElementById('voornaam').value.trim(),
+        achternaam: document.getElementById('achternaam').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        telefoon: document.getElementById('telefoon').value.trim(),
         geboortedatum: document.getElementById('geboortedatum').value || null,
-        notities: document.getElementById('notities').value
+        notities: document.getElementById('notities').value.trim()
     };
+
+    // Validate email format
+    if (!isValidEmail(huurderData.email)) {
+        showToast('Voer een geldig emailadres in', 'error');
+        return;
+    }
+
+    // Validate phone number (Dutch format)
+    if (!isValidPhone(huurderData.telefoon)) {
+        showToast('Voer een geldig telefoonnummer in (bijv. 06-12345678 of +31612345678)', 'error');
+        return;
+    }
 
     const huurderId = document.getElementById('huurderId').value;
 
@@ -128,12 +143,20 @@ async function editHuurder(id) {
     modal.classList.add('show');
 }
 
-// Delete huurder
+// Delete huurder (with cascading delete protection)
 async function deleteHuurder(id) {
-    const confirmed = await showConfirm('Weet u zeker dat u deze huurder wilt verwijderen?', 'Huurder verwijderen');
-    if (!confirmed) return;
-
     try {
+        // Check for active contracts linked to this huurder
+        const contracten = await dbGetAll('contracten');
+        const activeContracts = contracten.filter(c => c.huurderId === id);
+        if (activeContracts.length > 0) {
+            showToast('Deze huurder kan niet worden verwijderd omdat er nog contracten aan gekoppeld zijn. Verwijder eerst de contracten.', 'error');
+            return;
+        }
+
+        const confirmed = await showConfirm('Weet u zeker dat u deze huurder wilt verwijderen?', 'Huurder verwijderen');
+        if (!confirmed) return;
+
         showLoading('Huurder verwijderen...');
         await dbDelete('huurders', id);
         showToast('Huurder succesvol verwijderd', 'success');
