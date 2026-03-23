@@ -379,7 +379,7 @@ function initCopilotAssistant() {
 
 	// Register service worker for PWA
 	if ("serviceWorker" in navigator) {
-		navigator.serviceWorker.register("/sw.js").catch(() => {});
+		navigator.serviceWorker.register("sw.js").catch(() => {});
 	}
 
 	// Add page context meta tags for Edge Copilot sidebar
