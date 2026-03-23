@@ -7,81 +7,81 @@
  * @returns {Promise<object>} Generated werkbon data
  */
 async function generateWerkbon(meldingId) {
-  try {
-    // Get melding details
-    const melding = await dbGet("onderhoud", meldingId);
-    if (!melding) {
-      throw new Error("Onderhoudsmelding niet gevonden");
-    }
+	try {
+		// Get melding details
+		const melding = await dbGet("onderhoud", meldingId);
+		if (!melding) {
+			throw new Error("Onderhoudsmelding niet gevonden");
+		}
 
-    // Get related data
-    const pand = await dbGet("panden", melding.pandId);
-    if (!pand) {
-      throw new Error("Pand niet gevonden");
-    }
+		// Get related data
+		const pand = await dbGet("panden", melding.pandId);
+		if (!pand) {
+			throw new Error("Pand niet gevonden");
+		}
 
-    // Get active contract and huurder
-    const contracten = await dbGetAll("contracten");
-    // Find most recent contract for this pand (check status if present, otherwise accept any)
-    const contract = contracten
-      .filter((c) => c.pandId === melding.pandId)
-      .sort((a, b) => new Date(b.startdatum) - new Date(a.startdatum))[0];
+		// Get active contract and huurder
+		const contracten = await dbGetAll("contracten");
+		// Find most recent contract for this pand (check status if present, otherwise accept any)
+		const contract = contracten
+			.filter((c) => c.pandId === melding.pandId)
+			.sort((a, b) => new Date(b.startdatum) - new Date(a.startdatum))[0];
 
-    let huurder = null;
-    if (contract) {
-      huurder = await dbGet("huurders", contract.huurderId);
-    }
+		let huurder = null;
+		if (contract) {
+			huurder = await dbGet("huurders", contract.huurderId);
+		}
 
-    // Generate werkbon number
-    const werkbonNummer = await generateWerkbonNummer();
+		// Generate werkbon number
+		const werkbonNummer = await generateWerkbonNummer();
 
-    // Create werkbon data
-    const werkbonData = {
-      werkbonNummer: werkbonNummer,
-      meldingId: meldingId,
-      pandId: melding.pandId,
-      huurderId: huurder?.id || null,
-      titel: melding.titel,
-      beschrijving: melding.beschrijving,
-      prioriteit: melding.prioriteit,
-      status: "aangemaakt",
-      aanmaakDatum: new Date().toISOString(),
-      geplanddatum: melding.geplanddatum || null,
-      geschatteKosten: melding.kosten || 0,
-      werkelijkeKosten: null,
-      onderhoudsBedrijf: null,
-      contactPersoon: null,
-      contactTelefoon: null,
-      notities: melding.notities || "",
-      uitgevoerdDoor: null,
-      uitgevoerdDatum: null,
-      goedgekeurd: false,
-      goedgekeurdDoor: null,
-      goedgekeurdDatum: null,
-      // Related info for reference
-      pandAdres: pand.adres,
-      pandPostcode: pand.postcode,
-      pandPlaats: pand.plaats,
-      huurderNaam: huurder ? `${huurder.voornaam} ${huurder.achternaam}` : null,
-      huurderEmail: huurder?.email || null,
-      huurderTelefoon: huurder?.telefoon || null,
-    };
+		// Create werkbon data
+		const werkbonData = {
+			werkbonNummer: werkbonNummer,
+			meldingId: meldingId,
+			pandId: melding.pandId,
+			huurderId: huurder?.id || null,
+			titel: melding.titel,
+			beschrijving: melding.beschrijving,
+			prioriteit: melding.prioriteit,
+			status: "aangemaakt",
+			aanmaakDatum: new Date().toISOString(),
+			geplanddatum: melding.geplanddatum || null,
+			geschatteKosten: melding.kosten || 0,
+			werkelijkeKosten: null,
+			onderhoudsBedrijf: null,
+			contactPersoon: null,
+			contactTelefoon: null,
+			notities: melding.notities || "",
+			uitgevoerdDoor: null,
+			uitgevoerdDatum: null,
+			goedgekeurd: false,
+			goedgekeurdDoor: null,
+			goedgekeurdDatum: null,
+			// Related info for reference
+			pandAdres: pand.adres,
+			pandPostcode: pand.postcode,
+			pandPlaats: pand.plaats,
+			huurderNaam: huurder ? `${huurder.voornaam} ${huurder.achternaam}` : null,
+			huurderEmail: huurder?.email || null,
+			huurderTelefoon: huurder?.telefoon || null,
+		};
 
-    // Save werkbon to Firebase
-    const werkbonId = await dbAdd("werkbonnen", werkbonData);
-    werkbonData.id = werkbonId;
+		// Save werkbon to Firebase
+		const werkbonId = await dbAdd("werkbonnen", werkbonData);
+		werkbonData.id = werkbonId;
 
-    // Update melding with werkbon reference
-    await dbUpdate("onderhoud", meldingId, {
-      werkbonId: werkbonId,
-      status: "gepland",
-    });
+		// Update melding with werkbon reference
+		await dbUpdate("onderhoud", meldingId, {
+			werkbonId: werkbonId,
+			status: "gepland",
+		});
 
-    return werkbonData;
-  } catch (error) {
-    console.error("Error generating werkbon:", error);
-    throw error;
-  }
+		return werkbonData;
+	} catch (error) {
+		console.error("Error generating werkbon:", error);
+		throw error;
+	}
 }
 
 /**
@@ -89,21 +89,21 @@ async function generateWerkbon(meldingId) {
  * Format: WB-YYYY-NNNN
  */
 async function generateWerkbonNummer() {
-  const year = new Date().getFullYear();
-  const prefix = `WB-${year}-`;
+	const year = new Date().getFullYear();
+	const prefix = `WB-${year}-`;
 
-  try {
-    const werkbonnen = await dbGetAll("werkbonnen");
-    const thisYearWerkbonnen = werkbonnen.filter(
-      (w) => w.werkbonNummer && w.werkbonNummer.startsWith(prefix),
-    );
+	try {
+		const werkbonnen = await dbGetAll("werkbonnen");
+		const thisYearWerkbonnen = werkbonnen.filter(
+			(w) => w.werkbonNummer && w.werkbonNummer.startsWith(prefix),
+		);
 
-    const nextNumber = thisYearWerkbonnen.length + 1;
-    return `${prefix}${String(nextNumber).padStart(4, "0")}`;
-  } catch (error) {
-    console.error("Error generating werkbon nummer:", error);
-    return `${prefix}0001`;
-  }
+		const nextNumber = thisYearWerkbonnen.length + 1;
+		return `${prefix}${String(nextNumber).padStart(4, "0")}`;
+	} catch (error) {
+		console.error("Error generating werkbon nummer:", error);
+		return `${prefix}0001`;
+	}
 }
 
 /**
@@ -112,16 +112,16 @@ async function generateWerkbonNummer() {
  * @returns {string} HTML content
  */
 function generateWerkbonHTML(werkbon) {
-  const s =
-    typeof sanitizeHTML === "function"
-      ? sanitizeHTML
-      : (v) =>
-          String(v ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-  return `
+	const s =
+		typeof sanitizeHTML === "function"
+			? sanitizeHTML
+			: (v) =>
+					String(v ?? "")
+						.replace(/&/g, "&amp;")
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;")
+						.replace(/"/g, "&quot;");
+	return `
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -244,12 +244,12 @@ function generateWerkbonHTML(werkbon) {
             <div class="werkbon-nummer">WERKBON</div>
             <div class="werkbon-nummer">${werkbon.werkbonNummer}</div>
             <div class="datum">${new Date(
-              werkbon.aanmaakDatum,
-            ).toLocaleDateString("nl-NL", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}</div>
+							werkbon.aanmaakDatum,
+						).toLocaleDateString("nl-NL", {
+							day: "numeric",
+							month: "long",
+							year: "numeric",
+						})}</div>
         </div>
     </div>
 
@@ -266,34 +266,34 @@ function generateWerkbonHTML(werkbon) {
     </div>
 
     ${
-      werkbon.huurderNaam
-        ? `
+			werkbon.huurderNaam
+				? `
     <div class="section">
         <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Huurder</div>
         <div class="info-grid">
             <div class="info-label">Naam:</div>
             <div class="info-value">${s(werkbon.huurderNaam)}</div>
             ${
-              werkbon.huurderTelefoon
-                ? `
+							werkbon.huurderTelefoon
+								? `
             <div class="info-label">Telefoon:</div>
             <div class="info-value">${s(werkbon.huurderTelefoon)}</div>
             `
-                : ""
-            }
+								: ""
+						}
             ${
-              werkbon.huurderEmail
-                ? `
+							werkbon.huurderEmail
+								? `
             <div class="info-label">Email:</div>
             <div class="info-value">${s(werkbon.huurderEmail)}</div>
             `
-                : ""
-            }
+								: ""
+						}
         </div>
     </div>
     `
-        : ""
-    }
+				: ""
+		}
 
     <div class="section">
         <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg> Werkzaamheden</div>
@@ -307,67 +307,67 @@ function generateWerkbonHTML(werkbon) {
                 </span>
             </div>
             ${
-              werkbon.geplanddatum
-                ? `
+							werkbon.geplanddatum
+								? `
             <div class="info-label">Geplande datum:</div>
             <div class="info-value">${new Date(werkbon.geplanddatum).toLocaleDateString("nl-NL")}</div>
             `
-                : ""
-            }
+								: ""
+						}
             ${
-              werkbon.geschatteKosten
-                ? `
+							werkbon.geschatteKosten
+								? `
             <div class="info-label">Geschatte kosten:</div>
-            <div class="info-value"><strong>€${parseFloat(werkbon.geschatteKosten).toLocaleString("nl-NL", { minimumFractionDigits: 2 })}</strong></div>
+            <div class="info-value"><strong>€${Number.parseFloat(werkbon.geschatteKosten).toLocaleString("nl-NL", { minimumFractionDigits: 2 })}</strong></div>
             `
-                : ""
-            }
+								: ""
+						}
         </div>
         <div class="description-box">
             <strong>Beschrijving:</strong><br>
             ${s(werkbon.beschrijving)}
         </div>
         ${
-          werkbon.notities
-            ? `
+					werkbon.notities
+						? `
         <div class="description-box">
             <strong>Notities:</strong><br>
             ${s(werkbon.notities)}
         </div>
         `
-            : ""
-        }
+						: ""
+				}
     </div>
 
     ${
-      werkbon.onderhoudsBedrijf
-        ? `
+			werkbon.onderhoudsBedrijf
+				? `
     <div class="section">
         <div class="section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M12 6h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M16 6h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path><path d="M8 6h.01"></path><path d="M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><rect x="4" y="2" width="16" height="20" rx="2"></rect></svg> Onderhoudsbedrijf</div>
         <div class="info-grid">
             <div class="info-label">Bedrijf:</div>
             <div class="info-value">${s(werkbon.onderhoudsBedrijf)}</div>
             ${
-              werkbon.contactPersoon
-                ? `
+							werkbon.contactPersoon
+								? `
             <div class="info-label">Contactpersoon:</div>
             <div class="info-value">${s(werkbon.contactPersoon)}</div>
             `
-                : ""
-            }
+								: ""
+						}
             ${
-              werkbon.contactTelefoon
-                ? `
+							werkbon.contactTelefoon
+								? `
             <div class="info-label">Telefoon:</div>
             <div class="info-value">${s(werkbon.contactTelefoon)}</div>
             `
-                : ""
-            }
+								: ""
+						}
         </div>
     </div>
     `
-        : ""
-    }
+				: ""
+		}
 
     <div class="signature-section">
         <div class="signature-box">
@@ -397,106 +397,106 @@ function generateWerkbonHTML(werkbon) {
  * @param {object} options - Send options
  */
 async function sendWerkbon(werkbonId, options = {}) {
-  try {
-    // Check if Microsoft signed in
-    if (!isMicrosoftSignedIn()) {
-      const signIn = await showConfirm(
-        "U moet eerst inloggen met Microsoft 365 om werkbonnen te versturen. Nu inloggen?",
-        "Microsoft 365 vereist",
-      );
-      if (signIn) {
-        await signInToMicrosoft();
-      }
-      return;
-    }
+	try {
+		// Check if Microsoft signed in
+		if (!isMicrosoftSignedIn()) {
+			const signIn = await showConfirm(
+				"U moet eerst inloggen met Microsoft 365 om werkbonnen te versturen. Nu inloggen?",
+				"Microsoft 365 vereist",
+			);
+			if (signIn) {
+				await signInToMicrosoft();
+			}
+			return;
+		}
 
-    // Get werkbon
-    const werkbon = await dbGet("werkbonnen", werkbonId);
-    if (!werkbon) {
-      throw new Error("Werkbon niet gevonden");
-    }
+		// Get werkbon
+		const werkbon = await dbGet("werkbonnen", werkbonId);
+		if (!werkbon) {
+			throw new Error("Werkbon niet gevonden");
+		}
 
-    // Generate HTML content
-    const htmlContent = generateWerkbonHTML(werkbon);
+		// Generate HTML content
+		const htmlContent = generateWerkbonHTML(werkbon);
 
-    // Prepare recipients
-    const recipients = [];
+		// Prepare recipients
+		const recipients = [];
 
-    if (options.sendToHuurder && werkbon.huurderEmail) {
-      recipients.push({
-        email: werkbon.huurderEmail,
-        name: werkbon.huurderNaam,
-        type: "huurder",
-      });
-    }
+		if (options.sendToHuurder && werkbon.huurderEmail) {
+			recipients.push({
+				email: werkbon.huurderEmail,
+				name: werkbon.huurderNaam,
+				type: "huurder",
+			});
+		}
 
-    if (options.sendToOnderhoudsBedrijf && options.onderhoudsBedrijfEmail) {
-      recipients.push({
-        email: options.onderhoudsBedrijfEmail,
-        name: werkbon.onderhoudsBedrijf || "Onderhoudsbedrijf",
-        type: "onderhoudsbedrijf",
-      });
-    }
+		if (options.sendToOnderhoudsBedrijf && options.onderhoudsBedrijfEmail) {
+			recipients.push({
+				email: options.onderhoudsBedrijfEmail,
+				name: werkbon.onderhoudsBedrijf || "Onderhoudsbedrijf",
+				type: "onderhoudsbedrijf",
+			});
+		}
 
-    if (recipients.length === 0) {
-      throw new Error("Geen ontvangers geselecteerd");
-    }
+		if (recipients.length === 0) {
+			throw new Error("Geen ontvangers geselecteerd");
+		}
 
-    // Send emails
-    const sendPromises = recipients.map(async (recipient) => {
-      const emailData = {
-        to: [recipient.email],
-        subject: `Werkbon ${werkbon.werkbonNummer} - ${werkbon.titel}`,
-        body:
-          recipient.type === "huurder"
-            ? `Beste ${recipient.name},\n\nBijgaand ontvangt u de werkbon voor de onderhouds­werkzaamheden op het adres ${werkbon.pandAdres}.\n\nDe werkzaamheden zijn gepland voor ${werkbon.geplanddatum ? new Date(werkbon.geplanddatum).toLocaleDateString("nl-NL") : "nog niet gepland"}.\n\nMet vriendelijke groet,\nStadsgezicht Ontwikkelingen`
-            : `Geachte ${recipient.name},\n\nBijgaand ontvangt u de werkbon voor uit te voeren onderhouds­werkzaamheden.\n\nLocatie: ${werkbon.pandAdres}, ${werkbon.pandPostcode} ${werkbon.pandPlaats}\nWerkzaamheden: ${werkbon.titel}\n\nGraag vernemen wij uw bevestiging.\n\nMet vriendelijke groet,\nStadsgezicht Ontwikkelingen`,
-        contentType: "Text",
-        attachments: [
-          {
-            name: `Werkbon_${werkbon.werkbonNummer}.html`,
-            contentBytes: btoa(unescape(encodeURIComponent(htmlContent))),
-            contentType: "text/html",
-          },
-        ],
-        saveToSent: true,
-      };
+		// Send emails
+		const sendPromises = recipients.map(async (recipient) => {
+			const emailData = {
+				to: [recipient.email],
+				subject: `Werkbon ${werkbon.werkbonNummer} - ${werkbon.titel}`,
+				body:
+					recipient.type === "huurder"
+						? `Beste ${recipient.name},\n\nBijgaand ontvangt u de werkbon voor de onderhouds­werkzaamheden op het adres ${werkbon.pandAdres}.\n\nDe werkzaamheden zijn gepland voor ${werkbon.geplanddatum ? new Date(werkbon.geplanddatum).toLocaleDateString("nl-NL") : "nog niet gepland"}.\n\nMet vriendelijke groet,\nStadsgezicht Ontwikkelingen`
+						: `Geachte ${recipient.name},\n\nBijgaand ontvangt u de werkbon voor uit te voeren onderhouds­werkzaamheden.\n\nLocatie: ${werkbon.pandAdres}, ${werkbon.pandPostcode} ${werkbon.pandPlaats}\nWerkzaamheden: ${werkbon.titel}\n\nGraag vernemen wij uw bevestiging.\n\nMet vriendelijke groet,\nStadsgezicht Ontwikkelingen`,
+				contentType: "Text",
+				attachments: [
+					{
+						name: `Werkbon_${werkbon.werkbonNummer}.html`,
+						contentBytes: btoa(unescape(encodeURIComponent(htmlContent))),
+						contentType: "text/html",
+					},
+				],
+				saveToSent: true,
+			};
 
-      await sendEmail(emailData);
-      return recipient;
-    });
+			await sendEmail(emailData);
+			return recipient;
+		});
 
-    await Promise.all(sendPromises);
+		await Promise.all(sendPromises);
 
-    // Save to SharePoint
-    if (options.saveToSharePoint !== false) {
-      const folderPath = `Werkbonnen/${new Date().getFullYear()}/${werkbon.pandAdres.replace(/[^a-z0-9]/gi, "_")}`;
-      await saveFileToSharePoint(
-        `Werkbon_${werkbon.werkbonNummer}.html`,
-        htmlContent,
-        folderPath,
-        "text/html",
-      );
-    }
+		// Save to SharePoint
+		if (options.saveToSharePoint !== false) {
+			const folderPath = `Werkbonnen/${new Date().getFullYear()}/${werkbon.pandAdres.replace(/[^a-z0-9]/gi, "_")}`;
+			await saveFileToSharePoint(
+				`Werkbon_${werkbon.werkbonNummer}.html`,
+				htmlContent,
+				folderPath,
+				"text/html",
+			);
+		}
 
-    // Update werkbon status
-    await dbUpdate("werkbonnen", werkbonId, {
-      verstuurdDatum: new Date().toISOString(),
-      verstuurdNaar: recipients.map((r) => r.email),
-      status: "verstuurd",
-    });
+		// Update werkbon status
+		await dbUpdate("werkbonnen", werkbonId, {
+			verstuurdDatum: new Date().toISOString(),
+			verstuurdNaar: recipients.map((r) => r.email),
+			status: "verstuurd",
+		});
 
-    showToast(
-      `Werkbon verstuurd naar ${recipients.length} ontvanger(s)`,
-      "success",
-    );
+		showToast(
+			`Werkbon verstuurd naar ${recipients.length} ontvanger(s)`,
+			"success",
+		);
 
-    return { success: true, recipients };
-  } catch (error) {
-    console.error("Error sending werkbon:", error);
-    showToast("Fout bij versturen werkbon: " + error.message, "error");
-    throw error;
-  }
+		return { success: true, recipients };
+	} catch (error) {
+		console.error("Error sending werkbon:", error);
+		showToast("Fout bij versturen werkbon: " + error.message, "error");
+		throw error;
+	}
 }
 
 /**
@@ -504,31 +504,31 @@ async function sendWerkbon(werkbonId, options = {}) {
  * @param {string} werkbonId - Werkbon ID
  */
 async function downloadWerkbon(werkbonId) {
-  try {
-    const werkbon = await dbGet("werkbonnen", werkbonId);
-    if (!werkbon) {
-      throw new Error("Werkbon niet gevonden");
-    }
+	try {
+		const werkbon = await dbGet("werkbonnen", werkbonId);
+		if (!werkbon) {
+			throw new Error("Werkbon niet gevonden");
+		}
 
-    const htmlContent = generateWerkbonHTML(werkbon);
+		const htmlContent = generateWerkbonHTML(werkbon);
 
-    // Create blob and download
-    const blob = new Blob([htmlContent], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Werkbon_${werkbon.werkbonNummer}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+		// Create blob and download
+		const blob = new Blob([htmlContent], { type: "text/html" });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = `Werkbon_${werkbon.werkbonNummer}.html`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
 
-    showToast("Werkbon gedownload", "success");
-  } catch (error) {
-    console.error("Error downloading werkbon:", error);
-    showToast("Fout bij downloaden werkbon", "error");
-    throw error;
-  }
+		showToast("Werkbon gedownload", "success");
+	} catch (error) {
+		console.error("Error downloading werkbon:", error);
+		showToast("Fout bij downloaden werkbon", "error");
+		throw error;
+	}
 }
 
 /**
@@ -536,29 +536,29 @@ async function downloadWerkbon(werkbonId) {
  * @param {string} werkbonId - Werkbon ID
  */
 async function printWerkbon(werkbonId) {
-  try {
-    const werkbon = await dbGet("werkbonnen", werkbonId);
-    if (!werkbon) {
-      throw new Error("Werkbon niet gevonden");
-    }
+	try {
+		const werkbon = await dbGet("werkbonnen", werkbonId);
+		if (!werkbon) {
+			throw new Error("Werkbon niet gevonden");
+		}
 
-    const htmlContent = generateWerkbonHTML(werkbon);
+		const htmlContent = generateWerkbonHTML(werkbon);
 
-    // Open in new window and print using safe DOM insertion
-    const printWindow = window.open("about:blank", "_blank");
-    const doc = printWindow.document;
-    doc.open();
-    doc.write(htmlContent); // Content is pre-sanitized in generateWerkbonHTML
-    doc.close();
+		// Open in new window and print using safe DOM insertion
+		const printWindow = window.open("about:blank", "_blank");
+		const doc = printWindow.document;
+		doc.open();
+		doc.write(htmlContent); // Content is pre-sanitized in generateWerkbonHTML
+		doc.close();
 
-    printWindow.onload = function () {
-      printWindow.print();
-    };
-  } catch (error) {
-    console.error("Error printing werkbon:", error);
-    showToast("Fout bij printen werkbon", "error");
-    throw error;
-  }
+		printWindow.onload = () => {
+			printWindow.print();
+		};
+	} catch (error) {
+		console.error("Error printing werkbon:", error);
+		showToast("Fout bij printen werkbon", "error");
+		throw error;
+	}
 }
 
 // Make functions globally available

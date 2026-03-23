@@ -196,6 +196,20 @@ python -m http.server 8000
 
 Navigate to `http://localhost:8000/#demo` for instant demo mode.
 
+## Unit Tests
+
+```powershell
+npm install    # Install dev dependencies (vitest, biome, jsdom)
+npm test       # Run all tests
+npm run test:watch  # Run tests in watch mode
+```
+
+Tests are in `tests/` directory:
+- `sanitize.test.js`: XSS prevention (sanitizeHTML, sanitizeAttr)
+- `utilities.test.js`: Formatting, validation (currency, dates, email, phone)
+- `business-logic.test.js`: Contract status, occupancy calculation
+- `email-template.test.js`: Template replacement, prototype pollution protection
+
 ## Key Gotchas
 
 1. **Demo mode check everywhere**: Every `dbGet`, `dbGetAll`, `dbAdd`, `dbUpdate`, `dbDelete` must route through demo helpers

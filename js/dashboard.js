@@ -7,104 +7,107 @@ let meldingen = [];
 
 // Load dashboard data
 async function loadDashboardData() {
-  try {
-    showLoading("Dashboard laden...");
+	try {
+		showLoading("Dashboard laden...");
 
-    // Load all data from Realtime Database
-    const [pandenData, huurdersData, contractenData, meldingenData] =
-      await Promise.all([
-        dbGetAll("panden"),
-        dbGetAll("huurders"),
-        dbGetAll("contracten"),
-        dbGetAll("onderhoud"),
-      ]);
+		// Load all data from Realtime Database
+		const [pandenData, huurdersData, contractenData, meldingenData] =
+			await Promise.all([
+				dbGetAll("panden"),
+				dbGetAll("huurders"),
+				dbGetAll("contracten"),
+				dbGetAll("onderhoud"),
+			]);
 
-    panden = pandenData;
-    huurders = huurdersData;
-    contracten = contractenData;
-    meldingen = meldingenData;
+		panden = pandenData;
+		huurders = huurdersData;
+		contracten = contractenData;
+		meldingen = meldingenData;
 
-    updateStatistics();
-    loadRecentMeldingen();
-    loadVerlopendeContracten();
+		updateStatistics();
+		loadRecentMeldingen();
+		loadVerlopendeContracten();
 
-    hideLoading();
-  } catch (error) {
-    console.error("Error loading dashboard data:", error);
-    hideLoading();
-    showToast("Fout bij laden dashboard gegevens", "error");
-  }
+		hideLoading();
+	} catch (error) {
+		console.error("Error loading dashboard data:", error);
+		hideLoading();
+		showToast("Fout bij laden dashboard gegevens", "error");
+	}
 }
 
 // Update statistics cards
 function updateStatistics() {
-  // Total panden
-  const totalPanden = panden.length;
-  const bedrijfspanden = panden.filter((p) => p.type === "bedrijfspand").length;
-  const woningen = panden.filter((p) => p.type === "woning").length;
+	// Total panden
+	const totalPanden = panden.length;
+	const bedrijfspanden = panden.filter((p) => p.type === "bedrijfspand").length;
+	const woningen = panden.filter((p) => p.type === "woning").length;
 
-  document.getElementById("totalPanden").textContent = totalPanden;
-  document.getElementById("pandenBreakdown").textContent =
-    `${bedrijfspanden} bedrijfspanden, ${woningen} woningen`;
+	document.getElementById("totalPanden").textContent = totalPanden;
+	document.getElementById("pandenBreakdown").textContent =
+		`${bedrijfspanden} bedrijfspanden, ${woningen} woningen`;
 
-  // Total huurders
-  const activeContracts = contracten.filter((c) => {
-    const eindDatum = new Date(c.einddatum);
-    return eindDatum > new Date();
-  }).length;
+	// Total huurders
+	const activeContracts = contracten.filter(
+		(contract) => getContractStatus(contract) === "actief",
+	);
 
-  document.getElementById("totalHuurders").textContent = activeContracts;
+	document.getElementById("totalHuurders").textContent = activeContracts.length;
 
-  const bezetting =
-    panden.length > 0 ? Math.round((activeContracts / panden.length) * 100) : 0;
-  document.getElementById("bezettingsgraad").textContent =
-    `${bezetting}% bezetting`;
+	const uniquePandIds =
+		typeof countOccupiedPanden === "function"
+			? countOccupiedPanden(contracten)
+			: new Set(activeContracts.map((contract) => contract.pandId)).size;
+	const bezetting =
+		panden.length > 0 ? Math.round((uniquePandIds / panden.length) * 100) : 0;
+	document.getElementById("bezettingsgraad").textContent =
+		`${bezetting}% bezetting`;
 
-  // Open meldingen
-  const openMeldingen = meldingen.filter((m) => m.status !== "afgerond").length;
-  const urgentMeldingen = meldingen.filter(
-    (m) => m.prioriteit === "urgent" && m.status !== "afgerond",
-  ).length;
+	// Open meldingen
+	const openMeldingen = meldingen.filter((m) => m.status !== "afgerond").length;
+	const urgentMeldingen = meldingen.filter(
+		(m) => m.prioriteit === "urgent" && m.status !== "afgerond",
+	).length;
 
-  document.getElementById("openMeldingen").textContent = openMeldingen;
-  document.getElementById("urgentMeldingen").textContent =
-    `${urgentMeldingen} urgent`;
+	document.getElementById("openMeldingen").textContent = openMeldingen;
+	document.getElementById("urgentMeldingen").textContent =
+		`${urgentMeldingen} urgent`;
 
-  // Maandelijkse inkomsten
-  const maandInkomsten = contracten
-    .filter((c) => {
-      const eindDatum = new Date(c.einddatum);
-      return eindDatum > new Date();
-    })
-    .reduce((sum, c) => sum + (parseFloat(c.huurprijs) || 0), 0);
+	// Maandelijkse inkomsten
+	const maandInkomsten = contracten
+		.filter((c) => {
+			const eindDatum = new Date(c.einddatum);
+			return eindDatum > new Date();
+		})
+		.reduce((sum, c) => sum + (Number.parseFloat(c.huurprijs) || 0), 0);
 
-  document.getElementById("maandInkomsten").textContent =
-    `€${maandInkomsten.toLocaleString("nl-NL")}`;
-  document.getElementById("jaarInkomsten").textContent =
-    `€${(maandInkomsten * 12).toLocaleString("nl-NL")} per jaar`;
+	document.getElementById("maandInkomsten").textContent =
+		`€${maandInkomsten.toLocaleString("nl-NL")}`;
+	document.getElementById("jaarInkomsten").textContent =
+		`€${(maandInkomsten * 12).toLocaleString("nl-NL")} per jaar`;
 }
 
 // Load recent meldingen
 function loadRecentMeldingen() {
-  const container = document.getElementById("recenteMeldingen");
+	const container = document.getElementById("recenteMeldingen");
 
-  const recentMeldingen = meldingen
-    .filter((m) => m.status !== "afgerond")
-    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
-    .slice(0, 5);
+	const recentMeldingen = meldingen
+		.filter((m) => m.status !== "afgerond")
+		.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+		.slice(0, 5);
 
-  if (recentMeldingen.length === 0) {
-    container.innerHTML = '<p class="empty-state">Geen recente meldingen</p>';
-    return;
-  }
+	if (recentMeldingen.length === 0) {
+		container.innerHTML = '<p class="empty-state">Geen recente meldingen</p>';
+		return;
+	}
 
-  container.innerHTML = recentMeldingen
-    .map((m) => {
-      const pand = panden.find((p) => p.id === m.pandId);
-      const priorityClass = m.prioriteit || "normaal";
-      const s = sanitizeHTML;
+	container.innerHTML = recentMeldingen
+		.map((m) => {
+			const pand = panden.find((p) => p.id === m.pandId);
+			const priorityClass = m.prioriteit || "normaal";
+			const s = sanitizeHTML;
 
-      return `
+			return `
             <div class="list-item" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
                 <div style="display: flex; justify-content: space-between; align-items: start;">
                     <div>
@@ -117,39 +120,39 @@ function loadRecentMeldingen() {
                 </div>
             </div>
         `;
-    })
-    .join("");
+		})
+		.join("");
 }
 
 // Load verlopende contracten (binnen 3 maanden)
 function loadVerlopendeContracten() {
-  const container = document.getElementById("verlpendeContracten");
+	const container = document.getElementById("verlpendeContracten");
 
-  const threeMonthsFromNow = new Date();
-  threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+	const threeMonthsFromNow = new Date();
+	threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
 
-  const verlopend = contracten
-    .filter((c) => {
-      const eindDatum = new Date(c.einddatum);
-      const now = new Date();
-      return eindDatum > now && eindDatum <= threeMonthsFromNow;
-    })
-    .sort((a, b) => new Date(a.einddatum) - new Date(b.einddatum));
+	const verlopend = contracten
+		.filter((c) => {
+			const eindDatum = new Date(c.einddatum);
+			const now = new Date();
+			return eindDatum > now && eindDatum <= threeMonthsFromNow;
+		})
+		.sort((a, b) => new Date(a.einddatum) - new Date(b.einddatum));
 
-  if (verlopend.length === 0) {
-    container.innerHTML =
-      '<p class="empty-state">Geen verlopende contracten in de komende 3 maanden</p>';
-    return;
-  }
+	if (verlopend.length === 0) {
+		container.innerHTML =
+			'<p class="empty-state">Geen verlopende contracten in de komende 3 maanden</p>';
+		return;
+	}
 
-  container.innerHTML = verlopend
-    .map((c) => {
-      const huurder = huurders.find((h) => h.id === c.huurderId);
-      const pand = panden.find((p) => p.id === c.pandId);
-      const eindDatum = new Date(c.einddatum).toLocaleDateString("nl-NL");
-      const s = sanitizeHTML;
+	container.innerHTML = verlopend
+		.map((c) => {
+			const huurder = huurders.find((h) => h.id === c.huurderId);
+			const pand = panden.find((p) => p.id === c.pandId);
+			const eindDatum = new Date(c.einddatum).toLocaleDateString("nl-NL");
+			const s = sanitizeHTML;
 
-      return `
+			return `
             <div class="list-item" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
                 <div>
                     <strong style="color: var(--text-primary);">
@@ -162,72 +165,72 @@ function loadVerlopendeContracten() {
                 </div>
             </div>
         `;
-    })
-    .join("");
+		})
+		.join("");
 }
 
 // Initialize dashboard
 document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    // Check Entra ID authentication (or demo mode)
-    const user = await checkEntraAuth();
+	try {
+		// Check Entra ID authentication (or demo mode)
+		const user = await checkEntraAuth();
 
-    if (!user && !isDemoMode()) {
-      window.location.href = "index.html";
-      return;
-    }
+		if (!user && !isDemoMode()) {
+			window.location.href = "index.html";
+			return;
+		}
 
-    await loadDashboardData();
+		await loadDashboardData();
 
-    // Set user name if available
-    if (user) {
-      document.getElementById("userName").textContent =
-        user.name || user.email.split("@")[0];
-    } else if (isDemoMode()) {
-      document.getElementById("userName").textContent = "Demo Gebruiker";
-    }
+		// Set user name if available
+		if (user) {
+			document.getElementById("userName").textContent =
+				user.name || user.email.split("@")[0];
+		} else if (isDemoMode()) {
+			document.getElementById("userName").textContent = "Demo Gebruiker";
+		}
 
-    // Setup Microsoft 365 sign-in button
-    const microsoftBtn = document.getElementById("microsoftSignInBtn");
-    if (microsoftBtn) {
-      // Don't show M365 button in demo mode
-      if (isDemoMode()) {
-        microsoftBtn.style.display = "none";
-      } else if (typeof initializeMSAL !== "undefined") {
-        initializeMSAL();
+		// Setup Microsoft 365 sign-in button
+		const microsoftBtn = document.getElementById("microsoftSignInBtn");
+		if (microsoftBtn) {
+			// Don't show M365 button in demo mode
+			if (isDemoMode()) {
+				microsoftBtn.style.display = "none";
+			} else if (typeof initializeMSAL !== "undefined") {
+				initializeMSAL();
 
-        // Show button if not signed in
-        if (!isMicrosoftSignedIn()) {
-          microsoftBtn.style.display = "block";
-          microsoftBtn.textContent =
-            '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Microsoft 365 Inloggen';
-        } else {
-          microsoftBtn.style.display = "block";
-          microsoftBtn.textContent =
-            '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Microsoft 365';
-          microsoftBtn.disabled = true;
-        }
+				// Show button if not signed in
+				if (!isMicrosoftSignedIn()) {
+					microsoftBtn.style.display = "block";
+					microsoftBtn.textContent =
+						'<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Microsoft 365 Inloggen';
+				} else {
+					microsoftBtn.style.display = "block";
+					microsoftBtn.textContent =
+						'<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Microsoft 365';
+					microsoftBtn.disabled = true;
+				}
 
-        microsoftBtn.addEventListener("click", async () => {
-          try {
-            await signInToMicrosoft();
-            microsoftBtn.textContent =
-              '<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Microsoft 365';
-            microsoftBtn.disabled = true;
-            showToast(
-              "Succesvol ingelogd bij Microsoft 365! U kunt nu emails versturen en documenten opslaan.",
-              "success",
-              5000,
-            );
-          } catch (error) {
-            console.error("Microsoft sign-in error:", error);
-            showToast("Fout bij inloggen: " + error.message, "error");
-          }
-        });
-      }
-    }
-    // Demo indicator is handled globally by app-init.js
-  } catch (error) {
-    console.error("Dashboard initialization error:", error);
-  }
+				microsoftBtn.addEventListener("click", async () => {
+					try {
+						await signInToMicrosoft();
+						microsoftBtn.textContent =
+							'<svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg> Microsoft 365';
+						microsoftBtn.disabled = true;
+						showToast(
+							"Succesvol ingelogd bij Microsoft 365! U kunt nu emails versturen en documenten opslaan.",
+							"success",
+							5000,
+						);
+					} catch (error) {
+						console.error("Microsoft sign-in error:", error);
+						showToast(`Fout bij inloggen: ${error.message}`, "error");
+					}
+				});
+			}
+		}
+		// Demo indicator is handled globally by app-init.js
+	} catch (error) {
+		console.error("Dashboard initialization error:", error);
+	}
 });
