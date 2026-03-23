@@ -55,7 +55,12 @@ function initializeEntraAuth() {
 		msalAuthInstance = new msal.PublicClientApplication(getMsalAuthConfig());
 		return msalAuthInstance;
 	} catch (error) {
-		console.error("Error initializing Entra ID auth:", error);
+		// "Not configured" is expected in demo mode – not a real error
+		if (error.message?.includes("nog niet geconfigureerd")) {
+			console.info("Entra ID auth not configured yet:", error.message);
+		} else {
+			console.error("Error initializing Entra ID auth:", error);
+		}
 		throw error;
 	}
 }
@@ -112,7 +117,10 @@ async function checkEntraAuth() {
 			throw silentError;
 		}
 	} catch (error) {
-		console.error("Error checking Entra auth:", error);
+		// Only log as error if it's not the expected "not configured" state
+		if (!error.message?.includes("nog niet geconfigureerd")) {
+			console.error("Error checking Entra auth:", error);
+		}
 
 		// Don't redirect if in demo mode
 		if (!isDemoMode()) {

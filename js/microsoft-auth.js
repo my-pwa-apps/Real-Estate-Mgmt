@@ -170,9 +170,14 @@ async function callMicrosoftGraph(endpoint, method = "GET", body = null) {
 	}
 }
 
-// Initialize on load
+// Initialize on load – silently skip when Azure config is not yet set
 if (typeof msal !== "undefined") {
-	initializeMSAL();
+	try {
+		initializeMSAL();
+	} catch (e) {
+		// Azure AD credentials not configured yet; will be initialised on sign-in
+		console.info("Microsoft 365 not configured:", e.message);
+	}
 }
 
 // Export functions
