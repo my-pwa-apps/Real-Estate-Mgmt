@@ -461,13 +461,11 @@ body {
 	max-width: 190px;
 	height: auto;
 	display: block;
-	border-radius: 10px;
-	background: rgba(255, 255, 255, 0.12);
-	padding: 8px 12px;
-	filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
-	transition: transform 0.3s ease, filter 0.3s ease;
-	mix-blend-mode: luminosity;
-	opacity: 0.92;
+	border-radius: 8px;
+	padding: 0;
+	mix-blend-mode: multiply;
+	transition: transform 0.3s ease, opacity 0.3s ease;
+	opacity: 0.95;
 }
 
 .sidebar-header .sidebar-logo:hover {
