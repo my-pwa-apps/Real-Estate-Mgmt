@@ -97,7 +97,7 @@
                 <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
                 <circle cx="9" cy="7" r="4"></circle></svg
             ></span>
-            Huurders
+            Relaties
           </a>
           <a href="contracten.html" class="nav-item">
             <span class="icon"
@@ -557,6 +557,23 @@
             </table>
           </div>
         </section>
+
+        <!-- Payment Reminders -->
+        <section class="content-section">
+          <div
+            style="
+              justify-content: space-between;
+              display: flex;
+              align-items: center;
+              margin-bottom: 1rem;
+            "
+          >
+            <h2>Betalingsherinneringen</h2>
+          </div>
+          <div id="herinneringenContainer">
+            <p class="empty-state">Geen openstaande herinneringen</p>
+          </div>
+        </section>
       </main>
     </div>
 
@@ -655,15 +672,15 @@
       </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" integrity="sha384-yuGdyIzzYtOBlBG6JOWn+Ey9kpq7HocusNuxEGyyohr1eEyXpeEyehIIXC/hznw4" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" integrity="sha384-lI+CxEx/bCvWP1b0OK13j5HTrTZP7yf1xle8TVOFq2smz6KC1RChTarRV/RHP5PP" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js" integrity="sha384-M6AmjBRXEjkdGzRN1Y94xtkmblFbYBSLkqzyZ8rPvpRM2c48nhjIRFXVvUM/VATL" crossorigin="anonymous"></script>
 
     <!-- Chart.js for financial charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- MSAL.js for Entra ID -->
-    <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js"></script>
+    <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js" integrity="sha384-R+wLLONYXDy1SoHBdEDjMHWlX/SFBEPbEYP1Xy1cwm3qFwuIiL2TUWCp1VfmmAA1" crossorigin="anonymous"></script>
 
     <script src="js/config.js"></script>
     <script src="js/ui-utilities.js"></script>

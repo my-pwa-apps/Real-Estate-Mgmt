@@ -96,10 +96,15 @@ async function createFolder(parentPath, folderName) {
     const drive = await getSharePointDrive();
     const driveId = drive.id;
 
+    // Sanitize paths to prevent path traversal
+    const safeFolderName = folderName.replace(/[\.]{2,}/g, "").replace(/[\/\\]/g, "_").trim();
+    const safeParentPath = parentPath.replace(/[\.]{2,}/g, "").trim();
+    if (!safeFolderName) throw new Error("Invalid folder name");
+
     // Check if folder already exists
     try {
       const existing = await callMicrosoftGraph(
-        `/drives/${driveId}/root:/${parentPath}/${folderName}`,
+        `/drives/${driveId}/root:/${safeParentPath}/${safeFolderName}`,
       );
       return existing; // Folder exists, return it
     } catch (error) {
@@ -107,13 +112,13 @@ async function createFolder(parentPath, folderName) {
     }
 
     const folderData = {
-      name: folderName,
+      name: safeFolderName,
       folder: {},
       "@microsoft.graph.conflictBehavior": "rename",
     };
 
     const newFolder = await callMicrosoftGraph(
-      `/drives/${driveId}/root:/${parentPath}:/children`,
+      `/drives/${driveId}/root:/${safeParentPath}:/children`,
       "POST",
       folderData,
     );

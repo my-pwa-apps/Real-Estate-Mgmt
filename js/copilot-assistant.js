@@ -29,12 +29,12 @@ function gatherPageContext() {
   const statCards = document.querySelectorAll(".stat-card");
   if (statCards.length > 0) {
     context.stats = [];
-    statCards.forEach((card) => {
+    for (const card of statCards) {
       const label = card.querySelector("p")?.textContent || "";
       const value = card.querySelector("h3")?.textContent || "";
       const detail = card.querySelector("small")?.textContent || "";
       context.stats.push(`${label}: ${value} ${detail}`.trim());
-    });
+    }
   }
 
   // Capture visible table data
@@ -60,8 +60,9 @@ function gatherPageContext() {
   const cards = document.querySelectorAll(".item-card");
   if (cards.length > 0) {
     context.cards = [];
-    cards.forEach((card, i) => {
-      if (i >= 10) return; // Limit to 10
+    let i = 0;
+    for (const card of cards) {
+      if (i >= 10) break; // Limit to 10
       const title = card.querySelector("h3")?.textContent || "";
       const body =
         card
@@ -69,7 +70,8 @@ function gatherPageContext() {
           ?.textContent?.trim()
           .substring(0, 200) || "";
       context.cards.push(`${title}: ${body}`);
-    });
+      i += 1;
+    }
     context.totalCards = cards.length;
   }
 
@@ -79,9 +81,9 @@ function gatherPageContext() {
   );
   if (filters.length > 0) {
     context.filters = {};
-    filters.forEach((f) => {
+    for (const f of filters) {
       if (f.value) context.filters[f.id || f.name || "filter"] = f.value;
-    });
+    }
   }
 
   // Capture detail panel if open
@@ -108,17 +110,17 @@ function gatherPageContext() {
   if (context.table) {
     summary += `\nTabel (${context.table.totalRows} rijen):\n`;
     summary += `Kolommen: ${context.table.headers.join(" | ")}\n`;
-    context.table.rows.slice(0, 5).forEach((row) => {
+    for (const row of context.table.rows.slice(0, 5)) {
       summary += `  ${row.join(" | ")}\n`;
-    });
+    }
     if (context.table.totalRows > 5)
       summary += `  ... en ${context.table.totalRows - 5} meer\n`;
   }
   if (context.cards) {
     summary += `\nKaarten (${context.totalCards} totaal):\n`;
-    context.cards.slice(0, 5).forEach((c) => {
+    for (const c of context.cards.slice(0, 5)) {
       summary += `  - ${c}\n`;
-    });
+    }
   }
   if (context.filters && Object.keys(context.filters).length > 0) {
     summary += `\nActieve filters: ${JSON.stringify(context.filters)}\n`;
@@ -172,10 +174,7 @@ function openMicrosoftCopilot(customPrompt) {
   let prompt = customPrompt || "";
 
   if (!prompt) {
-    prompt =
-      `Ik gebruik een vastgoedbeheer applicatie (Stadsgezicht Vastgoedbeheer). ` +
-      `Ik kijk momenteel naar de "${context.title}" pagina. ` +
-      `Kun je me helpen begrijpen wat ik zie en advies geven?`;
+    prompt = `Ik gebruik een vastgoedbeheer applicatie (Stadsgezicht Vastgoedbeheer). Ik kijk momenteel naar de "${context.title}" pagina. Kun je me helpen begrijpen wat ik zie en advies geven?`;
   }
 
   // Append visible page context
@@ -348,7 +347,7 @@ function initCopilotAssistant() {
   const input = document.getElementById("copilotInput");
   input.addEventListener("input", () => {
     input.style.height = "auto";
-    input.style.height = Math.min(input.scrollHeight, 120) + "px";
+    input.style.height = `${Math.min(input.scrollHeight, 120)}px`;
   });
 
   // Send on Enter (Shift+Enter for new line)
@@ -408,9 +407,9 @@ function switchCopilotMode(mode) {
   copilotMode = mode;
 
   // Update mode buttons
-  document.querySelectorAll(".copilot-mode-btn").forEach((btn) => {
+  for (const btn of document.querySelectorAll(".copilot-mode-btn")) {
     btn.classList.toggle("active", btn.dataset.mode === mode);
-  });
+  }
 
   // Update content panels
   document
@@ -650,9 +649,24 @@ async function generateCopilotResponse(message, file) {
 async function callAzureOpenAI(message, file) {
   // Get Azure OpenAI config from settings
   const config = storage.get("azureOpenAIConfig", null);
-  if (!config || !config.endpoint || !config.apiKey) {
-    throw new Error("Azure OpenAI not configured");
+
+  // Support proxy mode: if proxyUrl is configured, route through backend
+  if (config?.proxyUrl) {
+    return callAzureOpenAIViaProxy(config.proxyUrl, message, file);
   }
+
+  if (!config || !config.endpoint || !config.apiKey) {
+    throw new Error("Azure OpenAI not configured. Configure a proxy URL or direct endpoint in Admin > AI.");
+  }
+
+  if (typeof isDemoMode !== "function" || !isDemoMode()) {
+    throw new Error(
+      "Directe Azure OpenAI sleutels zijn buiten demo modus uitgeschakeld. Configureer een proxy URL in Admin > AI.",
+    );
+  }
+
+  // Security warning: API key should ideally be proxied through a backend service
+  console.warn("[Security] Azure OpenAI API key is stored client-side. Configure a proxyUrl in Admin > AI for production.");
 
   const appContext = await gatherAppContext();
 
@@ -670,7 +684,7 @@ ${appContext}`,
     { role: "user", content: message },
   ];
 
-  if (file && file.dataUrl) {
+  if (file?.dataUrl) {
     messages[messages.length - 1] = {
       role: "user",
       content: [
@@ -700,6 +714,50 @@ ${appContext}`,
 
   const data = await response.json();
   return formatCopilotResponse(data.choices[0].message.content);
+}
+
+/**
+ * Call Azure OpenAI via a backend proxy (no API key in browser)
+ * The proxy should accept {message, context, file} and forward to Azure OpenAI
+ */
+async function callAzureOpenAIViaProxy(proxyUrl, message, file) {
+  const appContext = await gatherAppContext();
+
+  const payload = {
+    message,
+    context: appContext,
+    chatHistory: copilotChatHistory.slice(-10),
+  };
+
+  if (file && file.dataUrl) {
+    payload.file = { dataUrl: file.dataUrl };
+  }
+
+  const headers = { "Content-Type": "application/json" };
+
+  // If user has a Microsoft token, send it for auth
+  if (typeof getEntraAccessToken === "function") {
+    try {
+      const token = await getEntraAccessToken(["api://default/access"]);
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+    } catch (_) {
+      // Continue without token
+    }
+  }
+
+  const response = await fetch(proxyUrl, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok)
+    throw new Error(`Proxy error: ${response.status}`);
+
+  const data = await response.json();
+  const content =
+    data.choices?.[0]?.message?.content || data.response || data.message || "";
+  return formatCopilotResponse(content);
 }
 
 /**

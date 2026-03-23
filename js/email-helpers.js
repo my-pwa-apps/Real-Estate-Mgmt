@@ -6,79 +6,79 @@
 
 // Send email via Exchange Online
 async function sendEmail(emailData) {
-  try {
-    const message = {
-      message: {
-        subject: emailData.subject,
-        body: {
-          contentType: emailData.isHtml ? "HTML" : "Text",
-          content: emailData.body,
-        },
-        toRecipients: emailData.to.map((email) => ({
-          emailAddress: { address: email },
-        })),
-        ccRecipients: emailData.cc
-          ? emailData.cc.map((email) => ({
-              emailAddress: { address: email },
-            }))
-          : [],
-        bccRecipients: emailData.bcc
-          ? emailData.bcc.map((email) => ({
-              emailAddress: { address: email },
-            }))
-          : [],
-        attachments: emailData.attachments || [],
-      },
-      saveToSentItems: true,
-    };
+	try {
+		const message = {
+			message: {
+				subject: emailData.subject,
+				body: {
+					contentType: emailData.isHtml ? "HTML" : "Text",
+					content: emailData.body,
+				},
+				toRecipients: emailData.to.map((email) => ({
+					emailAddress: { address: email },
+				})),
+				ccRecipients: emailData.cc
+					? emailData.cc.map((email) => ({
+							emailAddress: { address: email },
+						}))
+					: [],
+				bccRecipients: emailData.bcc
+					? emailData.bcc.map((email) => ({
+							emailAddress: { address: email },
+						}))
+					: [],
+				attachments: emailData.attachments || [],
+			},
+			saveToSentItems: true,
+		};
 
-    await callMicrosoftGraph("/me/sendMail", "POST", message);
+		await callMicrosoftGraph("/me/sendMail", "POST", message);
 
-    // Save copy to SharePoint if needed
-    if (emailData.saveToSharePoint) {
-      await saveEmailToSharePoint(emailData);
-    }
+		// Save copy to SharePoint if needed
+		if (emailData.saveToSharePoint) {
+			await saveEmailToSharePoint(emailData);
+		}
 
-    return true;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    throw error;
-  }
+		return true;
+	} catch (error) {
+		console.error("Error sending email:", error);
+		throw error;
+	}
 }
 
 // Send email with file attachment from SharePoint
 async function sendEmailWithSharePointAttachment(emailData, fileId) {
-  try {
-    // Download file from SharePoint
-    const fileData = await downloadFileFromSharePoint(fileId);
+	try {
+		// Download file from SharePoint
+		const fileData = await downloadFileFromSharePoint(fileId);
 
-    // Convert blob to base64
-    const base64 = await blobToBase64(fileData.blob);
+		// Convert blob to base64
+		const base64 = await blobToBase64(fileData.blob);
 
-    // Add attachment to email
-    emailData.attachments = emailData.attachments || [];
-    emailData.attachments.push({
-      "@odata.type": "#microsoft.graph.fileAttachment",
-      name: fileData.fileName,
-      contentType: fileData.blob.type,
-      contentBytes: base64.split(",")[1], // Remove data:... prefix
-    });
+		// Add attachment to email
+		emailData.attachments = emailData.attachments || [];
+		emailData.attachments.push({
+			"@odata.type": "#microsoft.graph.fileAttachment",
+			name: fileData.fileName,
+			contentType: fileData.blob.type,
+			contentBytes: base64.split(",")[1], // Remove data:... prefix
+		});
 
-    return await sendEmail(emailData);
-  } catch (error) {
-    console.error("Error sending email with attachment:", error);
-    throw error;
-  }
+		return await sendEmail(emailData);
+	} catch (error) {
+		console.error("Error sending email with attachment:", error);
+		throw error;
+	}
 }
 
 // Helper: Convert blob to base64
 function blobToBase64(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onloadend = () => resolve(reader.result);
+		reader.onerror = reject;
+		reader.readAsDataURL(blob);
+	});
 }
 
 // ============================================
@@ -87,9 +87,9 @@ function blobToBase64(blob) {
 
 // Email templates for common scenarios
 const emailTemplates = {
-  huurcontract: {
-    subject: "Huurcontract {{pand.adres}}",
-    body: `
+	huurcontract: {
+		subject: "Huurcontract {{pand.adres}}",
+		body: `
             <p>Beste {{huurder.voornaam}},</p>
             
             <p>Hierbij ontvangt u het huurcontract voor <strong>{{pand.adres}}, {{pand.postcode}} {{pand.plaats}}</strong>.</p>
@@ -110,12 +110,12 @@ const emailTemplates = {
             T: 020 47 00 965<br>
             E: info@stadsgezicht.nl</p>
         `,
-    isHtml: true,
-  },
+		isHtml: true,
+	},
 
-  huurverhoging: {
-    subject: "Huurverhoging {{pand.adres}} per {{datum}}",
-    body: `
+	huurverhoging: {
+		subject: "Huurverhoging {{pand.adres}} per {{datum}}",
+		body: `
             <p>Beste {{huurder.voornaam}},</p>
             
             <p>Hierbij informeren wij u dat de huurprijs van <strong>{{pand.adres}}</strong> per <strong>{{datum}}</strong> wordt verhoogd.</p>
@@ -131,12 +131,12 @@ const emailTemplates = {
             <p>Met vriendelijke groet,<br>
             <strong>Stadsgezicht Ontwikkelingen en Beheer</strong></p>
         `,
-    isHtml: true,
-  },
+		isHtml: true,
+	},
 
-  onderhoud_bevestiging: {
-    subject: "Bevestiging onderhoudsmelding {{pand.adres}}",
-    body: `
+	onderhoud_bevestiging: {
+		subject: "Bevestiging onderhoudsmelding {{pand.adres}}",
+		body: `
             <p>Beste {{huurder.voornaam}},</p>
             
             <p>We hebben uw onderhoudsmelding ontvangen.</p>
@@ -150,12 +150,12 @@ const emailTemplates = {
             <p>Met vriendelijke groet,<br>
             <strong>Stadsgezicht Ontwikkelingen en Beheer</strong></p>
         `,
-    isHtml: true,
-  },
+		isHtml: true,
+	},
 
-  onderhoud_gepland: {
-    subject: "Afspraak onderhoud {{pand.adres}} - {{datum}}",
-    body: `
+	onderhoud_gepland: {
+		subject: "Afspraak onderhoud {{pand.adres}} - {{datum}}",
+		body: `
             <p>Beste {{huurder.voornaam}},</p>
             
             <p>Hierbij bevestigen wij de afspraak voor het onderhoud aan <strong>{{pand.adres}}</strong>.</p>
@@ -169,12 +169,12 @@ const emailTemplates = {
             <p>Met vriendelijke groet,<br>
             <strong>Stadsgezicht Ontwikkelingen en Beheer</strong></p>
         `,
-    isHtml: true,
-  },
+		isHtml: true,
+	},
 
-  huur_herinnering: {
-    subject: "Herinnering huurbetaling {{pand.adres}}",
-    body: `
+	huur_herinnering: {
+		subject: "Herinnering huurbetaling {{pand.adres}}",
+		body: `
             <p>Beste {{huurder.voornaam}},</p>
             
             <p>Dit is een vriendelijke herinnering dat de huur voor <strong>{{pand.adres}}</strong> nog niet is ontvangen.</p>
@@ -192,12 +192,12 @@ const emailTemplates = {
             <p>Met vriendelijke groet,<br>
             <strong>Stadsgezicht Ontwikkelingen en Beheer</strong></p>
         `,
-    isHtml: true,
-  },
+		isHtml: true,
+	},
 
-  welkom_nieuwe_huurder: {
-    subject: "Welkom bij Stadsgezicht - {{pand.adres}}",
-    body: `
+	welkom_nieuwe_huurder: {
+		subject: "Welkom bij Stadsgezicht - {{pand.adres}}",
+		body: `
             <p>Beste {{huurder.voornaam}},</p>
             
             <p>Van harte welkom als nieuwe huurder bij Stadsgezicht!</p>
@@ -224,42 +224,44 @@ const emailTemplates = {
             E: info@stadsgezicht.nl<br>
             W: www.stadsgezicht.nl</p>
         `,
-    isHtml: true,
-  },
+		isHtml: true,
+	},
 };
 
 // Fill email template with data
 function fillEmailTemplate(templateName, data) {
-  const template = emailTemplates[templateName];
-  if (!template) {
-    throw new Error(`Template ${templateName} not found`);
-  }
+	const template = emailTemplates[templateName];
+	if (!template) {
+		throw new Error(`Template ${templateName} not found`);
+	}
 
-  let subject = template.subject;
-  let body = template.body;
+	let subject = template.subject;
+	let body = template.body;
 
-  // Replace all placeholders with data
-  const replacePlaceholders = (text, data) => {
-    return text.replace(/\{\{([^}]+)\}\}/g, (match, path) => {
-      const keys = path.trim().split(".");
-      let value = data;
+	// Replace all placeholders with data
+	const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+	const replacePlaceholders = (text, data) => {
+		return text.replace(/\{\{([^}]+)\}\}/g, (match, path) => {
+			const keys = path.trim().split(".");
+			if (keys.some((k) => UNSAFE_KEYS.has(k))) return match;
+			let value = data;
 
-      for (const key of keys) {
-        value = value?.[key];
-      }
+			for (const key of keys) {
+				value = value?.[key];
+			}
 
-      return value !== undefined ? value : match;
-    });
-  };
+			return value !== undefined ? String(value) : match;
+		});
+	};
 
-  subject = replacePlaceholders(subject, data);
-  body = replacePlaceholders(body, data);
+	subject = replacePlaceholders(subject, data);
+	body = replacePlaceholders(body, data);
 
-  return {
-    subject: subject,
-    body: body,
-    isHtml: template.isHtml,
-  };
+	return {
+		subject: subject,
+		body: body,
+		isHtml: template.isHtml,
+	};
 }
 
 // ============================================
@@ -268,12 +270,12 @@ function fillEmailTemplate(templateName, data) {
 
 // Save email copy to SharePoint
 async function saveEmailToSharePoint(
-  emailData,
-  folderPath = "Correspondentie",
+	emailData,
+	folderPath = "Correspondentie",
 ) {
-  try {
-    // Create email HTML content
-    const emailHtml = `
+	try {
+		// Create email HTML content
+		const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -290,24 +292,30 @@ async function saveEmailToSharePoint(
 </body>
 </html>`;
 
-    // Create file name
-    const fileName = `Email_${new Date().toISOString().split("T")[0]}_${emailData.subject.substring(0, 50).replace(/[^a-z0-9]/gi, "_")}.html`;
+		// Create file name
+		const fileName = `Email_${new Date().toISOString().split("T")[0]}_${emailData.subject.substring(0, 50).replace(/[^a-z0-9]/gi, "_")}.html`;
 
-    // Convert to blob
-    const blob = new Blob([emailHtml], { type: "text/html" });
-    const file = new File([blob], fileName, { type: "text/html" });
+		// Convert to blob
+		const blob = new Blob([emailHtml], { type: "text/html" });
+		const file = new File([blob], fileName, { type: "text/html" });
 
-    // Upload to SharePoint
-    const uploadedFile = await uploadFileToSharePoint(file, folderPath, {
-      description: `Email verstuurd op ${new Date().toLocaleString("nl-NL")} - ${emailData.subject}`,
-    });
+		// Upload to SharePoint
+		const uploadedFile = await uploadFileToSharePoint(file, folderPath, {
+			description: `Email verstuurd op ${new Date().toLocaleString("nl-NL")} - ${emailData.subject}`,
+		});
 
-    return uploadedFile;
-  } catch (error) {
-    console.error("Error saving email to SharePoint:", error);
-    // Don't throw error, just log it - email was sent successfully
-    return null;
-  }
+		return uploadedFile;
+	} catch (error) {
+		console.error("Error saving email to SharePoint:", error);
+		// Email was sent successfully, but archiving failed - notify user
+		if (typeof showToast === "function") {
+			showToast(
+				"Email verstuurd, maar archivering naar SharePoint is mislukt",
+				"warning",
+			);
+		}
+		return null;
+	}
 }
 
 // ============================================
@@ -316,30 +324,30 @@ async function saveEmailToSharePoint(
 
 // Get user's emails
 async function getEmails(folderId = "inbox", top = 10) {
-  try {
-    const emails = await callMicrosoftGraph(
-      `/me/mailFolders/${folderId}/messages?$top=${top}&$select=subject,from,receivedDateTime,isRead,hasAttachments`,
-    );
+	try {
+		const emails = await callMicrosoftGraph(
+			`/me/mailFolders/${folderId}/messages?$top=${top}&$select=subject,from,receivedDateTime,isRead,hasAttachments`,
+		);
 
-    return emails.value;
-  } catch (error) {
-    console.error("Error getting emails:", error);
-    throw error;
-  }
+		return emails.value;
+	} catch (error) {
+		console.error("Error getting emails:", error);
+		throw error;
+	}
 }
 
 // Search emails
 async function searchEmails(query) {
-  try {
-    const results = await callMicrosoftGraph(
-      `/me/messages?$search="${encodeURIComponent(query)}"&$top=25`,
-    );
+	try {
+		const results = await callMicrosoftGraph(
+			`/me/messages?$search="${encodeURIComponent(query)}"&$top=25`,
+		);
 
-    return results.value;
-  } catch (error) {
-    console.error("Error searching emails:", error);
-    throw error;
-  }
+		return results.value;
+	} catch (error) {
+		console.error("Error searching emails:", error);
+		throw error;
+	}
 }
 
 // Export functions
@@ -350,3 +358,15 @@ window.fillEmailTemplate = fillEmailTemplate;
 window.saveEmailToSharePoint = saveEmailToSharePoint;
 window.getEmails = getEmails;
 window.searchEmails = searchEmails;
+
+if (typeof module !== "undefined" && module.exports) {
+	module.exports = {
+		sendEmail,
+		sendEmailWithSharePointAttachment,
+		emailTemplates,
+		fillEmailTemplate,
+		saveEmailToSharePoint,
+		getEmails,
+		searchEmails,
+	};
+}

@@ -1,7 +1,7 @@
 // Service Worker for Stadsgezicht Vastgoedbeheer PWA
 // Provides offline caching and PWA install support
 
-const CACHE_NAME = "stadsgezicht-v1";
+const CACHE_NAME = "stadsgezicht-v2";
 const STATIC_ASSETS = [
   "/",
   "/dashboard.html",
@@ -26,6 +26,21 @@ const STATIC_ASSETS = [
   "/js/data-export.js",
   "/js/global-search.js",
   "/js/copilot-assistant.js",
+  "/js/microsoft-auth.js",
+  "/js/sharepoint-helpers.js",
+  "/js/email-helpers.js",
+  "/js/invoice-helpers.js",
+  "/js/werkbon-helpers.js",
+  "/js/rent-increase.js",
+  "/js/login.js",
+  "/js/dashboard.js",
+  "/js/panden.js",
+  "/js/huurders.js",
+  "/js/contracten.js",
+  "/js/onderhoud.js",
+  "/js/werkbonnen.js",
+  "/js/financieel.js",
+  "/js/admin.js",
 ];
 
 // Install: cache static assets

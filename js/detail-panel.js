@@ -41,6 +41,9 @@ function showDetailPanel(entityType, data) {
     case "transactie":
       content = generateTransactieDetail(data);
       break;
+    case "werkbon":
+      content = generateWerkbonDetail(data);
+      break;
     default:
       content = generateGenericDetail(data);
   }
@@ -62,6 +65,20 @@ function showDetailPanel(entityType, data) {
 
   // Add event listeners
   document.getElementById("closePanelBtn").onclick = closeDetailPanel;
+
+  // Trap focus inside the detail panel for accessibility
+  if (typeof trapFocus === "function") {
+    trapFocus(panel);
+  }
+
+  // Close on Escape key
+  const escHandler = (e) => {
+    if (e.key === "Escape") {
+      closeDetailPanel();
+      document.removeEventListener("keydown", escHandler);
+    }
+  };
+  document.addEventListener("keydown", escHandler);
 }
 
 /**
@@ -640,6 +657,34 @@ function generateOnderhoudDetail(onderhoud) {
             `
                 : ""
             }
+
+            ${
+              Array.isArray(onderhoud.activiteitenLog) &&
+              onderhoud.activiteitenLog.length > 0
+                ? `
+            <div class="detail-section">
+                <div class="detail-section-title"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg> Activiteitenlog</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                ${onderhoud.activiteitenLog
+                  .slice()
+                  .reverse()
+                  .map(
+                    (entry) => `
+                    <div style="padding: 8px 12px; background: rgba(30,58,95,0.04); border-radius: 8px; border-left: 3px solid var(--primary-color); font-size: 13px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                            <strong>${s(entry.actie || "")}</strong>
+                            <span style="color: var(--text-secondary); font-size: 12px;">${entry.datum ? new Date(entry.datum).toLocaleString("nl-NL") : ""}</span>
+                        </div>
+                        <div style="color: var(--text-secondary);">${s(entry.gebruiker || "")}</div>
+                        ${entry.details ? `<div style="margin-top: 4px;">${s(entry.details)}</div>` : ""}
+                    </div>`,
+                  )
+                  .join("")}
+                </div>
+            </div>
+            `
+                : ""
+            }
         </div>
         <div class="detail-actions">
             ${
@@ -731,6 +776,103 @@ function generateTransactieDetail(transactie) {
 }
 
 /**
+ * Generate Werkbon detail view
+ */
+function generateWerkbonDetail(werkbon) {
+  const s = sanitizeHTML;
+  return `
+        <div class="detail-panel-header">
+            <h2><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg> Werkbon ${s(werkbon.werkbonNummer)}</h2>
+            <button class="detail-panel-close" id="closePanelBtn" aria-label="Sluiten"><svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <div class="detail-panel-body">
+            <div class="detail-section">
+                <div class="detail-section-title">Locatie</div>
+                <div class="detail-row">
+                    <div class="detail-label">Adres</div>
+                    <div class="detail-value"><strong>${s(werkbon.pandAdres || "")}</strong></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Postcode</div>
+                    <div class="detail-value">${s(werkbon.pandPostcode || "")}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Plaats</div>
+                    <div class="detail-value">${s(werkbon.pandPlaats || "")}</div>
+                </div>
+            </div>
+            ${werkbon.huurderNaam ? `
+            <div class="detail-section">
+                <div class="detail-section-title">Huurder</div>
+                <div class="detail-row">
+                    <div class="detail-label">Naam</div>
+                    <div class="detail-value">${s(werkbon.huurderNaam)}</div>
+                </div>
+                ${werkbon.huurderTelefoon ? `<div class="detail-row"><div class="detail-label">Telefoon</div><div class="detail-value">${s(werkbon.huurderTelefoon)}</div></div>` : ""}
+                ${werkbon.huurderEmail ? `<div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${s(werkbon.huurderEmail)}</div></div>` : ""}
+            </div>` : ""}
+            <div class="detail-section">
+                <div class="detail-section-title">Werkzaamheden</div>
+                <div class="detail-row">
+                    <div class="detail-label">Titel</div>
+                    <div class="detail-value"><strong>${s(werkbon.titel || "")}</strong></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Prioriteit</div>
+                    <div class="detail-value"><span class="priority-badge ${s(werkbon.prioriteit || "")}">${capitalizeFirst(s(werkbon.prioriteit || ""))}</span></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value"><span class="status-badge ${s(werkbon.status || "")}">${capitalizeFirst(s(werkbon.status || ""))}</span></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Beschrijving</div>
+                    <div class="detail-value">${s(werkbon.beschrijving || "")}</div>
+                </div>
+            </div>
+            ${werkbon.onderhoudsBedrijf ? `
+            <div class="detail-section">
+                <div class="detail-section-title">Onderhoudsbedrijf</div>
+                <div class="detail-row">
+                    <div class="detail-label">Bedrijf</div>
+                    <div class="detail-value">${s(werkbon.onderhoudsBedrijf)}</div>
+                </div>
+                ${werkbon.contactPersoon ? `<div class="detail-row"><div class="detail-label">Contact</div><div class="detail-value">${s(werkbon.contactPersoon)}</div></div>` : ""}
+                ${werkbon.contactTelefoon ? `<div class="detail-row"><div class="detail-label">Telefoon</div><div class="detail-value">${s(werkbon.contactTelefoon)}</div></div>` : ""}
+            </div>` : ""}
+            <div class="detail-section">
+                <div class="detail-section-title">Financieel</div>
+                <div class="detail-row">
+                    <div class="detail-label">Geschatte kosten</div>
+                    <div class="detail-value">${formatCurrency(parseFloat(werkbon.geschatteKosten || 0))}</div>
+                </div>
+                ${werkbon.werkelijkeKosten ? `
+                <div class="detail-row">
+                    <div class="detail-label">Werkelijke kosten</div>
+                    <div class="detail-value"><strong>${formatCurrency(parseFloat(werkbon.werkelijkeKosten))}</strong></div>
+                </div>` : ""}
+            </div>
+            <div class="detail-section">
+                <div class="detail-section-title">Data</div>
+                <div class="detail-row">
+                    <div class="detail-label">Aangemaakt</div>
+                    <div class="detail-value">${werkbon.aanmaakDatum ? new Date(werkbon.aanmaakDatum).toLocaleDateString("nl-NL") : "-"}</div>
+                </div>
+                ${werkbon.verstuurdDatum ? `<div class="detail-row"><div class="detail-label">Verstuurd</div><div class="detail-value">${new Date(werkbon.verstuurdDatum).toLocaleDateString("nl-NL")}</div></div>` : ""}
+                ${werkbon.geplanddatum ? `<div class="detail-row"><div class="detail-label">Gepland</div><div class="detail-value">${new Date(werkbon.geplanddatum).toLocaleDateString("nl-NL")}</div></div>` : ""}
+                ${werkbon.uitgevoerdDatum ? `<div class="detail-row"><div class="detail-label">Uitgevoerd</div><div class="detail-value">${new Date(werkbon.uitgevoerdDatum).toLocaleDateString("nl-NL")}</div></div>` : ""}
+            </div>
+        </div>
+        <div class="detail-actions">
+            <button class="btn-secondary" onclick="downloadWerkbon('${sanitizeAttr(werkbon.id)}')">Download</button>
+            <button class="btn-secondary" onclick="printWerkbon('${sanitizeAttr(werkbon.id)}')">Print</button>
+            <button class="btn-primary" onclick="resendWerkbon('${sanitizeAttr(werkbon.id)}')">Opnieuw Versturen</button>
+            <button class="btn-secondary" onclick="closeDetailPanel()">Sluiten</button>
+        </div>
+    `;
+}
+
+/**
  * Generate generic detail view
  */
 function generateGenericDetail(data) {
@@ -765,9 +907,4 @@ function generateGenericDetail(data) {
     `;
 }
 
-// Close panel on ESC key
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && currentDetailPanel) {
-    closeDetailPanel();
-  }
-});
+// Close panel on ESC key (legacy fallback removed - handled in showDetailPanel)

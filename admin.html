@@ -97,7 +97,7 @@
                 <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
                 <circle cx="9" cy="7" r="4"></circle></svg
             ></span>
-            Huurders
+            Relaties
           </a>
           <a href="contracten.html" class="nav-item">
             <span class="icon"
@@ -614,7 +614,7 @@
                   Bedrijfsgegevens
                 </h3>
                 <div class="form-group">
-                  <label>Bedrijfsnaam</label>
+                  <label for="companyName">Bedrijfsnaam</label>
                   <input
                     type="text"
                     id="companyName"
@@ -622,7 +622,7 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label>Adres</label>
+                  <label for="companyAddress">Adres</label>
                   <input
                     type="text"
                     id="companyAddress"
@@ -630,11 +630,11 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label>Telefoon</label>
+                  <label for="companyPhone">Telefoon</label>
                   <input type="text" id="companyPhone" value="020 47 00 965" />
                 </div>
                 <div class="form-group">
-                  <label>Email</label>
+                  <label for="companyEmail">Email</label>
                   <input
                     type="email"
                     id="companyEmail"
@@ -642,7 +642,7 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label>IBAN</label>
+                  <label for="companyIban">IBAN</label>
                   <input
                     type="text"
                     id="companyIban"
@@ -672,7 +672,7 @@
                   Email Instellingen
                 </h3>
                 <div class="form-group">
-                  <label>Standaard Afzender Naam</label>
+                  <label for="emailFromName">Standaard Afzender Naam</label>
                   <input
                     type="text"
                     id="emailFromName"
@@ -680,7 +680,7 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label>Standaard Afzender Email</label>
+                  <label for="emailFromAddress">Standaard Afzender Email</label>
                   <input
                     type="email"
                     id="emailFromAddress"
@@ -717,7 +717,7 @@
                   Financiële Instellingen
                 </h3>
                 <div class="form-group">
-                  <label>Standaard Borgbedrag (maanden huur)</label>
+                  <label for="defaultBorgMonths">Standaard Borgbedrag (maanden huur)</label>
                   <input
                     type="number"
                     id="defaultBorgMonths"
@@ -727,7 +727,7 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label>Standaard Betalingsdatum</label>
+                  <label for="defaultPaymentDay">Standaard Betalingsdatum</label>
                   <input
                     type="number"
                     id="defaultPaymentDay"
@@ -737,7 +737,7 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label>Huurverhoging Percentage (jaarlijks)</label>
+                  <label for="rentIncreasePercent">Huurverhoging Percentage (jaarlijks)</label>
                   <input
                     type="number"
                     id="rentIncreasePercent"
@@ -860,7 +860,7 @@
                   Azure OpenAI Configuratie
                 </h3>
                 <div class="form-group">
-                  <label>Azure OpenAI Endpoint URL</label>
+                  <label for="azureOpenAIEndpoint">Azure OpenAI Endpoint URL</label>
                   <input
                     type="url"
                     id="azureOpenAIEndpoint"
@@ -868,7 +868,15 @@
                   />
                 </div>
                 <div class="form-group">
-                  <label>API Key</label>
+                  <label for="azureOpenAIProxyUrl">Proxy URL (aanbevolen voor productie)</label>
+                  <input
+                    type="url"
+                    id="azureOpenAIProxyUrl"
+                    placeholder="https://uw-backend.example.com/api/copilot"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="azureOpenAIKey">API Key</label>
                   <input
                     type="password"
                     id="azureOpenAIKey"
@@ -1284,18 +1292,20 @@
     </div>
 
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" integrity="sha384-yuGdyIzzYtOBlBG6JOWn+Ey9kpq7HocusNuxEGyyohr1eEyXpeEyehIIXC/hznw4" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" integrity="sha384-lI+CxEx/bCvWP1b0OK13j5HTrTZP7yf1xle8TVOFq2smz6KC1RChTarRV/RHP5PP" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js" integrity="sha384-M6AmjBRXEjkdGzRN1Y94xtkmblFbYBSLkqzyZ8rPvpRM2c48nhjIRFXVvUM/VATL" crossorigin="anonymous"></script>
 
     <!-- MSAL.js for Entra ID -->
-    <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js"></script>
+    <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js" integrity="sha384-R+wLLONYXDy1SoHBdEDjMHWlX/SFBEPbEYP1Xy1cwm3qFwuIiL2TUWCp1VfmmAA1" crossorigin="anonymous"></script>
 
     <script src="js/config.js"></script>
     <script src="js/ui-utilities.js"></script>
     <script src="js/demo-data.js"></script>
     <script src="js/entra-auth.js"></script>
     <script src="js/db-helpers.js"></script>
+    <script src="js/app-init.js"></script>
+    <script src="js/detail-panel.js"></script>
     <script src="js/audit-trail.js"></script>
     <script src="js/data-export.js"></script>
     <script src="js/global-search.js"></script>
