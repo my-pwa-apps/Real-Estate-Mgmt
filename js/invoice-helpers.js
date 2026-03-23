@@ -7,226 +7,226 @@
  * @param {boolean} autoSend - Automatisch versturen via email
  */
 async function generateInvoice(invoiceData, autoSend = false) {
-  try {
-    // Validatie
-    if (!invoiceData.contractId && !invoiceData.huurderId) {
-      throw new Error("Contract ID of Huurder ID is verplicht");
-    }
+	try {
+		// Validatie
+		if (!invoiceData.contractId && !invoiceData.huurderId) {
+			throw new Error("Contract ID of Huurder ID is verplicht");
+		}
 
-    // Haal contract en huurder gegevens op
-    const contract = invoiceData.contractId
-      ? await dbGetAll("contracten").then((contracts) =>
-          contracts.find((c) => c.id === invoiceData.contractId),
-        )
-      : null;
+		// Haal contract en huurder gegevens op
+		const contract = invoiceData.contractId
+			? await dbGetAll("contracten").then((contracts) =>
+					contracts.find((c) => c.id === invoiceData.contractId),
+				)
+			: null;
 
-    const huurder = contract
-      ? await dbGetAll("huurders").then((huurders) =>
-          huurders.find((h) => h.id === contract.huurderId),
-        )
-      : await dbGetAll("huurders").then((huurders) =>
-          huurders.find((h) => h.id === invoiceData.huurderId),
-        );
+		const huurder = contract
+			? await dbGetAll("huurders").then((huurders) =>
+					huurders.find((h) => h.id === contract.huurderId),
+				)
+			: await dbGetAll("huurders").then((huurders) =>
+					huurders.find((h) => h.id === invoiceData.huurderId),
+				);
 
-    const pand = contract
-      ? await dbGetAll("panden").then((panden) =>
-          panden.find((p) => p.id === contract.pandId),
-        )
-      : null;
+		const pand = contract
+			? await dbGetAll("panden").then((panden) =>
+					panden.find((p) => p.id === contract.pandId),
+				)
+			: null;
 
-    if (!huurder) {
-      throw new Error("Huurder niet gevonden");
-    }
+		if (!huurder) {
+			throw new Error("Huurder niet gevonden");
+		}
 
-    // Factuur nummer genereren
-    const invoiceNumber = await generateInvoiceNumber();
+		// Factuur nummer genereren
+		const invoiceNumber = await generateInvoiceNumber();
 
-    // Factuur data samenstellen
-    const invoice = {
-      invoiceNumber: invoiceNumber,
-      invoiceDate:
-        invoiceData.invoiceDate || new Date().toISOString().split("T")[0],
-      dueDate: invoiceData.dueDate || calculateDueDate(14), // 14 dagen betaaltermijn
+		// Factuur data samenstellen
+		const invoice = {
+			invoiceNumber: invoiceNumber,
+			invoiceDate:
+				invoiceData.invoiceDate || new Date().toISOString().split("T")[0],
+			dueDate: invoiceData.dueDate || calculateDueDate(14), // 14 dagen betaaltermijn
 
-      // Bedrijfsgegevens (uit settings)
-      company: await getCompanySettings(),
+			// Bedrijfsgegevens (uit settings)
+			company: await getCompanySettings(),
 
-      // Klantgegevens
-      customer: {
-        name: `${huurder.voornaam} ${huurder.achternaam}`,
-        email: huurder.email,
-        phone: huurder.telefoon,
-        address: contract ? pand.adres : huurder.adres || "",
-        postalCode: contract ? pand.postcode : huurder.postcode || "",
-        city: contract ? pand.plaats : huurder.plaats || "",
-      },
+			// Klantgegevens
+			customer: {
+				name: `${huurder.voornaam} ${huurder.achternaam}`,
+				email: huurder.email,
+				phone: huurder.telefoon,
+				address: contract ? pand.adres : huurder.adres || "",
+				postalCode: contract ? pand.postcode : huurder.postcode || "",
+				city: contract ? pand.plaats : huurder.plaats || "",
+			},
 
-      // Factuurregels
-      items: invoiceData.items || [
-        {
-          description: `Huur ${pand ? pand.adres : "Vastgoed"} - ${getMonthName(new Date())}`,
-          quantity: 1,
-          unitPrice: contract ? contract.huurprijs : invoiceData.amount || 0,
-          vatRate: 0, // Huur is meestal vrijgesteld van BTW
-          total: contract ? contract.huurprijs : invoiceData.amount || 0,
-        },
-      ],
+			// Factuurregels
+			items: invoiceData.items || [
+				{
+					description: `Huur ${pand ? pand.adres : "Vastgoed"} - ${getMonthName(new Date())}`,
+					quantity: 1,
+					unitPrice: contract ? contract.huurprijs : invoiceData.amount || 0,
+					vatRate: 0, // Huur is meestal vrijgesteld van BTW
+					total: contract ? contract.huurprijs : invoiceData.amount || 0,
+				},
+			],
 
-      // Notities
-      notes: invoiceData.notes || "",
+			// Notities
+			notes: invoiceData.notes || "",
 
-      // Betalingsgegevens
-      paymentDetails: await getPaymentDetails(),
-    };
+			// Betalingsgegevens
+			paymentDetails: await getPaymentDetails(),
+		};
 
-    // Bereken totalen
-    invoice.subtotal = invoice.items.reduce((sum, item) => sum + item.total, 0);
-    invoice.vatAmount = invoice.items.reduce(
-      (sum, item) => sum + (item.total * item.vatRate) / 100,
-      0,
-    );
-    invoice.total = invoice.subtotal + invoice.vatAmount;
+		// Bereken totalen
+		invoice.subtotal = invoice.items.reduce((sum, item) => sum + item.total, 0);
+		invoice.vatAmount = invoice.items.reduce(
+			(sum, item) => sum + (item.total * item.vatRate) / 100,
+			0,
+		);
+		invoice.total = invoice.subtotal + invoice.vatAmount;
 
-    // Genereer PDF
-    const pdfBlob = await generateInvoicePDF(invoice);
+		// Genereer PDF
+		const pdfBlob = await generateInvoicePDF(invoice);
 
-    // Sla factuur op in Firebase
-    const savedInvoice = await saveInvoiceToDatabase(
-      invoice,
-      contract?.id,
-      huurder.id,
-    );
+		// Sla factuur op in Firebase
+		const savedInvoice = await saveInvoiceToDatabase(
+			invoice,
+			contract?.id,
+			huurder.id,
+		);
 
-    // Upload PDF naar SharePoint/OneDrive (als M365 geïntegreerd is)
-    let documentUrl = null;
-    if (typeof uploadToSharePoint === "function") {
-      try {
-        documentUrl = await uploadToSharePoint(
-          pdfBlob,
-          `Factuur_${invoiceNumber}.pdf`,
-          "Facturen",
-        );
+		// Upload PDF naar SharePoint/OneDrive (als M365 geïntegreerd is)
+		let documentUrl = null;
+		if (typeof uploadToSharePoint === "function") {
+			try {
+				documentUrl = await uploadToSharePoint(
+					pdfBlob,
+					`Factuur_${invoiceNumber}.pdf`,
+					"Facturen",
+				);
 
-        // Update factuur met document URL
-        await dbUpdate("invoices", savedInvoice.id, { documentUrl });
-      } catch (error) {
-        console.warn("SharePoint upload mislukt:", error);
-      }
-    }
+				// Update factuur met document URL
+				await dbUpdate("invoices", savedInvoice.id, { documentUrl });
+			} catch (error) {
+				console.warn("SharePoint upload mislukt:", error);
+			}
+		}
 
-    // Verstuur email (indien autoSend of handmatig aangevraagd)
-    if (autoSend || invoiceData.sendEmail) {
-      await sendInvoiceEmail(invoice, pdfBlob, huurder.email);
-    }
+		// Verstuur email (indien autoSend of handmatig aangevraagd)
+		if (autoSend || invoiceData.sendEmail) {
+			await sendInvoiceEmail(invoice, pdfBlob, huurder.email);
+		}
 
-    return {
-      success: true,
-      invoiceId: savedInvoice.id,
-      invoiceNumber: invoiceNumber,
-      documentUrl: documentUrl,
-      message: autoSend
-        ? "Factuur gegenereerd en verzonden"
-        : "Factuur gegenereerd",
-    };
-  } catch (error) {
-    console.error("Factuur generatie fout:", error);
-    throw error;
-  }
+		return {
+			success: true,
+			invoiceId: savedInvoice.id,
+			invoiceNumber: invoiceNumber,
+			documentUrl: documentUrl,
+			message: autoSend
+				? "Factuur gegenereerd en verzonden"
+				: "Factuur gegenereerd",
+		};
+	} catch (error) {
+		console.error("Factuur generatie fout:", error);
+		throw error;
+	}
 }
 
 /**
  * Genereert een uniek factuurnummer
  */
 async function generateInvoiceNumber() {
-  const year = new Date().getFullYear();
-  const invoices = await dbGetAll("invoices");
-  const yearInvoices = invoices.filter(
-    (inv) => inv.invoiceNumber && inv.invoiceNumber.startsWith(`${year}-`),
-  );
+	const year = new Date().getFullYear();
+	const invoices = await dbGetAll("invoices");
+	const yearInvoices = invoices.filter(
+		(inv) => inv.invoiceNumber && inv.invoiceNumber.startsWith(`${year}-`),
+	);
 
-  const nextNumber = yearInvoices.length + 1;
-  return `${year}-${String(nextNumber).padStart(4, "0")}`;
+	const nextNumber = yearInvoices.length + 1;
+	return `${year}-${String(nextNumber).padStart(4, "0")}`;
 }
 
 /**
  * Berekent vervaldatum
  */
 function calculateDueDate(days = 14) {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return date.toISOString().split("T")[0];
+	const date = new Date();
+	date.setDate(date.getDate() + days);
+	return date.toISOString().split("T")[0];
 }
 
 /**
  * Haalt bedrijfsgegevens op uit settings
  */
 async function getCompanySettings() {
-  try {
-    const settings = await dbGetAll("settings");
-    const companySettings = settings.find((s) => s.type === "company") || {};
+	try {
+		const settings = await dbGetAll("settings");
+		const companySettings = settings.find((s) => s.type === "company") || {};
 
-    return {
-      name: companySettings.companyName || "Stadsgezicht Ontwikkelingen",
-      address: companySettings.companyAddress || "Bedrijfsstraat 123",
-      postalCode: companySettings.companyPostalCode || "1234 AB",
-      city: companySettings.companyCity || "Amsterdam",
-      phone: companySettings.companyPhone || "+31 20 123 4567",
-      email: companySettings.companyEmail || "info@stadsgezicht.nl",
-      kvk: companySettings.kvkNumber || "12345678",
-      btw: companySettings.btwNumber || "NL123456789B01",
-    };
-  } catch (error) {
-    // Fallback gegevens
-    return {
-      name: "Stadsgezicht Ontwikkelingen",
-      address: "Bedrijfsstraat 123",
-      postalCode: "1234 AB",
-      city: "Amsterdam",
-      phone: "+31 20 123 4567",
-      email: "info@stadsgezicht.nl",
-      kvk: "12345678",
-      btw: "NL123456789B01",
-    };
-  }
+		return {
+			name: companySettings.companyName || "Stadsgezicht Ontwikkelingen",
+			address: companySettings.companyAddress || "Bedrijfsstraat 123",
+			postalCode: companySettings.companyPostalCode || "1234 AB",
+			city: companySettings.companyCity || "Amsterdam",
+			phone: companySettings.companyPhone || "+31 20 123 4567",
+			email: companySettings.companyEmail || "info@stadsgezicht.nl",
+			kvk: companySettings.kvkNumber || "12345678",
+			btw: companySettings.btwNumber || "NL123456789B01",
+		};
+	} catch (error) {
+		// Fallback gegevens
+		return {
+			name: "Stadsgezicht Ontwikkelingen",
+			address: "Bedrijfsstraat 123",
+			postalCode: "1234 AB",
+			city: "Amsterdam",
+			phone: "+31 20 123 4567",
+			email: "info@stadsgezicht.nl",
+			kvk: "12345678",
+			btw: "NL123456789B01",
+		};
+	}
 }
 
 /**
  * Haalt betalingsgegevens op
  */
 async function getPaymentDetails() {
-  try {
-    const settings = await dbGetAll("settings");
-    const paymentSettings = settings.find((s) => s.type === "payment") || {};
+	try {
+		const settings = await dbGetAll("settings");
+		const paymentSettings = settings.find((s) => s.type === "payment") || {};
 
-    return {
-      iban: paymentSettings.iban || "NL12 BANK 0123 4567 89",
-      bic: paymentSettings.bic || "BANKNL2A",
-      bankName: paymentSettings.bankName || "Bank Nederland",
-    };
-  } catch (error) {
-    return {
-      iban: "NL12 BANK 0123 4567 89",
-      bic: "BANKNL2A",
-      bankName: "Bank Nederland",
-    };
-  }
+		return {
+			iban: paymentSettings.iban || "NL12 BANK 0123 4567 89",
+			bic: paymentSettings.bic || "BANKNL2A",
+			bankName: paymentSettings.bankName || "Bank Nederland",
+		};
+	} catch (error) {
+		return {
+			iban: "NL12 BANK 0123 4567 89",
+			bic: "BANKNL2A",
+			bankName: "Bank Nederland",
+		};
+	}
 }
 
 /**
  * Genereert factuur PDF
  */
 async function generateInvoicePDF(invoice) {
-  const s =
-    typeof sanitizeHTML === "function"
-      ? sanitizeHTML
-      : (v) =>
-          String(v ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-  // HTML template voor factuur
-  const html = `
+	const s =
+		typeof sanitizeHTML === "function"
+			? sanitizeHTML
+			: (v) =>
+					String(v ?? "")
+						.replace(/&/g, "&amp;")
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;")
+						.replace(/"/g, "&quot;");
+	// HTML template voor factuur
+	const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -292,8 +292,8 @@ async function generateInvoicePDF(invoice) {
         </thead>
         <tbody>
             ${invoice.items
-              .map(
-                (item) => `
+							.map(
+								(item) => `
                 <tr>
                     <td>${s(item.description)}</td>
                     <td style="text-align: center;">${item.quantity}</td>
@@ -302,8 +302,8 @@ async function generateInvoicePDF(invoice) {
                     <td class="amount">€ ${item.total.toFixed(2)}</td>
                 </tr>
             `,
-              )
-              .join("")}
+							)
+							.join("")}
         </tbody>
     </table>
 
@@ -338,68 +338,68 @@ async function generateInvoicePDF(invoice) {
 </html>
     `;
 
-  // Converteer HTML naar PDF (via browser print of externe service)
-  const blob = await htmlToPdfBlob(
-    html,
-    `Factuur_${invoice.invoiceNumber}.pdf`,
-  );
-  return blob;
+	// Converteer HTML naar PDF (via browser print of externe service)
+	const blob = await htmlToPdfBlob(
+		html,
+		`Factuur_${invoice.invoiceNumber}.pdf`,
+	);
+	return blob;
 }
 
 /**
  * Converteert HTML naar PDF Blob
  */
 async function htmlToPdfBlob(html, filename) {
-  // Use browser print API with pre-sanitized content
-  const printWindow = window.open("about:blank", "_blank");
-  printWindow.document.open();
-  printWindow.document.write(html); // Content is pre-sanitized in generateInvoicePDF
-  printWindow.document.close();
+	// Use browser print API with pre-sanitized content
+	const printWindow = window.open("about:blank", "_blank");
+	printWindow.document.open();
+	printWindow.document.write(html); // Content is pre-sanitized in generateInvoicePDF
+	printWindow.document.close();
 
-  // Return een mock blob voor nu (in productie zou je een PDF library gebruiken)
-  const htmlBlob = new Blob([html], { type: "text/html" });
+	// Return een mock blob voor nu (in productie zou je een PDF library gebruiken)
+	const htmlBlob = new Blob([html], { type: "text/html" });
 
-  // TODO: Integreer met PDF library zoals jsPDF of gebruik server-side PDF generatie
-  console.log("PDF generatie - gebruik print dialog of integreer PDF library");
+	// TODO: Integreer met PDF library zoals jsPDF of gebruik server-side PDF generatie
+	console.log("PDF generatie - gebruik print dialog of integreer PDF library");
 
-  return htmlBlob;
+	return htmlBlob;
 }
 
 /**
  * Slaat factuur op in database
  */
 async function saveInvoiceToDatabase(invoice, contractId, huurderId) {
-  const invoiceRecord = {
-    invoiceNumber: invoice.invoiceNumber,
-    invoiceDate: invoice.invoiceDate,
-    dueDate: invoice.dueDate,
-    contractId: contractId,
-    huurderId: huurderId,
-    amount: invoice.total,
-    subtotal: invoice.subtotal,
-    vatAmount: invoice.vatAmount,
-    status: "outstanding", // outstanding, paid, overdue, cancelled
-    items: invoice.items,
-    customer: invoice.customer,
-    notes: invoice.notes,
-    createdAt: new Date().toISOString(),
-    createdBy: firebase.auth().currentUser?.email || "system",
-  };
+	const invoiceRecord = {
+		invoiceNumber: invoice.invoiceNumber,
+		invoiceDate: invoice.invoiceDate,
+		dueDate: invoice.dueDate,
+		contractId: contractId,
+		huurderId: huurderId,
+		amount: invoice.total,
+		subtotal: invoice.subtotal,
+		vatAmount: invoice.vatAmount,
+		status: "outstanding", // outstanding, paid, overdue, cancelled
+		items: invoice.items,
+		customer: invoice.customer,
+		notes: invoice.notes,
+		createdAt: new Date().toISOString(),
+		createdBy: firebase.auth().currentUser?.email || "system",
+	};
 
-  const id = await dbAdd("invoices", invoiceRecord);
-  return { id, ...invoiceRecord };
+	const id = await dbAdd("invoices", invoiceRecord);
+	return { id, ...invoiceRecord };
 }
 
 /**
  * Verstuurt factuur via email
  */
 async function sendInvoiceEmail(invoice, pdfBlob, recipientEmail) {
-  if (typeof sendEmailWithAttachment !== "function") {
-    console.warn("Email functionaliteit niet beschikbaar");
-    return;
-  }
+	if (typeof sendEmailWithAttachment !== "function") {
+		console.warn("Email functionaliteit niet beschikbaar");
+		return;
+	}
 
-  const emailContent = `
+	const emailContent = `
 Beste ${invoice.customer.name},
 
 Hierbij ontvangt u factuur ${invoice.invoiceNumber} voor de huur van ${invoice.items[0].description}.
@@ -415,66 +415,66 @@ Met vriendelijke groet,
 ${invoice.company.name}
     `.trim();
 
-  await sendEmailWithAttachment({
-    to: recipientEmail,
-    subject: `Factuur ${invoice.invoiceNumber} - ${invoice.company.name}`,
-    body: emailContent,
-    attachments: [
-      {
-        filename: `Factuur_${invoice.invoiceNumber}.pdf`,
-        content: pdfBlob,
-      },
-    ],
-  });
+	await sendEmailWithAttachment({
+		to: recipientEmail,
+		subject: `Factuur ${invoice.invoiceNumber} - ${invoice.company.name}`,
+		body: emailContent,
+		attachments: [
+			{
+				filename: `Factuur_${invoice.invoiceNumber}.pdf`,
+				content: pdfBlob,
+			},
+		],
+	});
 }
 
 /**
  * Automatische factuur generatie voor alle actieve contracten
  */
 async function generateMonthlyInvoices() {
-  try {
-    const contracten = await dbGetAll("contracten");
-    const activeContracts = contracten.filter((c) => c.status === "actief");
+	try {
+		const contracten = await dbGetAll("contracten");
+		const activeContracts = contracten.filter((c) => c.status === "actief");
 
-    const results = [];
-    for (const contract of activeContracts) {
-      try {
-        const result = await generateInvoice(
-          {
-            contractId: contract.id,
-            invoiceDate: new Date().toISOString().split("T")[0],
-            sendEmail: true,
-          },
-          true,
-        );
+		const results = [];
+		for (const contract of activeContracts) {
+			try {
+				const result = await generateInvoice(
+					{
+						contractId: contract.id,
+						invoiceDate: new Date().toISOString().split("T")[0],
+						sendEmail: true,
+					},
+					true,
+				);
 
-        results.push({ contract: contract.id, success: true, ...result });
-      } catch (error) {
-        results.push({
-          contract: contract.id,
-          success: false,
-          error: error.message,
-        });
-      }
-    }
+				results.push({ contract: contract.id, success: true, ...result });
+			} catch (error) {
+				results.push({
+					contract: contract.id,
+					success: false,
+					error: error.message,
+				});
+			}
+		}
 
-    return results;
-  } catch (error) {
-    console.error("Bulk factuur generatie fout:", error);
-    throw error;
-  }
+		return results;
+	} catch (error) {
+		console.error("Bulk factuur generatie fout:", error);
+		throw error;
+	}
 }
 
 // Helper functies
 function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("nl-NL", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+	const date = new Date(dateString);
+	return date.toLocaleDateString("nl-NL", {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+	});
 }
 
 function getMonthName(date) {
-  return date.toLocaleDateString("nl-NL", { month: "long", year: "numeric" });
+	return date.toLocaleDateString("nl-NL", { month: "long", year: "numeric" });
 }

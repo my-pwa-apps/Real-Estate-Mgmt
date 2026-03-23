@@ -111,12 +111,14 @@ function calculateStatistics() {
 
 	// Maandelijkse huur from active contracts
 	const now = new Date();
-	const maandelijks = contracten
-		.filter((c) => {
-			const eindDatum = new Date(c.einddatum);
-			return eindDatum > now;
-		})
-		.reduce((sum, c) => sum + Number.parseFloat(c.huurprijs || 0), 0);
+	const actieveContracten = contracten.filter((c) => {
+		const eindDatum = new Date(c.einddatum);
+		return eindDatum > now;
+	});
+	const maandelijks = actieveContracten.reduce(
+		(sum, c) => sum + Number.parseFloat(c.huurprijs || 0),
+		0,
+	);
 
 	document.getElementById("totaalInkomsten").textContent =
 		`€${inkomsten.toLocaleString("nl-NL")}`;
@@ -131,9 +133,19 @@ function calculateStatistics() {
 	document.getElementById("resultaatDetail").textContent =
 		netto >= 0 ? "Positief" : "Negatief";
 
+	// Dynamically color the Netto icon: green = profit, red = loss
+	const nettoIconEl = document.querySelector(
+		".stat-card:nth-child(3) .stat-icon",
+	);
+	if (nettoIconEl) {
+		nettoIconEl.classList.remove("blue", "green", "red");
+		nettoIconEl.classList.add(netto >= 0 ? "green" : "red");
+	}
+
 	document.getElementById("maandelijks").textContent =
 		`€${maandelijks.toLocaleString("nl-NL")}`;
-	document.getElementById("maandDetail").textContent = "Actieve contracten";
+	document.getElementById("maandDetail").textContent =
+		`${actieveContracten.length} actieve contracten`;
 }
 
 // Render monthly overview
