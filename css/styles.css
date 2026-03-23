@@ -509,16 +509,17 @@ body {
 }
 
 .nav-item.active {
-	background: rgba(198, 156, 109, 0.15);
+	background: rgba(255, 255, 255, 0.12);
 	color: white;
-	border-right: none;
-	box-shadow: 0 2px 12px rgba(198, 156, 109, 0.15);
+	border: none;
+	box-shadow: none;
 	font-weight: 600;
 	-webkit-backdrop-filter: blur(8px);
 	backdrop-filter: blur(8px);
 }
 
 .nav-item.active::before {
+	content: none;
 	display: none;
 }
 
