@@ -23,7 +23,7 @@ preview_id = "e859571f4c5e43f5af60d85fa7fecd9a"
 
 [vars]
 # Allowed origins for CORS. Override per environment with `wrangler deploy --var`.
-ALLOWED_ORIGINS = "http://localhost:8000,http://127.0.0.1:8000"
+ALLOWED_ORIGINS = "http://localhost:8000,http://127.0.0.1:8000,https://my-pwa-apps.github.io"
 # Default Entra ID tenant ID for token validation. Set per tenant via secret.
 ENTRA_TENANT_ID = ""
 # Default Entra ID app (client) id - the audience claim that incoming tokens must match.
