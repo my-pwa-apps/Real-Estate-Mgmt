@@ -1,8 +1,8 @@
 {
-	"name": "stadsgezicht-vastgoedbeheer",
+	"name": "objctmgmt",
 	"version": "1.0.0",
 	"private": true,
-	"description": "Stadsgezicht Vastgoedbeheer - Real Estate Management PWA",
+	"description": "ObjctMgmt - Real Estate / Object Management PWA",
 	"scripts": {
 		"test": "vitest run",
 		"test:watch": "vitest",

@@ -2,6 +2,7 @@
 // Provides a slide-in panel with comprehensive information
 
 let currentDetailPanel = null;
+let detailPanelAbortController = null;
 
 /**
  * Show detail panel with entity information
@@ -63,8 +64,16 @@ function showDetailPanel(entityType, data) {
 	// Store reference
 	currentDetailPanel = { panel, overlay, entityType, data };
 
-	// Add event listeners
-	document.getElementById("closePanelBtn").onclick = closeDetailPanel;
+	// Single AbortController owns all listeners attached for this panel
+	// instance, so closeDetailPanel() can detach them in one call and
+	// re-opening the panel never accumulates duplicate handlers.
+	detailPanelAbortController = new AbortController();
+	const { signal } = detailPanelAbortController;
+
+	const closeBtn = document.getElementById("closePanelBtn");
+	if (closeBtn) {
+		closeBtn.addEventListener("click", closeDetailPanel, { signal });
+	}
 
 	// Trap focus inside the detail panel for accessibility
 	if (typeof trapFocus === "function") {
@@ -72,29 +81,35 @@ function showDetailPanel(entityType, data) {
 	}
 
 	// Close on Escape key
-	const escHandler = (e) => {
-		if (e.key === "Escape") {
-			closeDetailPanel();
-			document.removeEventListener("keydown", escHandler);
-		}
-	};
-	document.addEventListener("keydown", escHandler);
+	document.addEventListener(
+		"keydown",
+		(e) => {
+			if (e.key === "Escape") closeDetailPanel();
+		},
+		{ signal },
+	);
 }
 
 /**
  * Close detail panel
  */
 function closeDetailPanel() {
+	// Detach any listeners registered for the current panel instance
+	if (detailPanelAbortController) {
+		detailPanelAbortController.abort();
+		detailPanelAbortController = null;
+	}
+
 	const panel = document.getElementById("detailPanel");
 	const overlay = document.getElementById("detailPanelOverlay");
 
 	if (panel) {
 		panel.classList.remove("show");
-		overlay.classList.remove("show");
+		if (overlay) overlay.classList.remove("show");
 
 		setTimeout(() => {
 			panel.remove();
-			overlay.remove();
+			if (overlay) overlay.remove();
 		}, 300);
 	}
 

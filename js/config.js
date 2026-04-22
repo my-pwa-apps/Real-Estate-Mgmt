@@ -1,4 +1,4 @@
-// Firebase Configuration - Stadsgezicht Ontwikkelingen
+// Firebase Configuration
 const firebaseConfig = {
 	apiKey: "AIzaSyCnO8J8zDqM0m2Ha3VEiQHFSowUNO_alNk",
 	authDomain: "stadsgezicht-8af8b.firebaseapp.com",
@@ -10,6 +10,14 @@ const firebaseConfig = {
 	appId: "1:976439602772:web:77d2febec86520785c47c1",
 	measurementId: "G-HP1B4BBZXQ",
 };
+
+// Cloudflare Worker (objctmgmt-api) base URL.
+// Override per deployment by setting `window.OBJCTMGMT_API_BASE` before this
+// script runs, e.g. via a small per-tenant config.local.js.
+window.OBJCTMGMT_API_BASE =
+	window.OBJCTMGMT_API_BASE ||
+	"https://objctmgmt-api.garfieldapp.workers.dev";
+window.OBJCTMGMT_TENANT_ID = window.OBJCTMGMT_TENANT_ID || "default";
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);

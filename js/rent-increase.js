@@ -27,12 +27,10 @@ async function processRentIncrease() {
 		const currentYear = now.getFullYear();
 
 		// Find active contracts eligible for increase (not already increased this year)
+		// Use strict equality on the year to avoid substring matches (e.g. "2026" vs "12026")
 		const eligible = contracten.filter((c) => {
 			const end = new Date(c.einddatum);
-			return (
-				end > now &&
-				!c.lastIncreaseYear?.toString().includes(currentYear.toString())
-			);
+			return end > now && Number(c.lastIncreaseYear) !== currentYear;
 		});
 
 		if (eligible.length === 0) {
@@ -48,44 +46,88 @@ async function processRentIncrease() {
 		if (!confirmed) return { processed: 0 };
 
 		showLoading("Huurverhoging verwerken...");
+
+		// Index lookups so we don't do an O(n) .find() per contract
+		const huurderById = new Map(huurders.map((h) => [h.id, h]));
+		const pandById = new Map(panden.map((p) => [p.id, p]));
+
 		let processed = 0;
+		const failures = [];
 
 		for (const contract of eligible) {
 			const oldPrice = Number.parseFloat(contract.huurprijs);
 			const newPrice =
 				Math.round(oldPrice * (1 + increasePercent / 100) * 100) / 100;
 
-			await dbUpdate("contracten", contract.id, {
-				huurprijs: newPrice,
-				lastIncreaseYear: currentYear,
-				lastIncreasePercent: increasePercent,
-				lastIncreaseOldPrice: oldPrice,
-			});
-
-			// Also update the pand huurprijs
-			if (contract.pandId) {
-				await dbUpdate("panden", contract.pandId, { huurprijs: newPrice });
-			}
-
-			// Log the increase
-			if (typeof logAuditEvent === "function") {
-				const huurder = huurders.find((h) => h.id === contract.huurderId);
-				const pand = panden.find((p) => p.id === contract.pandId);
-				logAuditEvent("update", "contracten", contract.id, {
-					description: `Huurverhoging ${increasePercent}%: €${oldPrice} <svg xmlns="http://www.w3.org/2000/svg" class="lucide-icon" aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> €${newPrice} (${huurder ? huurder.voornaam + " " + huurder.achternaam : ""}, ${pand ? pand.adres : ""})`,
+			try {
+				await dbUpdate("contracten", contract.id, {
+					huurprijs: newPrice,
+					lastIncreaseYear: currentYear,
+					lastIncreasePercent: increasePercent,
+					lastIncreaseOldPrice: oldPrice,
 				});
-			}
 
-			processed++;
+				// Also update the pand huurprijs - on failure, roll back the contract
+				// so the contract+pand pair stays consistent.
+				if (contract.pandId) {
+					try {
+						await dbUpdate("panden", contract.pandId, {
+							huurprijs: newPrice,
+						});
+					} catch (pandErr) {
+						try {
+							await dbUpdate("contracten", contract.id, {
+								huurprijs: oldPrice,
+								lastIncreaseYear: contract.lastIncreaseYear ?? null,
+								lastIncreasePercent: contract.lastIncreasePercent ?? null,
+								lastIncreaseOldPrice: contract.lastIncreaseOldPrice ?? null,
+							});
+						} catch (rollbackErr) {
+							console.error(
+								"Rollback failed for contract",
+								contract.id,
+								rollbackErr,
+							);
+						}
+						throw pandErr;
+					}
+				}
+
+				// Log the increase
+				if (typeof logAuditEvent === "function") {
+					const huurder = huurderById.get(contract.huurderId);
+					const pand = pandById.get(contract.pandId);
+					logAuditEvent("update", "contracten", contract.id, {
+						description: `Huurverhoging ${increasePercent}%: €${oldPrice} -> €${newPrice} (${huurder ? `${huurder.voornaam} ${huurder.achternaam}` : ""}, ${pand ? pand.adres : ""})`,
+					});
+				}
+
+				processed++;
+			} catch (err) {
+				console.error(
+					"Rent increase failed for contract",
+					contract.id,
+					err,
+				);
+				failures.push({ contractId: contract.id, error: err.message });
+				// Continue with the rest of the batch instead of aborting
+			}
 		}
 
 		hideLoading();
-		showToast(
-			`${processed} contracten bijgewerkt met ${increasePercent}% huurverhoging`,
-			"success",
-		);
+		if (failures.length > 0) {
+			showToast(
+				`${processed} contracten bijgewerkt; ${failures.length} mislukt. Zie console voor details.`,
+				"warning",
+			);
+		} else {
+			showToast(
+				`${processed} contracten bijgewerkt met ${increasePercent}% huurverhoging`,
+				"success",
+			);
+		}
 
-		return { processed, increasePercent };
+		return { processed, failures, increasePercent };
 	} catch (error) {
 		hideLoading();
 		console.error("Error processing rent increase:", error);
@@ -114,10 +156,7 @@ async function previewRentIncrease() {
 
 	const eligible = contracten.filter((c) => {
 		const end = new Date(c.einddatum);
-		return (
-			end > now &&
-			!c.lastIncreaseYear?.toString().includes(currentYear.toString())
-		);
+		return end > now && Number(c.lastIncreaseYear) !== currentYear;
 	});
 
 	return eligible.map((c) => {

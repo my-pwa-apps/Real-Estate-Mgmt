@@ -1,7 +1,7 @@
-// Service Worker for Stadsgezicht Vastgoedbeheer PWA
+// Service Worker for ObjctMgmt PWA
 // Provides offline caching and PWA install support
 
-const CACHE_NAME = "stadsgezicht-v4";
+const CACHE_NAME = "objctmgmt-v5";
 
 // Compute base path to support subdirectory deployments (e.g., GitHub Pages /Real-Estate-Mgmt/)
 const BASE_PATH = self.location.pathname.replace(/sw\.js$/, "");
@@ -18,9 +18,10 @@ const STATIC_ASSETS = [
 	`${BASE_PATH}admin.html`,
 	`${BASE_PATH}css/styles.css`,
 	`${BASE_PATH}css/enhancements.css`,
-	`${BASE_PATH}images/stadsgezicht-logo.jpg`,
+	`${BASE_PATH}images/default-logo.svg`,
 	`${BASE_PATH}js/config.js`,
 	`${BASE_PATH}js/ui-utilities.js`,
+	`${BASE_PATH}js/branding.js`,
 	`${BASE_PATH}js/demo-data.js`,
 	`${BASE_PATH}js/entra-auth.js`,
 	`${BASE_PATH}js/db-helpers.js`,

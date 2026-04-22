@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' https://www.gstatic.com https://alcdn.msauth.net https://cdn.jsdelivr.net https://apis.google.com https://accounts.google.com https://*.google.com https://*.googleapis.com https://*.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://login.microsoftonline.com https://*.microsoft.com https://*.openai.azure.com wss://*.firebaseio.com; img-src 'self' data:; font-src 'self'; frame-src 'self' https://login.microsoftonline.com https://*.firebaseapp.com;"
+      content="default-src 'self'; script-src 'self' https://www.gstatic.com https://alcdn.msauth.net https://cdn.jsdelivr.net https://apis.google.com https://accounts.google.com https://*.google.com https://*.googleapis.com https://*.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://login.microsoftonline.com https://*.microsoft.com https://*.openai.azure.com https://*.workers.dev wss://*.firebaseio.com; img-src 'self' data: https:; font-src 'self'; frame-src 'self' https://login.microsoftonline.com https://*.firebaseapp.com;"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stadsgezicht Ontwikkelingen - Login</title>
+    <title>Login</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/enhancements.css" />
     <link rel="manifest" href="manifest.json" />
-    <link rel="icon" type="image/jpeg" href="images/stadsgezicht-logo.jpg" />
+    <link rel="icon" type="image/svg+xml" href="images/default-logo.svg" />
     <meta name="theme-color" content="#1e3a5f" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
   </head>
@@ -21,9 +21,10 @@
       <div class="login-box">
         <div class="logo-section">
           <img
-            src="images/stadsgezicht-logo.jpg"
-            alt="Stadsgezicht Ontwikkelingen"
+            src="images/default-logo.svg"
+            alt="ObjctMgmt"
             class="logo"
+            data-brand-logo
           />
           <p class="subtitle">Professioneel Vastgoedbeheer Platform</p>
         </div>
@@ -102,6 +103,7 @@
     <!-- App Scripts -->
     <script src="js/config.js"></script>
     <script src="js/ui-utilities.js"></script>
+    <script src="js/branding.js"></script>
     <script src="js/demo-data.js"></script>
     <script src="js/entra-auth.js"></script>
     <script src="js/login.js"></script>

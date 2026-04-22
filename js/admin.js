@@ -179,10 +179,10 @@ function loadUsersList() {
 
 // Load admin emails
 async function loadAdminEmails() {
-	const defaultEmails = [
-		"admin@stadsgezicht.onmicrosoft.com",
-		"beheer@stadsgezicht.nl",
-	];
+	// Fall back to whatever the active branding declares; no tenant-specific
+	// addresses are baked into the codebase.
+	const brandingDefaults =
+		typeof getBranding === "function" ? getBranding().adminEmails || [] : [];
 	try {
 		const fbEmails = await dbGet("settings", "adminEmails");
 		if (fbEmails?.emails) {
@@ -194,7 +194,7 @@ async function loadAdminEmails() {
 		console.warn("Failed to load admin emails from Firebase", e);
 	}
 	const savedEmails = localStorage.getItem("adminEmails");
-	const emails = savedEmails ? JSON.parse(savedEmails) : defaultEmails;
+	const emails = savedEmails ? JSON.parse(savedEmails) : brandingDefaults;
 	document.getElementById("adminEmailsList").value = emails.join("\n");
 }
 
@@ -315,6 +315,9 @@ function setupEventListeners() {
 	document
 		.getElementById("importDemoData")
 		.addEventListener("click", importDemoData);
+
+	// Branding tab
+	initBrandingTab();
 }
 
 // Save settings
@@ -676,3 +679,185 @@ async function loadAuditLogEntries() {
 }
 
 window.loadAuditLogEntries = loadAuditLogEntries;
+
+
+// ============================================
+// BRANDING / HUISSTIJL TAB
+// ============================================
+
+function initBrandingTab() {
+const form = document.getElementById("brandingForm");
+if (!form) return;
+
+populateBrandingForm();
+
+const fileInput = document.getElementById("brandingLogoFile");
+if (fileInput) {
+fileInput.addEventListener("change", handleLogoFileChange);
+}
+
+const resetBtn = document.getElementById("resetBrandingBtn");
+if (resetBtn) {
+resetBtn.addEventListener("click", handleResetBranding);
+}
+
+form.addEventListener("submit", handleBrandingSubmit);
+
+// Refresh from server when tab is opened
+const tabBtn = document.querySelector('.tab-btn[data-tab="branding"]');
+if (tabBtn) {
+tabBtn.addEventListener("click", async () => {
+if (typeof loadBranding === "function") {
+await loadBranding();
+populateBrandingForm();
+}
+});
+}
+}
+
+function populateBrandingForm() {
+if (typeof getBranding !== "function") return;
+const b = getBranding();
+const set = (id, val) => {
+const el = document.getElementById(id);
+if (el) el.value = val ?? "";
+};
+set("brandingAppName", b.appName);
+set("brandingCompanyName", b.companyName);
+set("brandingTagline", b.tagline);
+set("brandingLogoUrl", b.logoUrl);
+set("brandingPrimaryColor", b.primaryColor);
+set("brandingAccentColor", b.accentColor);
+set("brandingSupportEmail", b.supportEmail);
+set("brandingCompanyPhone", b.companyPhone);
+set("brandingCompanyAddress", b.companyAddress);
+set("brandingCompanyWebsite", b.companyWebsite);
+set("brandingCompanyIban", b.companyIban);
+
+const adminEmailsTxt = document.getElementById("brandingAdminEmails");
+if (adminEmailsTxt) {
+adminEmailsTxt.value = Array.isArray(b.adminEmails)
+? b.adminEmails.join("\n")
+: "";
+}
+
+const preview = document.getElementById("brandingLogoPreview");
+if (preview && b.logoUrl) preview.src = b.logoUrl;
+}
+
+async function handleLogoFileChange(e) {
+const file = e.target.files?.[0];
+if (!file) return;
+
+// Validate type and size
+const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
+if (!allowed.includes(file.type)) {
+showToast("Ongeldig bestandstype. Gebruik JPG, PNG, WebP, GIF of SVG.", "error");
+e.target.value = "";
+return;
+}
+const MAX_BYTES = 2 * 1024 * 1024;
+if (file.size > MAX_BYTES) {
+showToast("Bestand te groot (max 2 MB).", "error");
+e.target.value = "";
+return;
+}
+
+// Show local preview immediately
+const preview = document.getElementById("brandingLogoPreview");
+const reader = new FileReader();
+reader.onload = (ev) => {
+if (preview) preview.src = ev.target.result;
+const urlField = document.getElementById("brandingLogoUrl");
+if (urlField) urlField.value = ev.target.result;
+};
+reader.readAsDataURL(file);
+
+// Try uploading to Cloudflare if available
+if (typeof uploadLogo === "function") {
+try {
+showLoading("Logo uploaden...");
+const url = await uploadLogo(file);
+hideLoading();
+if (url) {
+const urlField = document.getElementById("brandingLogoUrl");
+if (urlField) urlField.value = url;
+if (preview) preview.src = url;
+showToast("Logo geüpload", "success");
+}
+} catch (err) {
+hideLoading();
+console.warn("Upload to Cloudflare failed, using inline data URL", err);
+showToast("Upload naar server mislukt; gebruik 'Opslaan' om data-URL te bewaren.", "info");
+}
+}
+}
+
+async function handleBrandingSubmit(e) {
+e.preventDefault();
+const get = (id) => document.getElementById(id)?.value?.trim() ?? "";
+
+const adminEmailsRaw = document.getElementById("brandingAdminEmails")?.value ?? "";
+const adminEmails = adminEmailsRaw
+.split(/\r?\n/)
+.map((s) => s.trim())
+.filter((s) => s && /\S+@\S+\.\S+/.test(s));
+
+const updates = {
+appName: get("brandingAppName"),
+companyName: get("brandingCompanyName"),
+tagline: get("brandingTagline"),
+logoUrl: get("brandingLogoUrl"),
+primaryColor: get("brandingPrimaryColor"),
+accentColor: get("brandingAccentColor"),
+supportEmail: get("brandingSupportEmail"),
+companyPhone: get("brandingCompanyPhone"),
+companyAddress: get("brandingCompanyAddress"),
+companyWebsite: get("brandingCompanyWebsite"),
+companyIban: get("brandingCompanyIban"),
+adminEmails,
+};
+
+if (!updates.appName || !updates.companyName) {
+showToast("Applicatienaam en bedrijfsnaam zijn verplicht", "error");
+return;
+}
+
+try {
+showLoading("Huisstijl opslaan...");
+if (typeof saveBranding === "function") {
+await saveBranding(updates);
+}
+if (typeof applyBranding === "function") applyBranding();
+hideLoading();
+showToast("Huisstijl opgeslagen", "success");
+} catch (err) {
+hideLoading();
+console.error("Save branding failed", err);
+showToast("Opslaan mislukt: " + (err?.message || "onbekende fout"), "error");
+}
+}
+
+async function handleResetBranding() {
+if (!confirm("Weet u zeker dat u de huisstijl wilt resetten naar de standaardwaarden?")) {
+return;
+}
+try {
+showLoading("Resetten...");
+if (typeof window.resetBranding === "function") {
+await window.resetBranding();
+} else {
+localStorage.removeItem("tenantBranding");
+if (typeof loadBranding === "function") await loadBranding();
+}
+populateBrandingForm();
+if (typeof applyBranding === "function") applyBranding();
+hideLoading();
+showToast("Huisstijl gereset", "success");
+} catch (err) {
+hideLoading();
+showToast("Reset mislukt", "error");
+}
+}
+
+window.initBrandingTab = initBrandingTab;

@@ -1,5 +1,41 @@
 // Audit Trail - Tracks all data modifications with user, timestamp, and action details
 
+const AUDIT_BUFFER_KEY = "auditLogPendingBuffer";
+const AUDIT_BUFFER_MAX = 200;
+
+function readAuditBuffer() {
+	try {
+		const raw = localStorage.getItem(AUDIT_BUFFER_KEY);
+		return raw ? JSON.parse(raw) : [];
+	} catch (_) {
+		return [];
+	}
+}
+
+function writeAuditBuffer(entries) {
+	try {
+		// Cap to avoid unbounded localStorage growth
+		const trimmed = entries.slice(-AUDIT_BUFFER_MAX);
+		localStorage.setItem(AUDIT_BUFFER_KEY, JSON.stringify(trimmed));
+	} catch (_) {
+		// Quota or serialization failure - drop silently to avoid breaking the app
+	}
+}
+
+async function flushAuditBuffer() {
+	const pending = readAuditBuffer();
+	if (pending.length === 0) return;
+	const remaining = [];
+	for (const entry of pending) {
+		try {
+			await dbAdd("auditLog", entry);
+		} catch (_) {
+			remaining.push(entry);
+		}
+	}
+	writeAuditBuffer(remaining);
+}
+
 /**
  * Log an audit event to the auditLog collection
  * @param {string} action - create|update|delete|login|logout|export|email
@@ -8,26 +44,33 @@
  * @param {object} details - Additional details (old values, new values, description)
  */
 async function logAuditEvent(action, entityType, entityId, details = {}) {
-	try {
-		const user = getCurrentAuditUser();
-		const auditEntry = {
-			action,
-			entityType,
-			entityId: entityId || null,
-			userId: user.id,
-			userName: user.name,
-			userEmail: user.email,
-			timestamp: Date.now(),
-			dateFormatted: new Date().toISOString(),
-			details: details.description || "",
-			changes: details.changes || null,
-			ipAddress: null, // Not available in client-side SPA
-		};
+	const user = getCurrentAuditUser();
+	const auditEntry = {
+		action,
+		entityType,
+		entityId: entityId || null,
+		userId: user.id,
+		userName: user.name,
+		userEmail: user.email,
+		timestamp: Date.now(),
+		dateFormatted: new Date().toISOString(),
+		details: details.description || "",
+		changes: details.changes || null,
+		ipAddress: null, // Not available in client-side SPA
+	};
 
+	try {
 		await dbAdd("auditLog", auditEntry);
+		// Opportunistically flush any previously buffered entries
+		flushAuditBuffer().catch(() => {});
 	} catch (error) {
-		// Don't let audit logging failures break the app
-		console.warn("Audit log failed:", error);
+		// Don't let audit logging failures break the app, but DO buffer the
+		// entry so we can retry on the next successful write rather than
+		// silently losing the audit record.
+		console.warn("Audit log failed, buffering for retry:", error);
+		const pending = readAuditBuffer();
+		pending.push(auditEntry);
+		writeAuditBuffer(pending);
 	}
 }
 
@@ -39,7 +82,7 @@ function getCurrentAuditUser() {
 		return {
 			id: "demo",
 			name: "Demo Gebruiker",
-			email: "demo@stadsgezicht.nl",
+			email: "demo@local",
 		};
 	}
 	if (window.currentUser) {

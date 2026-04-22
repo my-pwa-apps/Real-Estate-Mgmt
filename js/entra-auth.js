@@ -237,11 +237,10 @@ function getUserRole(account) {
 		return account.idTokenClaims.extension_Role;
 	}
 
-	// Option 3: Hardcoded admin emails (for simple setup)
-	const adminEmails = [
-		"admin@stadsgezicht.onmicrosoft.com",
-		"beheer@stadsgezicht.nl",
-	];
+	// Option 3: Admin emails configured per-tenant via branding settings
+	const brandingAdmins =
+		typeof getBranding === "function" ? getBranding().adminEmails || [] : [];
+	const adminEmails = brandingAdmins.map((e) => String(e).toLowerCase());
 
 	if (adminEmails.includes(account.username.toLowerCase())) {
 		return USER_ROLES.ADMIN;
@@ -253,8 +252,11 @@ function getUserRole(account) {
 
 // Check if current user has specific role
 function hasRole(requiredRole) {
-	if (isDemoMode()) {
-		return true; // Demo mode has all permissions
+	// Demo bypass only applies when the active session is the demo user.
+	// Without this guard, a leftover demoMode flag combined with a real
+	// signed-in user would silently elevate that user to ADMIN in the UI.
+	if (isDemoMode() && (!window.currentUser || window.currentUser.isDemo)) {
+		return true;
 	}
 
 	if (!window.currentUser) {
@@ -337,16 +339,26 @@ async function getEntraAccessToken(scopes = ["User.Read"]) {
 
 // Get Firebase custom token from backend (for Firebase integration)
 async function getFirebaseToken() {
+	const idToken = window.currentUser?.idToken;
+
+	if (!idToken) {
+		throw new Error("No Entra ID token available");
+	}
+
+	// Backend exchange endpoint must be configured (e.g. an Azure Function
+	// that validates the Entra ID token and mints a Firebase custom token).
+	const backendUrl = window.AUTH_BACKEND_URL || null;
+	if (!backendUrl || backendUrl.includes("YOUR_BACKEND_URL")) {
+		// Fail loudly: silently returning the raw Entra ID token would
+		// bypass any custom-claims-based Firebase rules.
+		throw new Error(
+			"Firebase token exchange backend is not configured (window.AUTH_BACKEND_URL). " +
+				"Configure a backend that exchanges the Entra ID token for a Firebase custom token.",
+		);
+	}
+
 	try {
-		const idToken = window.currentUser?.idToken;
-
-		if (!idToken) {
-			throw new Error("No Entra ID token available");
-		}
-
-		// Call your backend endpoint to exchange Entra ID token for Firebase token
-		// This requires a backend function (Azure Function, Cloud Function, etc.)
-		const response = await fetch("YOUR_BACKEND_URL/auth/firebase-token", {
+		const response = await fetch(`${backendUrl}/auth/firebase-token`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -355,16 +367,14 @@ async function getFirebaseToken() {
 		});
 
 		if (!response.ok) {
-			throw new Error("Failed to get Firebase token");
+			throw new Error(`Failed to get Firebase token: ${response.status}`);
 		}
 
 		const data = await response.json();
 		return data.firebaseToken;
 	} catch (error) {
 		console.error("Error getting Firebase token:", error);
-		// For now, we'll use Entra ID token directly
-		// Firebase rules will need to be updated to validate Entra ID tokens
-		return window.currentUser?.idToken;
+		throw error;
 	}
 }
 
@@ -378,7 +388,7 @@ function enableDemoMode() {
 	localStorage.setItem("demoMode", "true");
 	window.currentUser = {
 		id: "demo-user",
-		email: "demo@stadsgezicht.nl",
+		email: "demo@local",
 		name: "Demo Gebruiker",
 		role: USER_ROLES.ADMIN, // Demo has full access
 		isDemo: true,

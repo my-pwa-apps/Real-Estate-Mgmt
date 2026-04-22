@@ -174,7 +174,9 @@ function openMicrosoftCopilot(customPrompt) {
 	let prompt = customPrompt || "";
 
 	if (!prompt) {
-		prompt = `Ik gebruik een vastgoedbeheer applicatie (Stadsgezicht Vastgoedbeheer). Ik kijk momenteel naar de "${context.title}" pagina. Kun je me helpen begrijpen wat ik zie en advies geven?`;
+		const appName =
+			typeof getBranding === "function" ? getBranding().appName : "deze app";
+		prompt = `Ik gebruik een vastgoedbeheer applicatie (${appName}). Ik kijk momenteel naar de "${context.title}" pagina. Kun je me helpen begrijpen wat ik zie en advies geven?`;
 	}
 
 	// Append visible page context
@@ -462,7 +464,10 @@ function addPageContextMeta() {
 		document.head.appendChild(descMeta);
 	}
 	descMeta.content =
-		pageDescriptions[page] || "Stadsgezicht Vastgoedbeheer Platform";
+		pageDescriptions[page] ||
+		(typeof getBranding === "function"
+			? `${getBranding().appName} Platform`
+			: "Vastgoedbeheer Platform");
 
 	// Add structured data annotation for the page
 	let ldJsonScript = document.getElementById("pageContextLD");
@@ -475,7 +480,10 @@ function addPageContextMeta() {
 	ldJsonScript.textContent = JSON.stringify({
 		"@context": "https://schema.org",
 		"@type": "WebApplication",
-		name: "Stadsgezicht Vastgoedbeheer",
+		name:
+			typeof getBranding === "function"
+				? getBranding().appName
+				: "Vastgoedbeheer",
 		applicationCategory: "BusinessApplication",
 		description: pageDescriptions[page] || "",
 		operatingSystem: "Web",
@@ -603,6 +611,7 @@ async function sendCopilotMessage() {
 
 		copilotChatHistory.push({ role: "user", content: message });
 		copilotChatHistory.push({ role: "assistant", content: response });
+		trimCopilotHistory();
 	} catch (error) {
 		const typingEl = document.getElementById("copilotTyping");
 		if (typingEl) typingEl.remove();
@@ -677,7 +686,7 @@ async function callAzureOpenAI(message, file) {
 	const messages = [
 		{
 			role: "system",
-			content: `Je bent een AI-assistent voor Stadsgezicht Vastgoedbeheer, een vastgoedbeheerapplicatie. 
+			content: `Je bent een AI-assistent voor ${typeof getBranding === "function" ? getBranding().appName : "deze"} vastgoedbeheerapplicatie. 
 Je helpt de beheerder met vragen over panden, huurders, contracten, onderhoud en financiën.
 Antwoord altijd in het Nederlands. Wees beknopt maar grondig.
 
@@ -1135,11 +1144,22 @@ function generateHelpResponse() {
 }
 
 function formatCopilotResponse(text) {
-	// Convert markdown-like formatting to HTML
-	return text
+	// SECURITY: Sanitize first to prevent XSS, then apply safe markdown-like formatting
+	if (text === null || text === undefined) return "";
+	const escaped = sanitizeHTML(String(text));
+	return escaped
 		.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-		.replace(/\n/g, "<br>")
-		.replace(/^- /gm, "- ");
+		.replace(/\*(.*?)\*/g, "<em>$1</em>")
+		.replace(/`([^`]+)`/g, "<code>$1</code>")
+		.replace(/\n/g, "<br>");
+}
+
+// Maximum number of chat history messages to retain (cost + latency control)
+const COPILOT_HISTORY_MAX = 30;
+function trimCopilotHistory() {
+	if (copilotChatHistory.length > COPILOT_HISTORY_MAX) {
+		copilotChatHistory = copilotChatHistory.slice(-COPILOT_HISTORY_MAX);
+	}
 }
 
 async function gatherAppContext() {

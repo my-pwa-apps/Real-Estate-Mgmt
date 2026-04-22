@@ -105,10 +105,10 @@ const emailTemplates = {
             <p>Graag het contract ondertekend retourneren.</p>
             
             <p>Met vriendelijke groet,<br>
-            <strong>Stadsgezicht Ontwikkelingen en Beheer</strong><br>
-            Stadionkade 94, 1076 BL Amsterdam<br>
-            T: 020 47 00 965<br>
-            E: info@stadsgezicht.nl</p>
+            <strong>{{company.name}}</strong><br>
+            {{company.address}}<br>
+            T: {{company.phone}}<br>
+            E: {{company.email}}</p>
         `,
 		isHtml: true,
 	},
@@ -129,7 +129,7 @@ const emailTemplates = {
             <p>Voor vragen kunt u contact met ons opnemen.</p>
             
             <p>Met vriendelijke groet,<br>
-            <strong>Stadsgezicht Ontwikkelingen en Beheer</strong></p>
+            <strong>{{company.name}}</strong></p>
         `,
 		isHtml: true,
 	},
@@ -148,7 +148,7 @@ const emailTemplates = {
             <p>We nemen zo spoedig mogelijk contact met u op om een afspraak te maken.</p>
             
             <p>Met vriendelijke groet,<br>
-            <strong>Stadsgezicht Ontwikkelingen en Beheer</strong></p>
+            <strong>{{company.name}}</strong></p>
         `,
 		isHtml: true,
 	},
@@ -167,7 +167,7 @@ const emailTemplates = {
             <p>Zorg ervoor dat u aanwezig bent of dat iemand anders thuis is.</p>
             
             <p>Met vriendelijke groet,<br>
-            <strong>Stadsgezicht Ontwikkelingen en Beheer</strong></p>
+            <strong>{{company.name}}</strong></p>
         `,
 		isHtml: true,
 	},
@@ -183,24 +183,24 @@ const emailTemplates = {
             <strong>Betalingstermijn:</strong> {{maand}}</p>
             
             <p>Graag de betaling zo spoedig mogelijk overmaken naar:<br>
-            IBAN: NL00 BANK 0000 0000 00<br>
-            T.n.v.: Stadsgezicht Ontwikkelingen en Beheer B.V.<br>
+            IBAN: {{company.iban}}<br>
+            T.n.v.: {{company.name}}<br>
             O.v.v.: Huur {{pand.adres}} - {{maand}}</p>
             
             <p>Heeft u al betaald? Dan kunt u deze herinnering negeren.</p>
             
             <p>Met vriendelijke groet,<br>
-            <strong>Stadsgezicht Ontwikkelingen en Beheer</strong></p>
+            <strong>{{company.name}}</strong></p>
         `,
 		isHtml: true,
 	},
 
 	welkom_nieuwe_huurder: {
-		subject: "Welkom bij Stadsgezicht - {{pand.adres}}",
+		subject: "Welkom als huurder - {{pand.adres}}",
 		body: `
             <p>Beste {{huurder.voornaam}},</p>
             
-            <p>Van harte welkom als nieuwe huurder bij Stadsgezicht!</p>
+            <p>Van harte welkom als nieuwe huurder bij {{company.name}}!</p>
             
             <p>U huurt vanaf <strong>{{contract.startdatum}}</strong> het pand aan <strong>{{pand.adres}}, {{pand.postcode}} {{pand.plaats}}</strong>.</p>
             
@@ -208,8 +208,7 @@ const emailTemplates = {
             <ul>
                 <li><strong>Huurprijs:</strong> €{{contract.huurprijs}} per maand</li>
                 <li><strong>Betalingsdatum:</strong> {{contract.betalingsdatum}}e van de maand</li>
-                <li><strong>Contact voor vragen:</strong> info@stadsgezicht.nl of 020 47 00 965</li>
-                <li><strong>Spoed (buiten kantooruren):</strong> 06 XX XX XX XX</li>
+                <li><strong>Contact voor vragen:</strong> {{company.email}} of {{company.phone}}</li>
             </ul>
             
             <p><strong>Bij problemen of onderhoud:</strong><br>
@@ -218,11 +217,11 @@ const emailTemplates = {
             <p>Wij wensen u veel woonplezier toe!</p>
             
             <p>Met vriendelijke groet,<br>
-            <strong>Stadsgezicht Ontwikkelingen en Beheer</strong><br>
-            Stadionkade 94, 1076 BL Amsterdam<br>
-            T: 020 47 00 965<br>
-            E: info@stadsgezicht.nl<br>
-            W: www.stadsgezicht.nl</p>
+            <strong>{{company.name}}</strong><br>
+            {{company.address}}<br>
+            T: {{company.phone}}<br>
+            E: {{company.email}}<br>
+            W: {{company.website}}</p>
         `,
 		isHtml: true,
 	},
@@ -233,6 +232,22 @@ function fillEmailTemplate(templateName, data) {
 	const template = emailTemplates[templateName];
 	if (!template) {
 		throw new Error(`Template ${templateName} not found`);
+	}
+
+	// Inject company info from branding so templates can use {{company.name}} etc.
+	if (typeof getBranding === "function" && !data.company) {
+		const b = getBranding();
+		data = {
+			...data,
+			company: {
+				name: b.companyName || b.appName || "",
+				email: b.supportEmail || "",
+				phone: b.companyPhone || "",
+				address: b.companyAddress || "",
+				iban: b.companyIban || "",
+				website: b.companyWebsite || "",
+			},
+		};
 	}
 
 	let subject = template.subject;

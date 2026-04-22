@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' https://www.gstatic.com https://alcdn.msauth.net https://cdn.jsdelivr.net https://apis.google.com https://accounts.google.com https://*.google.com https://*.googleapis.com https://*.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://login.microsoftonline.com https://*.microsoft.com https://*.openai.azure.com wss://*.firebaseio.com; img-src 'self' data:; font-src 'self'; frame-src 'self' https://login.microsoftonline.com https://*.firebaseapp.com;"
+      content="default-src 'self'; script-src 'self' https://www.gstatic.com https://alcdn.msauth.net https://cdn.jsdelivr.net https://apis.google.com https://accounts.google.com https://*.google.com https://*.googleapis.com https://*.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://login.microsoftonline.com https://*.microsoft.com https://*.openai.azure.com https://*.workers.dev wss://*.firebaseio.com; img-src 'self' data: https:; font-src 'self'; frame-src 'self' https://login.microsoftonline.com https://*.firebaseapp.com;"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - Stadsgezicht Ontwikkelingen</title>
+    <title>Admin</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/enhancements.css" />
     <link rel="manifest" href="manifest.json" />
-    <link rel="icon" type="image/jpeg" href="images/stadsgezicht-logo.jpg" />
+    <link rel="icon" type="image/svg+xml" href="images/default-logo.svg" />
     <meta name="theme-color" content="#1e3a5f" />
   </head>
   <body>
@@ -20,9 +20,10 @@
       <aside class="sidebar">
         <div class="sidebar-header">
           <img
-            src="images/stadsgezicht-logo.jpg"
-            alt="Stadsgezicht"
+            src="images/default-logo.svg"
+            alt="ObjctMgmt"
             class="sidebar-logo"
+            data-brand-logo
           />
         </div>
 
@@ -489,6 +490,34 @@
                 <path d="M14 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"></path>
               </svg>
               Demo Modus
+            </button>
+            <button
+              class="tab-btn"
+              data-tab="branding"
+              role="tab"
+              aria-selected="false"
+              aria-controls="brandingTab"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="lucide-icon"
+                aria-hidden="true"
+                width="1em"
+                height="1em"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                fill="none"
+              >
+                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
+                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
+                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+              </svg>
+              Huisstijl
             </button>
           </div>
 
@@ -1284,6 +1313,112 @@
               </button>
             </div>
           </div>
+
+          <!-- Branding Tab -->
+          <div id="brandingTab" class="tab-content" role="tabpanel" aria-labelledby="brandingTabBtn">
+            <div class="section-header">
+              <h2>Huisstijl &amp; Logo</h2>
+              <p class="section-subtitle">Pas de naam, logo en kleuren van de applicatie aan voor uw organisatie.</p>
+            </div>
+
+            <form id="brandingForm" class="settings-form" autocomplete="off">
+              <fieldset>
+                <legend>Identiteit</legend>
+
+                <div class="form-row">
+                  <label for="brandingAppName">Applicatienaam</label>
+                  <input type="text" id="brandingAppName" name="appName" maxlength="50" required />
+                </div>
+
+                <div class="form-row">
+                  <label for="brandingCompanyName">Bedrijfsnaam</label>
+                  <input type="text" id="brandingCompanyName" name="companyName" maxlength="100" required />
+                </div>
+
+                <div class="form-row">
+                  <label for="brandingTagline">Slogan / Ondertitel</label>
+                  <input type="text" id="brandingTagline" name="tagline" maxlength="120" />
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Logo</legend>
+
+                <div class="logo-preview-wrapper">
+                  <img id="brandingLogoPreview" src="images/default-logo.svg" alt="Logo preview" style="max-height:96px;max-width:240px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:8px;" />
+                </div>
+
+                <div class="form-row">
+                  <label for="brandingLogoFile">Upload nieuw logo</label>
+                  <input type="file" id="brandingLogoFile" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" />
+                  <small>Ondersteunde formaten: JPG, PNG, WebP, GIF, SVG. Max 2 MB.</small>
+                </div>
+
+                <div class="form-row">
+                  <label for="brandingLogoUrl">Of plak een URL</label>
+                  <input type="url" id="brandingLogoUrl" name="logoUrl" placeholder="https://..." />
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Kleuren</legend>
+
+                <div class="form-row">
+                  <label for="brandingPrimaryColor">Primaire kleur</label>
+                  <input type="color" id="brandingPrimaryColor" name="primaryColor" value="#1e3a5f" />
+                </div>
+
+                <div class="form-row">
+                  <label for="brandingAccentColor">Accentkleur</label>
+                  <input type="color" id="brandingAccentColor" name="accentColor" value="#c69c6d" />
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Bedrijfsgegevens (voor email-templates)</legend>
+
+                <div class="form-row">
+                  <label for="brandingSupportEmail">Contact e-mailadres</label>
+                  <input type="email" id="brandingSupportEmail" name="supportEmail" />
+                </div>
+
+                <div class="form-row">
+                  <label for="brandingCompanyPhone">Telefoon</label>
+                  <input type="tel" id="brandingCompanyPhone" name="companyPhone" />
+                </div>
+
+                <div class="form-row">
+                  <label for="brandingCompanyAddress">Adres</label>
+                  <input type="text" id="brandingCompanyAddress" name="companyAddress" />
+                </div>
+
+                <div class="form-row">
+                  <label for="brandingCompanyWebsite">Website</label>
+                  <input type="url" id="brandingCompanyWebsite" name="companyWebsite" placeholder="https://..." />
+                </div>
+
+                <div class="form-row">
+                  <label for="brandingCompanyIban">IBAN</label>
+                  <input type="text" id="brandingCompanyIban" name="companyIban" placeholder="NL00 BANK 0000 0000 00" />
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Beheerders</legend>
+
+                <div class="form-row">
+                  <label for="brandingAdminEmails">Admin e-mailadressen (één per regel)</label>
+                  <textarea id="brandingAdminEmails" name="adminEmails" rows="4" placeholder="admin@example.com"></textarea>
+                  <small>Gebruikers met deze e-mailadressen krijgen automatisch de ADMIN-rol.</small>
+                </div>
+              </fieldset>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-primary" id="saveBrandingBtn">Opslaan</button>
+                <button type="button" class="btn-secondary" id="resetBrandingBtn">Herstel standaard</button>
+              </div>
+            </form>
+          </div>
         </div>
       </main>
     </div>
@@ -1298,6 +1433,7 @@
 
     <script src="js/config.js"></script>
     <script src="js/ui-utilities.js"></script>
+    <script src="js/branding.js"></script>
     <script src="js/demo-data.js"></script>
     <script src="js/entra-auth.js"></script>
     <script src="js/db-helpers.js"></script>
