@@ -383,7 +383,7 @@ async function saveInvoiceToDatabase(invoice, contractId, huurderId) {
 		customer: invoice.customer,
 		notes: invoice.notes,
 		createdAt: new Date().toISOString(),
-		createdBy: firebase.auth().currentUser?.email || "system",
+		createdBy: window.currentUser?.email || "system",
 	};
 
 	const id = await dbAdd("invoices", invoiceRecord);

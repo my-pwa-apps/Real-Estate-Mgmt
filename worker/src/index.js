@@ -268,6 +268,179 @@ async function handleTenantPut(request, env, user) {
 	return json({ ok: true }, 200, request, env);
 }
 
+// --- Generic entity DB (D1) -------------------------------------------------
+// Replaces Firebase Realtime Database. One row per entity, JSON blob for the
+// schemaless payload. Tenant isolation comes from the validated JWT `tid`
+// claim (or "demo" for demo-mode tokens).
+
+const COLLECTION_RE = /^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/;
+const ID_RE = /^[a-zA-Z0-9_-]{1,128}$/;
+
+function ensureDb(request, env) {
+	if (!env.DB) {
+		return json(
+			{ error: "D1 database is not enabled on this Worker." },
+			503,
+			request,
+			env,
+		);
+	}
+	return null;
+}
+
+function tenantOf(user) {
+	return user.tid || (user.demo ? "demo" : "default");
+}
+
+function generateId() {
+	// 22-char URL-safe random ID. Globally unique enough for our use cases.
+	const bytes = new Uint8Array(16);
+	crypto.getRandomValues(bytes);
+	let s = "";
+	for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+	return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function rowToObject(row) {
+	if (!row) return null;
+	const data = JSON.parse(row.data);
+	return { id: row.id, ...data };
+}
+
+async function handleDbList(request, env, user) {
+	const guard = ensureDb(request, env);
+	if (guard) return guard;
+	const url = new URL(request.url);
+	const collection = url.searchParams.get("c");
+	const id = url.searchParams.get("id");
+	if (!collection || !COLLECTION_RE.test(collection)) {
+		return json({ error: "invalid collection" }, 400, request, env);
+	}
+	const tenant = tenantOf(user);
+
+	if (id) {
+		if (!ID_RE.test(id)) {
+			return json({ error: "invalid id" }, 400, request, env);
+		}
+		const row = await env.DB.prepare(
+			"SELECT id, data FROM entities WHERE tenant_id=? AND collection=? AND id=?",
+		)
+			.bind(tenant, collection, id)
+			.first();
+		return json(rowToObject(row), 200, request, env);
+	}
+
+	const result = await env.DB.prepare(
+		"SELECT id, data FROM entities WHERE tenant_id=? AND collection=? ORDER BY updated_at DESC",
+	)
+		.bind(tenant, collection)
+		.all();
+	return json(
+		(result.results || []).map(rowToObject),
+		200,
+		request,
+		env,
+	);
+}
+
+async function handleDbCreate(request, env, user) {
+	const guard = ensureDb(request, env);
+	if (guard) return guard;
+	if (user.roles.includes("VIEWER")) {
+		return json({ error: "VIEWER role cannot write" }, 403, request, env);
+	}
+	const url = new URL(request.url);
+	const collection = url.searchParams.get("c");
+	if (!collection || !COLLECTION_RE.test(collection)) {
+		return json({ error: "invalid collection" }, 400, request, env);
+	}
+	const body = await request.json();
+	if (!body || typeof body !== "object" || Array.isArray(body)) {
+		return json({ error: "body must be an object" }, 400, request, env);
+	}
+	const tenant = tenantOf(user);
+	const now = Date.now();
+	const id = generateId();
+	const payload = { ...body, createdAt: now, updatedAt: now };
+	delete payload.id;
+	await env.DB.prepare(
+		"INSERT INTO entities (tenant_id, collection, id, data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+	)
+		.bind(tenant, collection, id, JSON.stringify(payload), now, now)
+		.run();
+	return json({ id }, 200, request, env);
+}
+
+async function handleDbUpdate(request, env, user) {
+	const guard = ensureDb(request, env);
+	if (guard) return guard;
+	if (user.roles.includes("VIEWER")) {
+		return json({ error: "VIEWER role cannot write" }, 403, request, env);
+	}
+	const url = new URL(request.url);
+	const collection = url.searchParams.get("c");
+	const id = url.searchParams.get("id");
+	if (!collection || !COLLECTION_RE.test(collection)) {
+		return json({ error: "invalid collection" }, 400, request, env);
+	}
+	if (!id || !ID_RE.test(id)) {
+		return json({ error: "invalid id" }, 400, request, env);
+	}
+	const body = await request.json();
+	if (!body || typeof body !== "object" || Array.isArray(body)) {
+		return json({ error: "body must be an object" }, 400, request, env);
+	}
+	const tenant = tenantOf(user);
+	const now = Date.now();
+
+	// Upsert with merge semantics: existing top-level keys are kept unless
+	// overridden by `body`. Matches Firebase `update()` behaviour and the
+	// previous front-end contract.
+	const existing = await env.DB.prepare(
+		"SELECT data, created_at FROM entities WHERE tenant_id=? AND collection=? AND id=?",
+	)
+		.bind(tenant, collection, id)
+		.first();
+
+	const merged = existing
+		? { ...JSON.parse(existing.data), ...body, updatedAt: now }
+		: { ...body, createdAt: now, updatedAt: now };
+	delete merged.id;
+	const createdAt = existing ? existing.created_at : now;
+
+	await env.DB.prepare(
+		"INSERT INTO entities (tenant_id, collection, id, data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?) " +
+			"ON CONFLICT(tenant_id, collection, id) DO UPDATE SET data=excluded.data, updated_at=excluded.updated_at",
+	)
+		.bind(tenant, collection, id, JSON.stringify(merged), createdAt, now)
+		.run();
+	return json({ id, ok: true }, 200, request, env);
+}
+
+async function handleDbDelete(request, env, user) {
+	const guard = ensureDb(request, env);
+	if (guard) return guard;
+	if (user.roles.includes("VIEWER")) {
+		return json({ error: "VIEWER role cannot write" }, 403, request, env);
+	}
+	const url = new URL(request.url);
+	const collection = url.searchParams.get("c");
+	const id = url.searchParams.get("id");
+	if (!collection || !COLLECTION_RE.test(collection)) {
+		return json({ error: "invalid collection" }, 400, request, env);
+	}
+	if (!id || !ID_RE.test(id)) {
+		return json({ error: "invalid id" }, 400, request, env);
+	}
+	const tenant = tenantOf(user);
+	await env.DB.prepare(
+		"DELETE FROM entities WHERE tenant_id=? AND collection=? AND id=?",
+	)
+		.bind(tenant, collection, id)
+		.run();
+	return json({ id, deleted: true }, 200, request, env);
+}
+
 // --- Router ------------------------------------------------------------------
 const ROUTES = [
 	{ method: "POST", path: "/ai/chat", auth: true, handler: handleAiChat },
@@ -290,6 +463,11 @@ const ROUTES = [
 	// the logo before the user signs in.
 	{ method: "GET", path: "/tenant/branding", auth: false, handler: handleTenantGet },
 	{ method: "PUT", path: "/tenant/branding", auth: true, handler: handleTenantPut },
+	// Generic entity DB (replaces Firebase Realtime Database).
+	{ method: "GET", path: "/db", auth: true, handler: handleDbList },
+	{ method: "POST", path: "/db", auth: true, handler: handleDbCreate },
+	{ method: "PUT", path: "/db", auth: true, handler: handleDbUpdate },
+	{ method: "DELETE", path: "/db", auth: true, handler: handleDbDelete },
 ];
 
 export default {

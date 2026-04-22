@@ -21,6 +21,16 @@ binding = "TENANT_SETTINGS"
 id = "ab3b52af2f014f6eb518523674f7ebe0"
 preview_id = "e859571f4c5e43f5af60d85fa7fecd9a"
 
+# D1 database for entity data (panden, huurders, contracten, onderhoud, etc.).
+# Provision once with:
+#   npx wrangler d1 create objctmgmt-db
+#   npx wrangler d1 execute objctmgmt-db --remote --file=schema.sql
+# Then paste the returned database_id below.
+[[d1_databases]]
+binding = "DB"
+database_name = "objctmgmt-db"
+database_id = "956d5923-637d-4f52-bda5-85638f21478a"
+
 [vars]
 # Allowed origins for CORS. Override per environment with `wrangler deploy --var`.
 ALLOWED_ORIGINS = "http://localhost:8000,http://127.0.0.1:8000,https://my-pwa-apps.github.io"

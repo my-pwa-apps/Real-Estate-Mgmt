@@ -1,41 +1,48 @@
-// Database Helper Functions for Firebase Realtime Database
-// Helper functions to work with Firebase Realtime Database
-// Automatically uses demo data when in demo mode
+// Database Helper Functions
+// Talks to the objctmgmt-api Cloudflare Worker (D1-backed entity store).
+// In demo mode all calls are routed to the in-memory localStorage demo DB
+// instead, so the rest of the app code remains storage-agnostic.
 
-// Enable Firebase offline persistence
-try {
-	if (typeof database !== "undefined" && database && database.ref) {
-		database.ref(".info/connected").on("value", (snap) => {
-			if (snap.val() === true) {
-				console.log("Firebase: Connected");
-			} else {
-				console.log("Firebase: Offline - using cached data");
-			}
-		});
-	}
-} catch (e) {
-	/* silently handle if Firebase not initialized */
+function getApiBase() {
+	return (
+		window.OBJCTMGMT_API_BASE ||
+		"https://objctmgmt-api.garfieldapp.workers.dev"
+	).replace(/\/+$/, "");
 }
 
-// Get all items from a path
-async function dbGetAll(path) {
-	// Use demo database if in demo mode
-	if (typeof isDemoMode === "function" && isDemoMode()) {
-		const demoHelpers = getDemoDbHelpers();
-		return demoHelpers.dbGetAll(path);
+async function apiFetch(path, opts = {}) {
+	const base = getApiBase();
+	const headers = new Headers(opts.headers || {});
+	const token = window.currentUser?.accessToken;
+	if (token) headers.set("Authorization", `Bearer ${token}`);
+	if (opts.body && !headers.has("Content-Type")) {
+		headers.set("Content-Type", "application/json");
 	}
-
+	const res = await fetch(`${base}${path}`, { ...opts, headers });
+	let body = null;
 	try {
-		const snapshot = await database.ref(path).once("value");
-		const data = snapshot.val();
+		body = await res.json();
+	} catch (_) {
+		// non-JSON response
+	}
+	if (!res.ok) {
+		const msg = body?.error || `HTTP ${res.status}`;
+		const detail = body?.detail ? `: ${body.detail}` : "";
+		throw new Error(`${msg}${detail}`);
+	}
+	return body;
+}
 
-		if (!data) return [];
+function dbInDemoMode() {
+	return typeof isDemoMode === "function" && isDemoMode();
+}
 
-		// Convert object to array with ids
-		return Object.keys(data).map((key) => ({
-			id: key,
-			...data[key],
-		}));
+// Get all items from a collection
+async function dbGetAll(path) {
+	if (dbInDemoMode()) return getDemoDbHelpers().dbGetAll(path);
+	try {
+		const data = await apiFetch(`/db?c=${encodeURIComponent(path)}`);
+		return Array.isArray(data) ? data : [];
 	} catch (error) {
 		console.error(`Error getting all from ${path}:`, error);
 		throw error;
@@ -44,64 +51,44 @@ async function dbGetAll(path) {
 
 // Get single item by id
 async function dbGet(path, id) {
-	// Use demo database if in demo mode
-	if (typeof isDemoMode === "function" && isDemoMode()) {
-		const demoHelpers = getDemoDbHelpers();
-		return demoHelpers.dbGet(path, id);
-	}
-
+	if (dbInDemoMode()) return getDemoDbHelpers().dbGet(path, id);
 	try {
-		const snapshot = await database.ref(`${path}/${id}`).once("value");
-		const data = snapshot.val();
-
-		if (!data) return null;
-
-		return { id, ...data };
+		const data = await apiFetch(
+			`/db?c=${encodeURIComponent(path)}&id=${encodeURIComponent(id)}`,
+		);
+		return data || null;
 	} catch (error) {
 		console.error(`Error getting ${path}/${id}:`, error);
 		throw error;
 	}
 }
 
-// Add new item
+// Add new item (auto-generated id)
 async function dbAdd(path, data) {
-	// Use demo database if in demo mode
-	if (typeof isDemoMode === "function" && isDemoMode()) {
-		const demoHelpers = getDemoDbHelpers();
-		return demoHelpers.dbAdd(path, data);
-	}
-
+	if (dbInDemoMode()) return getDemoDbHelpers().dbAdd(path, data);
 	try {
-		const timestamp = Date.now();
-		const itemData = {
-			...data,
-			createdAt: timestamp,
-			updatedAt: timestamp,
-		};
-
-		const newRef = await database.ref(path).push(itemData);
-		return newRef.key;
+		const res = await apiFetch(`/db?c=${encodeURIComponent(path)}`, {
+			method: "POST",
+			body: JSON.stringify(data || {}),
+		});
+		return res?.id;
 	} catch (error) {
 		console.error(`Error adding to ${path}:`, error);
 		throw error;
 	}
 }
 
-// Update existing item
+// Update existing item (merges top-level keys, upserts if missing)
 async function dbUpdate(path, id, data) {
-	// Use demo database if in demo mode
-	if (typeof isDemoMode === "function" && isDemoMode()) {
-		const demoHelpers = getDemoDbHelpers();
-		return demoHelpers.dbUpdate(path, id, data);
-	}
-
+	if (dbInDemoMode()) return getDemoDbHelpers().dbUpdate(path, id, data);
 	try {
-		const updateData = {
-			...data,
-			updatedAt: Date.now(),
-		};
-
-		await database.ref(`${path}/${id}`).update(updateData);
+		await apiFetch(
+			`/db?c=${encodeURIComponent(path)}&id=${encodeURIComponent(id)}`,
+			{
+				method: "PUT",
+				body: JSON.stringify(data || {}),
+			},
+		);
 		return true;
 	} catch (error) {
 		console.error(`Error updating ${path}/${id}:`, error);
@@ -111,14 +98,12 @@ async function dbUpdate(path, id, data) {
 
 // Delete item
 async function dbDelete(path, id) {
-	// Use demo database if in demo mode
-	if (typeof isDemoMode === "function" && isDemoMode()) {
-		const demoHelpers = getDemoDbHelpers();
-		return demoHelpers.dbDelete(path, id);
-	}
-
+	if (dbInDemoMode()) return getDemoDbHelpers().dbDelete(path, id);
 	try {
-		await database.ref(`${path}/${id}`).remove();
+		await apiFetch(
+			`/db?c=${encodeURIComponent(path)}&id=${encodeURIComponent(id)}`,
+			{ method: "DELETE" },
+		);
 		return true;
 	} catch (error) {
 		console.error(`Error deleting ${path}/${id}:`, error);
@@ -126,44 +111,32 @@ async function dbDelete(path, id) {
 	}
 }
 
-// Query items with filter
+// Query items with simple filter (client-side over the full collection).
+// Kept for backward compatibility with the previous Firebase-style API.
 async function dbQuery(path, orderByChild, equalTo) {
-	// Use demo database if in demo mode
-	if (typeof isDemoMode === "function" && isDemoMode()) {
-		const demoHelpers = getDemoDbHelpers();
-		return demoHelpers.dbQuery(path, {
+	if (dbInDemoMode()) {
+		return getDemoDbHelpers().dbQuery(path, {
 			orderBy: orderByChild,
-			where: equalTo ? [orderByChild, "==", equalTo] : null,
+			where: equalTo !== undefined ? [orderByChild, "==", equalTo] : null,
 		});
 	}
-
-	try {
-		let query = database.ref(path);
-
-		if (orderByChild) {
-			query = query.orderByChild(orderByChild);
-		}
-
-		if (equalTo !== undefined) {
-			query = query.equalTo(equalTo);
-		}
-
-		const snapshot = await query.once("value");
-		const data = snapshot.val();
-
-		if (!data) return [];
-
-		return Object.keys(data).map((key) => ({
-			id: key,
-			...data[key],
-		}));
-	} catch (error) {
-		console.error(`Error querying ${path}:`, error);
-		throw error;
+	const all = await dbGetAll(path);
+	let filtered = all;
+	if (orderByChild && equalTo !== undefined) {
+		filtered = all.filter((item) => item[orderByChild] === equalTo);
 	}
+	if (orderByChild) {
+		filtered = [...filtered].sort((a, b) => {
+			const av = a[orderByChild];
+			const bv = b[orderByChild];
+			if (av === bv) return 0;
+			return av < bv ? -1 : 1;
+		});
+	}
+	return filtered;
 }
 
-// Export functions
+// Export
 window.dbGetAll = dbGetAll;
 window.dbGet = dbGet;
 window.dbAdd = dbAdd;

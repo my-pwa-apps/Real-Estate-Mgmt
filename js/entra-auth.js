@@ -340,47 +340,6 @@ async function getEntraAccessToken(scopes = ["User.Read"]) {
 	}
 }
 
-// Get Firebase custom token from backend (for Firebase integration)
-async function getFirebaseToken() {
-	const idToken = window.currentUser?.idToken;
-
-	if (!idToken) {
-		throw new Error("No Entra ID token available");
-	}
-
-	// Backend exchange endpoint must be configured (e.g. an Azure Function
-	// that validates the Entra ID token and mints a Firebase custom token).
-	const backendUrl = window.AUTH_BACKEND_URL || null;
-	if (!backendUrl || backendUrl.includes("YOUR_BACKEND_URL")) {
-		// Fail loudly: silently returning the raw Entra ID token would
-		// bypass any custom-claims-based Firebase rules.
-		throw new Error(
-			"Firebase token exchange backend is not configured (window.AUTH_BACKEND_URL). " +
-				"Configure a backend that exchanges the Entra ID token for a Firebase custom token.",
-		);
-	}
-
-	try {
-		const response = await fetch(`${backendUrl}/auth/firebase-token`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${idToken}`,
-			},
-		});
-
-		if (!response.ok) {
-			throw new Error(`Failed to get Firebase token: ${response.status}`);
-		}
-
-		const data = await response.json();
-		return data.firebaseToken;
-	} catch (error) {
-		console.error("Error getting Firebase token:", error);
-		throw error;
-	}
-}
-
 // Demo mode detection
 function isDemoMode() {
 	return localStorage.getItem("demoMode") === "true";
@@ -411,7 +370,6 @@ window.signInWithEntraId = signInWithEntraId;
 window.handleEntraRedirect = handleEntraRedirect;
 window.signOutEntraId = signOutEntraId;
 window.getEntraAccessToken = getEntraAccessToken;
-window.getFirebaseToken = getFirebaseToken;
 window.hasRole = hasRole;
 window.isAdmin = isAdmin;
 window.getUserRole = getUserRole;

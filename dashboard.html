@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' https://www.gstatic.com https://alcdn.msauth.net https://cdn.jsdelivr.net https://apis.google.com https://accounts.google.com https://*.google.com https://*.googleapis.com https://*.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://login.microsoftonline.com https://*.microsoft.com https://*.openai.azure.com https://*.workers.dev wss://*.firebaseio.com; img-src 'self' data: https:; font-src 'self'; frame-src 'self' https://login.microsoftonline.com https://*.firebaseapp.com;"
+      content="default-src 'self'; script-src 'self' https://alcdn.msauth.net https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://login.microsoftonline.com https://*.microsoft.com https://*.openai.azure.com https://*.workers.dev; img-src 'self' data: https:; font-src 'self'; frame-src 'self' https://login.microsoftonline.com;"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
@@ -497,11 +497,6 @@
         </section>
       </main>
     </div>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" integrity="sha384-yuGdyIzzYtOBlBG6JOWn+Ey9kpq7HocusNuxEGyyohr1eEyXpeEyehIIXC/hznw4" crossorigin="anonymous"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" integrity="sha384-lI+CxEx/bCvWP1b0OK13j5HTrTZP7yf1xle8TVOFq2smz6KC1RChTarRV/RHP5PP" crossorigin="anonymous"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js" integrity="sha384-M6AmjBRXEjkdGzRN1Y94xtkmblFbYBSLkqzyZ8rPvpRM2c48nhjIRFXVvUM/VATL" crossorigin="anonymous"></script>
 
     <!-- MSAL.js for Microsoft 365 -->
     <script src="https://alcdn.msauth.net/browser/2.38.1/js/msal-browser.min.js" integrity="sha384-R+wLLONYXDy1SoHBdEDjMHWlX/SFBEPbEYP1Xy1cwm3qFwuIiL2TUWCp1VfmmAA1" crossorigin="anonymous"></script>
