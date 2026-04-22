@@ -17,7 +17,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 			return;
 		}
 	} catch (error) {
-		console.error("Error initializing auth:", error);
+		// "Not configured" is expected on a fresh install or in demo mode.
+		if (error?.message?.includes("nog niet geconfigureerd")) {
+			console.info("Entra ID not configured – demo mode is still available.");
+		} else {
+			console.error("Error initializing auth:", error);
+		}
 	}
 
 	// Check if already logged in
