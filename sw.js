@@ -1,7 +1,7 @@
 // Service Worker for ObjctMgmt PWA
 // Provides offline caching and PWA install support
 
-const CACHE_NAME = "objctmgmt-v6";
+const CACHE_NAME = "objctmgmt-v7";
 
 // Compute base path to support subdirectory deployments (e.g., GitHub Pages /Real-Estate-Mgmt/)
 const BASE_PATH = self.location.pathname.replace(/sw\.js$/, "");

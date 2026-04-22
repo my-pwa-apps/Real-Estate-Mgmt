@@ -122,8 +122,11 @@ async function checkEntraAuth() {
 			console.error("Error checking Entra auth:", error);
 		}
 
-		// Don't redirect if in demo mode
-		if (!isDemoMode()) {
+		// Don't redirect if in demo mode or already on login page (prevents reload loop)
+		const onLoginPage =
+			window.location.pathname.includes("index.html") ||
+			window.location.pathname.endsWith("/");
+		if (!isDemoMode() && !onLoginPage) {
 			window.location.href = "index.html";
 		}
 		return null;
